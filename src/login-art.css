@@ -1,0 +1,79 @@
+/* MR-ART-v1 image assets. Keep form controls as accessible, selectable HTML. */
+.auth-page {
+  background: linear-gradient(#08131724, #08131760), url('/assets/ui/login-background-v001.webp') center / cover no-repeat;
+  background-attachment: scroll;
+  padding: 0;
+  height: 100dvh;
+  min-height: 0;
+  overflow: hidden;
+}
+.ambient { display: none; }
+.auth-wrap {
+  width: min(calc(100% - 16px), 400px);
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%) scale(var(--auth-scale, 1));
+  transform-origin: center;
+}
+.topline { text-shadow: 0 1px 5px #000; color: #d8d5bf; }
+.auth-card {
+  isolation: isolate;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  padding: 38px 38px 48px;
+}
+.auth-card::before {
+  content: '';
+  position: absolute;
+  inset: 24px 18px;
+  z-index: -1;
+  background: #101b1eed;
+  box-shadow: 0 16px 60px #0008;
+}
+.auth-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  border: 48px solid transparent;
+  border-image-source: url('/assets/ui/login-frame-v001.webp');
+  border-image-slice: 100 64 100 64;
+  border-image-width: 48px 34px;
+  border-image-repeat: stretch;
+}
+.brand { padding: 0; }
+.brand-logo { display: block; width: 100%; height: auto; max-width: 230px; margin: 0 auto; }
+.welcome { margin-bottom: 8px; }
+.welcome h1 { font-size: 16px; margin-bottom: 0; }
+.welcome p, .topline, .page-footer { display: none; }
+.mode-switch { margin-bottom: 10px; }
+.mode-switch button { padding: 7px 5px; }
+.field { margin-bottom: 8px; }
+.confirm-slot[aria-hidden="true"] { visibility: hidden; }
+/* Reserve the same rows for both modes, errors and async provider feedback. */
+#form-error, #form-error:not(:empty) { height: 54px; margin: 0 0 8px; }
+#google-status { height: 42px; }
+.field label { margin-bottom: 4px; }
+.field input { height: 38px; padding: 8px 10px; }
+.reveal { top: 2px; }
+.primary, .guest { padding: 9px 12px; }
+.divider { margin: 10px 0; }
+.providers { gap: 6px; }
+.providers > button { height: 34px; }
+.provider-note { margin: 4px 0; line-height: 1.4; }
+#google-status { margin-bottom: 8px; }
+.guest-hint { margin: 5px 0 8px; }
+.card-bottom { padding-top: 8px; }
+.field small { line-height: 1.6; }
+.local-note, .page-footer { color: #c0cabe; text-shadow: 0 1px 4px #000; }
+.local-note { margin-top: 8px; }
+@media (max-width: 480px) {
+  .auth-card { padding: 34px 30px 44px; }
+  .auth-card::before { inset: 22px 16px; }
+  .auth-card::after { border-image-width: 44px 28px; }
+  .welcome h1 { font-size: 16px; }
+  .topline { font-size: 9px; }
+}

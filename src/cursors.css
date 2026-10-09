@@ -1,0 +1,13 @@
+/* MR-ART-v1: native image cursors, with standard fallbacks and measured tip hotspots. */
+@media (any-hover: hover) and (any-pointer: fine) {
+  :root {
+    --cursor-default: url('/assets/ui/cursors/cursor-default-v001.png') 5 3, auto;
+    --cursor-pointer: url('/assets/ui/cursors/cursor-pointer-v001.png') 14 2, pointer;
+  }
+  html, body, .auth-page, .game-page, #game canvas { cursor: var(--cursor-default); }
+  button:not(:disabled), select:not(:disabled), a[href], [role='button']:not([aria-disabled='true']) {
+    cursor: var(--cursor-pointer);
+  }
+  input:not(:disabled), textarea:not(:disabled), [contenteditable='true'] { cursor: text; }
+  button:disabled, select:disabled, input:disabled, [aria-disabled='true'] { cursor: not-allowed; }
+}

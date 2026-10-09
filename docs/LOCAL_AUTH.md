@@ -1,9 +1,12 @@
 # Local login prototype
 
-หน้าแรกมี login / register, Guest และตัวเลือกภาษาไทย/อังกฤษ ภาพตกแต่งเป็น CSS และตัวอักษร ไม่มีภาพ raster ความละเอียดสูงหรือ third-party font โหลดเข้ามา
+หน้าแรกมี login / register, Guest และตัวเลือกภาษาไทย/อังกฤษ ใช้ภาพ WebP จริงสำหรับโลโก้ ฉากหลัง และกรอบจาก public/assets/ui ส่วน input และปุ่มเป็น HTML เพื่อให้ใช้งานคีย์บอร์ดและมือถือได้ กรอบใช้ภาพแบ่ง 9 ส่วนเพื่อยืดตามฟอร์ม
+
+ต้นฉบับ PNG, prompt และ metadata อยู่ใน art/source/ui/login-v001 สร้างไฟล์ WebP ซ้ำได้ด้วย `node scripts/export-login-art.mjs`
 
 ## Features
-- สมัครด้วย username 3–16 ตัว a-z/0-9/_ (normalize lowercase), password อย่างน้อย 8 ตัว และ confirmation
+- สมัครด้วย username 3–16 ตัว A–Z/a–z/0–9/_ (normalize lowercase), password อย่างน้อย 8 ตัว และ confirmation
+- Password รับเฉพาะ visible ASCII: อักษรอังกฤษ ตัวเลข และสัญลักษณ์ ไม่รับภาษาไทยหรือช่องว่าง ทั้งการพิมพ์ วาง และ IME; เมื่อกรอกไม่ถูกต้องจะคืนค่าก่อนหน้าและแจ้งข้อผิดพลาด ไม่ตัดบางส่วนของ password ทิ้งเงียบ ๆ
 - เข้าเกมหลังสมัคร/ล็อกอินสำเร็จ และกลับหน้า login เมื่อออกจากเกม
 - Guest จำ identity บน browser เดิม รวมทั้งหลัง logout; active session กลับเข้าเกมเมื่อ reload
 - Session/บัญชีแยกตาม origin; 127.0.0.1 กับ localhost และพอร์ตต่างกันเป็น storage คนละชุด

@@ -1,5 +1,61 @@
 import { test, expect } from '@playwright/test';
 
+test('ASCII account fields reject Thai, paste and IME without silently changing passwords', async ({page}) => {
+  await page.goto('/');
+  await page.selectOption('#language','en');
+  await page.getByRole('button',{name:'Create account',exact:true}).click();
+  const username=page.locator('#username'), password=page.locator('#password'), confirm=page.locator('#confirm');
+  await username.fill('Player_123');
+  await username.pressSequentially('ไทย');
+  await expect(username).toHaveValue('Player_123');
+  await expect(username).toHaveAttribute('aria-invalid','true');
+  await password.fill('Good!Pass123');
+  await password.evaluate((input: HTMLInputElement) => {
+    input.dispatchEvent(new InputEvent('beforeinput',{inputType:'insertFromPaste',data:'ไทย'}));
+    input.value+='ไทย';
+    input.dispatchEvent(new InputEvent('input',{bubbles:true,inputType:'insertFromPaste',data:'ไทย'}));
+  });
+  await expect(password).toHaveValue('Good!Pass123');
+  await expect(page.locator('#form-error')).toContainText('No Thai or spaces');
+  await confirm.fill('Good!Pass123');
+  await confirm.evaluate((input: HTMLInputElement) => {
+    input.dispatchEvent(new CompositionEvent('compositionstart'));
+    input.value+='ก';
+    input.dispatchEvent(new InputEvent('input',{isComposing:true}));
+    input.dispatchEvent(new CompositionEvent('compositionend',{data:'ก'}));
+  });
+  await expect(confirm).toHaveValue('Good!Pass123');
+  await password.fill('Good Pass123');
+  await expect(password).toHaveValue('Good!Pass123');
+  await page.selectOption('#language','th');
+  await password.fill('ไทย');
+  await expect(password).toHaveValue('Good!Pass123');
+  await page.getByRole('button',{name:'สมัครและเข้าเกม',exact:true}).click();
+  await expect(page.locator('#game canvas')).toBeVisible();
+});
+
+test('submit and account adapter reject invalid values even when input events are bypassed', async ({page}) => {
+  await page.goto('/');
+  await page.selectOption('#language','en');
+  await page.locator('#username').fill('tester');
+  await page.locator('#password').evaluate((input: HTMLInputElement)=>{input.value='passwordไทย';});
+  await page.getByRole('button',{name:'Enter the world',exact:true}).click();
+  await expect(page.locator('#form-error')).toContainText('No Thai or spaces');
+  const codes=await page.evaluate(async()=>{
+    const modulePath='/src/auth/local-auth.ts';
+    const auth=await import(modulePath);
+    const result=[];
+    for(const method of ['login','register']) {
+      for(const [name,password] of [['ทดสอบ','Password!1'],['tester','Passwordไทย']]) {
+        try { await auth[method](name,password); result.push('accepted'); }
+        catch(error) { result.push((error as {code:string}).code); }
+      }
+    }
+    return result;
+  });
+  expect(codes).toEqual(['invalidUsername','invalidPasswordCharacters','invalidUsername','invalidPasswordCharacters']);
+});
+
 test('registration, validation, logout, login and saved session', async ({ page }) => {
   const errors: string[] = [];
   page.on('pageerror', error => errors.push(error.message));
@@ -60,6 +116,7 @@ test('mobile form preserves input on language switch and providers are unavailab
   await page.setViewportSize({width:390,height:844});
   await page.goto('/');
   await page.locator('#username').fill('traveler');
+  await expect(page.locator('.brand-logo')).toHaveJSProperty('naturalWidth',640);
   await page.locator('#password').fill('some-test-pass');
   await page.selectOption('#language','en');
   await expect(page.locator('#username')).toHaveValue('traveler');
@@ -70,6 +127,11 @@ test('mobile form preserves input on language switch and providers are unavailab
   await page.screenshot({path:'test-results/login-mobile.png',fullPage:true});
   await page.setViewportSize({width:1440,height:1000});
   await page.screenshot({path:'test-results/login-desktop.png',fullPage:true});
+  await page.setViewportSize({width:320,height:700});
+  await page.selectOption('#language','th');
+  await page.getByRole('button',{name:'สร้างบัญชี',exact:true}).click();
+  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
+  await page.screenshot({path:'test-results/register-mobile.png',fullPage:true});
 });
 
 test('configured Google button forwards a credential and uses the server identity (mocked provider)',async({page})=>{

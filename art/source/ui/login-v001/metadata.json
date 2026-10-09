@@ -1,0 +1,54 @@
+[
+  {
+    "styleId": "MR-ART-v1",
+    "assetId": "mythraven-logo",
+    "revision": "v001",
+    "status": "reviewed",
+    "sourcePath": "art\\source\\ui\\login-v001\\mythraven-logo-v001.png",
+    "exportPath": "public\\assets\\ui\\mythraven-logo-v001.webp",
+    "promptPath": "art/source/ui/login-v001/PROMPTS.md",
+    "references": [],
+    "generationTool": "built-in image_gen (previous turn)",
+    "width": 640,
+    "height": 320,
+    "bytes": 237584,
+    "hasTransparency": true
+  },
+  {
+    "styleId": "MR-ART-v1",
+    "assetId": "login-background",
+    "revision": "v001",
+    "status": "reviewed",
+    "sourcePath": "art\\source\\ui\\login-v001\\login-background-v001.png",
+    "exportPath": "public\\assets\\ui\\login-background-v001.webp",
+    "promptPath": "art/source/ui/login-v001/PROMPTS.md",
+    "references": [],
+    "generationTool": "built-in image_gen (previous turn)",
+    "width": 1280,
+    "height": 720,
+    "bytes": 79472,
+    "hasTransparency": false
+  },
+  {
+    "styleId": "MR-ART-v1",
+    "assetId": "login-frame",
+    "revision": "v001",
+    "status": "reviewed",
+    "sourcePath": "art\\source\\ui\\login-v001\\login-frame-v001.png",
+    "exportPath": "public\\assets\\ui\\login-frame-v001.webp",
+    "promptPath": "art/source/ui/login-v001/PROMPTS.md",
+    "references": [],
+    "generationTool": "built-in image_gen (previous turn)",
+    "width": 512,
+    "height": 768,
+    "bytes": 243548,
+    "hasTransparency": true,
+    "nineSlicePx": [
+      100,
+      64,
+      100,
+      64
+    ],
+    "centerFill": false
+  }
+]

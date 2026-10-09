@@ -1,9 +1,10 @@
 /** LOCAL DEMO ONLY. Browser records are editable, not a trusted authentication boundary.
  * Replace this adapter with a server-backed service before multiplayer or deployment.
  */
+import { validUsername, validPasswordCharacters, MAX_PASSWORD_LENGTH } from './input-policy';
 export interface Session { id: string; username: string; kind: 'account' | 'guest' | 'google'; }
 interface Account { username: string; salt: string; hash: string; }
-export type AuthErrorCode = 'invalidUsername' | 'shortPassword' | 'duplicate' | 'credentials' | 'storage' | 'unavailable';
+export type AuthErrorCode = 'invalidUsername' | 'invalidPasswordCharacters' | 'shortPassword' | 'longPassword' | 'duplicate' | 'credentials' | 'storage' | 'unavailable';
 export class AuthError extends Error { constructor(public code: AuthErrorCode) { super(code); } }
 const ACCOUNTS = 'mr.demo.accounts.v1', SESSION = 'mr.demo.session.v1', GUEST = 'mr.demo.guest.v1';
 function read(key: string): unknown {
@@ -37,8 +38,10 @@ export function logout(): void {
   try { localStorage.removeItem(SESSION); } catch { throw new AuthError('storage'); }
 }
 export async function register(username: string, password: string): Promise<Session> {
-  username = username.trim().toLowerCase();
-  if (!/^[a-z0-9_]{3,16}$/.test(username)) throw new AuthError('invalidUsername');
+  if (password.length > MAX_PASSWORD_LENGTH) throw new AuthError('longPassword');
+  if (!validUsername(username)) throw new AuthError('invalidUsername');
+  username = username.toLowerCase();
+  if (!validPasswordCharacters(password)) throw new AuthError('invalidPasswordCharacters');
   if (password.length < 8) throw new AuthError('shortPassword');
   if (!globalThis.crypto?.subtle) throw new AuthError('unavailable');
   if (accounts().some(a => a.username === username)) throw new AuthError('duplicate');
@@ -53,6 +56,10 @@ export async function register(username: string, password: string): Promise<Sess
   return session;
 }
 export async function login(username: string,password: string): Promise<Session> {
+  if (password.length > MAX_PASSWORD_LENGTH) throw new AuthError('longPassword');
+  if (!validUsername(username)) throw new AuthError('invalidUsername');
+  if (!validPasswordCharacters(password)) throw new AuthError('invalidPasswordCharacters');
+  if (password.length < 8) throw new AuthError('shortPassword');
   const account = accounts().find(a => a.username === username.trim().toLowerCase());
   if (!account || await derive(password,account.salt) !== account.hash) throw new AuthError('credentials');
   const session: Session = {id:crypto.randomUUID(),username:account.username,kind:'account'};

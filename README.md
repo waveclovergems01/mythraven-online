@@ -1,6 +1,6 @@
 # Mythraven Online
 
-ต้นแบบเกมเว็บ Phaser + TypeScript + Vite สำหรับรันบนเครื่อง ใช้ภาพ placeholder ที่วาดจากโค้ด
+ต้นแบบเกมเว็บ Phaser + TypeScript + Vite สำหรับรันบนเครื่อง หน้า login ใช้ภาพแฟนตาซีที่สร้างด้วย AI ส่วนฉากเกมยังใช้ภาพ placeholder ที่วาดจากโค้ด
 
 ## เริ่มเล่นบน local
 
@@ -12,7 +12,7 @@ npm.cmd install
 npm.cmd run dev
 ```
 
-เปิด URL ที่ terminal แสดง ปกติคือ http://127.0.0.1:5173 ถ้าพอร์ตไม่ว่าง Vite จะเลือกพอร์ตถัดไป เปิด terminal ค้างไว้ระหว่างเล่น หยุดด้วย Ctrl+C ครั้งต่อไปใช้ npm.cmd run dev ได้เลย
+เปิด http://localhost:5173 สำหรับ Google sign-in พอร์ต 5173 เป็น strictPort เพื่อให้ตรงกับ OAuth origins หากไม่ว่างต้องปิด dev server เดิมก่อน เปิด terminal ค้างไว้ระหว่างเล่น หยุดด้วย Ctrl+C ครั้งต่อไปใช้ npm.cmd run dev ได้เลย
 
 ใช้ npm.cmd เพื่อหลีกเลี่ยงปัญหา PowerShell บล็อก npm.ps1 โดยไม่ต้องเปลี่ยน execution policy
 
@@ -63,7 +63,12 @@ npm.cmd run dev -- --host 0.0.0.0
 ภาพต้นแบบที่ผู้ใช้ส่งเก็บไว้ใน [visual references](docs/art/references/README.md) ยังไม่มี approved master ของ Mythraven และภาพ procedural ในฉากทดลองไม่ใช่มาตรฐานภาพจริง
 ## หน้าเข้าสู่ระบบ
 
+เมาส์ใช้ภาพ PNG แฟนตาซี 40×40: ลูกศรปกติและมือเกราะเมื่อชี้ปุ่ม รองรับเมาส์บนหน้าเว็บและ canvas เกม ช่องข้อความคง text cursor และปุ่ม disabled คง not-allowed; ปุ่ม Google ใน iframe และหน้าต่างเลือกบัญชีใช้ cursor ของ Google
+ไฟล์อยู่ใน public/assets/ui/cursors กติกา CSS อยู่ใน src/cursors.css ต้นฉบับและ prompt อยู่ใน [Cursor artwork](art/source/ui/cursors-v001/PROMPTS.md) สร้าง export ซ้ำด้วย `node scripts/export-cursors.mjs`
+
 เปิดหน้าเว็บแล้วเลือกเข้าสู่ระบบ สมัครบัญชีทดลอง หรือ Guest ได้ สลับไทย/อังกฤษจากเมนูภาษา
+ชื่อผู้ใช้รับ A–Z/a–z/0–9/_ จำนวน 3–16 ตัว รหัสผ่านรับอักษรอังกฤษ ตัวเลข และสัญลักษณ์ ASCII อย่างน้อย 8 ตัว ไม่รับภาษาไทยหรือช่องว่าง
+ภาพโลโก้ ฉากหลัง และกรอบอยู่ใน public/assets/ui ต้นฉบับและ prompt อยู่ใน [Login artwork](art/source/ui/login-v001/PROMPTS.md) สร้าง WebP ซ้ำด้วย `node scripts/export-login-art.mjs`
 Guest และ session จำเฉพาะ browser/origin นี้; ออกจากเกมเพื่อกลับหน้าบัญชี
 Google เชื่อมผ่าน GIS และ server verification แล้ว แต่ต้องตั้ง Client ID ของคุณก่อน ตาม [Google Auth Setup](docs/GOOGLE_AUTH_SETUP.md) ส่วนอีเมลอื่นยังไม่เปิดใช้ รายละเอียดบัญชีทดลองอยู่ใน [Local Auth](docs/LOCAL_AUTH.md)
 ทดสอบ flow ด้วย `npm.cmd run test:e2e` (ต้องมี Microsoft Edge)

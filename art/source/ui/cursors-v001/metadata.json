@@ -1,0 +1,44 @@
+[
+  {
+    "styleId": "MR-ART-v1",
+    "assetId": "cursor-default",
+    "revision": "v001",
+    "status": "reviewed",
+    "sourcePath": "art\\source\\ui\\cursors-v001\\cursor-default.png",
+    "exportPath": "public\\assets\\ui\\cursors\\cursor-default-v001.png",
+    "promptPath": "art/source/ui/cursors-v001/PROMPTS.md",
+    "references": [
+      "public/assets/ui/login-frame-v001.webp"
+    ],
+    "generationTool": "built-in image_gen",
+    "width": 40,
+    "height": 40,
+    "runtimeScale": 1,
+    "hotspotPx": [
+      5,
+      3
+    ],
+    "hasTransparency": true
+  },
+  {
+    "styleId": "MR-ART-v1",
+    "assetId": "cursor-pointer",
+    "revision": "v001",
+    "status": "reviewed",
+    "sourcePath": "art\\source\\ui\\cursors-v001\\cursor-pointer.png",
+    "exportPath": "public\\assets\\ui\\cursors\\cursor-pointer-v001.png",
+    "promptPath": "art/source/ui/cursors-v001/PROMPTS.md",
+    "references": [
+      "public/assets/ui/login-frame-v001.webp"
+    ],
+    "generationTool": "built-in image_gen",
+    "width": 40,
+    "height": 40,
+    "runtimeScale": 1,
+    "hotspotPx": [
+      14,
+      2
+    ],
+    "hasTransparency": true
+  }
+]
