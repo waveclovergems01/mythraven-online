@@ -55,3 +55,9 @@ npm.cmd run dev -- --host 0.0.0.0
 เลือก Phaser 3.90 แบบระบุเวอร์ชันเพื่อให้ฐาน API คงที่ ไม่ใช่ Phaser รุ่นล่าสุด
 ยังไม่รวมบัญชี multiplayer ฐานข้อมูล gem skill tree Electron หรือ deploy
 เก็บ package-lock.json ใน Git เมื่อต้องการนำโปรเจกต์ขึ้น repository
+
+## กติกาการสร้างภาพเกม
+
+ก่อน generate หรือเพิ่มภาพในเกม ให้อ่าน [Art Bible](docs/art/ART_BIBLE.md), [Asset / Sprite Spec](docs/art/ASSET_SPEC.md) และ [Prompt Templates](docs/art/PROMPT_TEMPLATES.md)
+ทุกประเภทใช้ style ID MR-ART-v1 เดียวกัน คำแนะนำอัตโนมัติของโปรเจกต์อยู่ใน [AGENTS.md](AGENTS.md)
+ภาพต้นแบบที่ผู้ใช้ส่งเก็บไว้ใน [visual references](docs/art/references/README.md) ยังไม่มี approved master ของ Mythraven และภาพ procedural ในฉากทดลองไม่ใช่มาตรฐานภาพจริง
