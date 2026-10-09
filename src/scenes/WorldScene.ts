@@ -1,4 +1,5 @@
 import Phaser from 'phaser';
+import { t } from '../i18n';
 
 /** Local movement sandbox. Artwork is procedural placeholder art. */
 export class WorldScene extends Phaser.Scene {
@@ -53,8 +54,8 @@ export class WorldScene extends Phaser.Scene {
     this.bodyArt = this.add.container(0,0,[character]);
     const label = this.add.text(0,-80,'Novice · Lv.1',{fontFamily:'Tahoma',fontSize:'12px',color:'#f4ecd0',stroke:'#20332e',strokeThickness:4}).setOrigin(0.5);
     this.player.add([shadow,ring,this.bodyArt,label]).setDepth(355);
-    this.add.text(24,22,'MYTHRAVEN / TRAINING GROUNDS',{fontFamily:'Georgia',fontSize:'14px',color:'#eee1b7',backgroundColor:'#21372d',padding:{x:14,y:10}}).setDepth(2000);
-    this.add.text(24,642,'LOCAL SESSION  •  SINGLE PLAYER',{fontFamily:'monospace',fontSize:'11px',color:'#c1d3ba'}).setDepth(2000);
+    this.add.text(24,22,t('worldTitle'),{fontFamily:'Georgia',fontSize:'14px',color:'#eee1b7',backgroundColor:'#21372d',padding:{x:14,y:10}}).setDepth(2000);
+    this.add.text(24,642,t('session'),{fontFamily:'monospace',fontSize:'11px',color:'#c1d3ba'}).setDepth(2000);
     this.cursors = this.input.keyboard!.createCursorKeys();
     this.keys = this.input.keyboard!.addKeys('W,A,S,D') as Record<string,Phaser.Input.Keyboard.Key>;
     this.input.on('pointerdown',(pointer: Phaser.Input.Pointer) => {

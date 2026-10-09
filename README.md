@@ -53,7 +53,7 @@ npm.cmd run dev -- --host 0.0.0.0
 - public/assets/ — ที่เก็บภาพและเสียงภายหลัง อ้าง URL ด้วย /assets/...
 
 เลือก Phaser 3.90 แบบระบุเวอร์ชันเพื่อให้ฐาน API คงที่ ไม่ใช่ Phaser รุ่นล่าสุด
-ยังไม่รวมบัญชี multiplayer ฐานข้อมูล gem skill tree Electron หรือ deploy
+มีบัญชีทดลองและ Guest ที่เก็บบนเบราว์เซอร์แล้ว ยังไม่รวมบัญชีบนเซิร์ฟเวอร์ multiplayer ฐานข้อมูล gem skill tree Electron หรือ deploy
 เก็บ package-lock.json ใน Git เมื่อต้องการนำโปรเจกต์ขึ้น repository
 
 ## กติกาการสร้างภาพเกม
@@ -61,3 +61,9 @@ npm.cmd run dev -- --host 0.0.0.0
 ก่อน generate หรือเพิ่มภาพในเกม ให้อ่าน [Art Bible](docs/art/ART_BIBLE.md), [Asset / Sprite Spec](docs/art/ASSET_SPEC.md) และ [Prompt Templates](docs/art/PROMPT_TEMPLATES.md)
 ทุกประเภทใช้ style ID MR-ART-v1 เดียวกัน คำแนะนำอัตโนมัติของโปรเจกต์อยู่ใน [AGENTS.md](AGENTS.md)
 ภาพต้นแบบที่ผู้ใช้ส่งเก็บไว้ใน [visual references](docs/art/references/README.md) ยังไม่มี approved master ของ Mythraven และภาพ procedural ในฉากทดลองไม่ใช่มาตรฐานภาพจริง
+## หน้าเข้าสู่ระบบ
+
+เปิดหน้าเว็บแล้วเลือกเข้าสู่ระบบ สมัครบัญชีทดลอง หรือ Guest ได้ สลับไทย/อังกฤษจากเมนูภาษา
+Guest และ session จำเฉพาะ browser/origin นี้; ออกจากเกมเพื่อกลับหน้าบัญชี
+Google และอีเมลยังไม่เชื่อม provider จริง รายละเอียดและข้อจำกัดอยู่ใน [Local Auth](docs/LOCAL_AUTH.md)
+ทดสอบ flow ด้วย `npm.cmd run test:e2e` (ต้องมี Microsoft Edge)

@@ -1,12 +1,112 @@
-import Phaser from 'phaser';
-import { WorldScene } from './scenes/WorldScene';
+import { AuthError, getSession, guest, login, logout, register, type Session } from './auth/local-auth';
+import { locale, locales, setLocale, t, type Locale, type MessageKey } from './i18n';
 import './style.css';
 
-new Phaser.Game({
-  type: Phaser.AUTO,
-  parent: 'game',
-  backgroundColor: '#243b36',
-  scale: { mode: Phaser.Scale.FIT, autoCenter: Phaser.Scale.CENTER_BOTH, width: 1120, height: 680 },
-  scene: [WorldScene],
-  render: { antialias: true },
-});
+const app = document.querySelector<HTMLDivElement>('#app')!;
+let mode: 'login' | 'register' = 'login';
+let errorKey: MessageKey | null = null;
+let game: import('phaser').Game | null = null;
+let viewVersion = 0;
+setLocale(locale());
+const brand = '<div class="brand-mark" aria-hidden="true"><span class="wing left"></span><span class="gem"></span><span class="wing right"></span></div><div class="wordmark">MYTHRAVEN</div><div class="wordmark-sub"><span></span>ONLINE<span></span></div>';
+
+function renderAuth(): void {
+  viewVersion++;
+  app.innerHTML = `<main class="auth-page">
+    <div class="ambient" aria-hidden="true"></div>
+    <div class="auth-wrap">
+      <div class="topline"><span class="tiny-star">✦</span> ${t('tagline')} <span class="tiny-star">✦</span></div>
+      <section class="auth-card" aria-labelledby="welcome">
+        <div class="corner tl"></div><div class="corner br"></div>
+        <header class="brand">${brand}</header>
+        <div class="welcome"><h1 id="welcome">${t('welcome')}</h1><p>${t('subtitle')}</p></div>
+        <div class="mode-switch" role="group" aria-label="${t('login')} / ${t('register')}">
+          <button type="button" data-mode="login" aria-pressed="${mode==='login'}">${t('login')}</button>
+          <button type="button" data-mode="register" aria-pressed="${mode==='register'}">${t('register')}</button>
+        </div>
+        <form id="auth-form" novalidate>
+          <div class="field"><label for="username">${t('username')}</label>
+          <input id="username" name="username" autocomplete="username" autocapitalize="none" spellcheck="false" maxlength="16" required aria-describedby="username-hint form-error">
+          <small id="username-hint">${t('usernameHint')}</small></div>
+          <div class="field"><label for="password">${t('password')}</label><div class="password-wrap">
+          <input id="password" name="password" type="password" autocomplete="${mode==='register'?'new-password':'current-password'}" required aria-describedby="password-hint form-error">
+          <button type="button" class="reveal" aria-controls="password" aria-pressed="false">${t('show')}</button></div>
+          <small id="password-hint">${mode==='register'?t('passwordHint'):''}</small></div>
+          ${mode==='register'?`<div class="field"><label for="confirm">${t('confirm')}</label><input id="confirm" name="confirm" type="password" autocomplete="new-password" required aria-describedby="form-error"></div>`:''}
+          <p id="form-error" class="error" role="alert">${errorKey?t(errorKey):''}</p>
+          <button class="primary" type="submit"><span>${t(mode==='login'?'enter':'create')}</span><span aria-hidden="true">→</span></button>
+        </form>
+        <div class="divider"><span></span>${t('or')}<span></span></div>
+        <div class="providers"><button type="button" disabled aria-describedby="provider-note"><span aria-hidden="true">G</span>${t('google')}</button>
+        <button type="button" disabled aria-describedby="provider-note"><span aria-hidden="true">✉</span>${t('email')}</button></div>
+        <p id="provider-note" class="provider-note">${t('providerNote')}</p>
+        <button type="button" class="guest" id="guest">${t('guest')} <span aria-hidden="true">↗</span></button>
+        <p class="guest-hint">${t('guestHint')}</p>
+        <div class="card-bottom"><span class="local-badge"><i></i>${t('local')}</span><label class="language"><span class="sr-only">${t('language')}</span><select id="language">${locales.map(l=>`<option value="${l.code}" ${l.code===locale()?'selected':''}>${l.label}</option>`).join('')}</select></label></div>
+      </section>
+      <p class="local-note">${t('localNote')}</p>
+      <p class="page-footer">${t('footer')}</p>
+    </div></main>`;
+  app.querySelectorAll<HTMLButtonElement>('[data-mode]').forEach(button => button.addEventListener('click',()=>{
+    mode = button.dataset.mode as typeof mode; errorKey = null; renderAuth(); app.querySelector<HTMLInputElement>('#username')!.focus();
+  }));
+  app.querySelector<HTMLSelectElement>('#language')!.addEventListener('change',event=>{
+    const form = new FormData(app.querySelector<HTMLFormElement>('form')!);
+    setLocale((event.target as HTMLSelectElement).value as Locale); renderAuth();
+    for (const [key,value] of form) { const input=app.querySelector<HTMLInputElement>(`[name="${key}"]`); if(input) input.value=String(value); }
+    app.querySelector<HTMLSelectElement>('#language')!.focus();
+  });
+  app.querySelector<HTMLButtonElement>('.reveal')!.addEventListener('click',event=>{
+    const input=app.querySelector<HTMLInputElement>('#password')!;
+    const show=input.type==='password'; input.type=show?'text':'password';
+    const button=event.currentTarget as HTMLButtonElement; button.textContent=t(show?'hide':'show'); button.setAttribute('aria-pressed',String(show));
+  });
+  app.querySelector<HTMLFormElement>('form')!.addEventListener('submit',async event=>{
+    event.preventDefault();
+    const form=event.currentTarget as HTMLFormElement;
+    const data=new FormData(form), username=String(data.get('username')??'').trim(), password=String(data.get('password')??'');
+    if(!/^[a-z0-9_]{3,16}$/i.test(username)) return showError('invalidUsername','username');
+    if(password.length<8) return showError('shortPassword','password');
+    if(mode==='register' && password!==data.get('confirm')) return showError('mismatch','confirm');
+    await runAuth(()=>mode==='register'?register(username,password):login(username,password));
+  });
+  app.querySelector('#guest')!.addEventListener('click',()=>void runAuth(async()=>guest()));
+}
+function showError(key: MessageKey, field?: string): void {
+  errorKey=key;
+  const error=app.querySelector('#form-error'); if(error) error.textContent=t(key);
+  app.querySelectorAll('[aria-invalid]').forEach(el=>el.removeAttribute('aria-invalid'));
+  if(field){ const input=app.querySelector<HTMLInputElement>('#'+field); input?.setAttribute('aria-invalid','true'); input?.focus(); }
+}
+async function runAuth(action:()=>Promise<Session>): Promise<void> {
+  const controls=Array.from(app.querySelectorAll<HTMLInputElement|HTMLButtonElement|HTMLSelectElement>('input,button,select'));
+  const originallyDisabled=controls.map(c=>c.disabled);
+  controls.forEach(c=>c.disabled=true);
+  const label=app.querySelector('.primary span'); if(label) label.textContent=t('busy');
+  try { const session=await action(); await showGame(session); }
+  catch(error) {
+    if(!app.querySelector('#auth-form')) renderAuth();
+    showError(error instanceof AuthError?error.code:'generic');
+  } finally {
+    controls.forEach((c,i)=>c.disabled=originallyDisabled[i]);
+    if(label) label.textContent=t(mode==='login'?'enter':'create');
+  }
+}
+async function showGame(session: Session): Promise<void> {
+  const version=++viewVersion;
+  app.innerHTML=`<main class="game-page"><header class="game-header"><div><div class="mini-brand">MYTHRAVEN <span>ONLINE</span></div><p>${t('training')} · <span id="player-name"></span></p></div><button class="leave" id="logout">${t('logout')}</button></header><div id="game" aria-label="${t('training')}"><p class="loading">${t('loading')}</p></div><footer class="game-footer"><span>${t('controls')}</span><span>${t('placeholder')}</span></footer></main>`;
+  app.querySelector('#player-name')!.textContent=session.username;
+  app.querySelector('#logout')!.addEventListener('click',()=>{
+    try { logout(); } catch { return; }
+    game?.destroy(true); game=null; errorKey=null; renderAuth();
+  });
+  const [{default:Phaser},{WorldScene}]=await Promise.all([import('phaser'),import('./scenes/WorldScene')]);
+  if(version!==viewVersion) return;
+  app.querySelector('.loading')?.remove();
+  game=new Phaser.Game({type:Phaser.AUTO,parent:'game',backgroundColor:'#243b36',
+    scale:{mode:Phaser.Scale.FIT,autoCenter:Phaser.Scale.CENTER_BOTH,width:1120,height:680},
+    scene:[WorldScene],render:{antialias:true}});
+}
+const session=getSession();
+if(session) void showGame(session).catch(()=>{renderAuth();showError('generic');});
+else renderAuth();
