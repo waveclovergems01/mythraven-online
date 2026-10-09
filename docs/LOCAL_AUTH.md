@@ -10,10 +10,10 @@
 - TH/EN dictionaries ใน src/i18n.ts; เพิ่ม dictionary และ entry ใน locales เมื่อต้องการภาษาใหม่
 - ทุกข้อความหน้า auth รวม validation/hints และ game shell แปลสองภาษา
 - Phaser โหลดแบบ dynamic หลังเข้าเกม จึงไม่โหลด engine หนักบนหน้าล็อกอิน
-- ปุ่ม Google / email disabled พร้อมข้อความอธิบาย ไม่จำลอง OAuth สำเร็จ
+- Google ใช้ GIS และ server verification เมื่อกำหนด Client ID; ดู GOOGLE_AUTH_SETUP.md ส่วน email อื่นยัง disabled
 
 ## Limits
-บัญชีนี้เป็น demo ใน browser ไม่ใช่ระบบยืนยันตัวตนจริง ไม่มี backend หรือการยืนยันอีเมล
+บัญชี username/password ในเอกสารนี้เป็น demo ใน browser ไม่ใช่ server authentication ส่วน Google เป็นเส้นทางแยกที่ตรวจ token จริงบน backend ตาม GOOGLE_AUTH_SETUP.md
 localStorage เก็บ salted PBKDF2 SHA-256 password verifier (600,000 iterations), ไม่เก็บ plaintext password แต่ผู้ใช้ยังแก้ข้อมูลและ session ใน browser ได้ จึงห้ามใช้เป็นหลักฐานสิทธิ์สำหรับ multiplayer/ไอเทม/ข้อมูลจริง
 ใช้ password สำหรับทดสอบเท่านั้น ไม่มี password recovery หรือ account sync ข้ามเครื่อง
 Guest identity จำได้เท่านั้น ไม่ได้บันทึก progress/ตำแหน่งในเกม; การล้าง site data ทำให้บัญชีและ Guest หาย

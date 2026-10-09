@@ -64,10 +64,44 @@ test('mobile form preserves input on language switch and providers are unavailab
   await page.selectOption('#language','en');
   await expect(page.locator('#username')).toHaveValue('traveler');
   await expect(page.locator('#password')).toHaveValue('some-test-pass');
-  await expect(page.getByRole('button',{name:'Continue with Google'})).toBeDisabled();
+  await expect(page.locator('#google-status')).not.toBeEmpty();
   await expect(page.getByRole('button',{name:'Sign in with email',exact:true})).toBeDisabled();
   expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
   await page.screenshot({path:'test-results/login-mobile.png',fullPage:true});
   await page.setViewportSize({width:1440,height:1000});
   await page.screenshot({path:'test-results/login-desktop.png',fullPage:true});
+});
+
+test('configured Google button forwards a credential and uses the server identity (mocked provider)',async({page})=>{
+  let signedIn=false;
+  const user={id:'google:test-sub',username:'Verified <player>',kind:'google'};
+  await page.route('**/api/auth/config',r=>r.fulfill({json:{enabled:true,clientId:'test.apps.googleusercontent.com'}}));
+  await page.route('**/api/auth/challenge',r=>r.fulfill({json:{nonce:'browser-bound-test-nonce'}}));
+  await page.route('**/api/auth/session',r=>r.fulfill({json:{user:signedIn?user:null}}));
+  await page.route('**/api/auth/logout',r=>{signedIn=false;return r.fulfill({status:204});});
+  await page.route('**/api/auth/google',r=>{
+    expect(r.request().postDataJSON()).toEqual({credential:'signed-test-credential'});
+    signedIn=true;
+    return r.fulfill({json:{user}});
+  });
+  await page.route('https://accounts.google.com/gsi/client',r=>r.fulfill({
+    contentType:'application/javascript',
+    body:`window.google={accounts:{id:{
+      initialize(options){window.testGoogleOptions=options;},
+      renderButton(host){const button=document.createElement('button');button.textContent='Test Google chooser';
+        button.onclick=()=>window.testGoogleOptions.callback({credential:'signed-test-credential'});host.append(button);},
+      disableAutoSelect(){}
+    }}};`
+  }));
+  await page.goto('/');
+  await page.selectOption('#language','en');
+  await page.getByRole('button',{name:'Test Google chooser'}).click();
+  await expect(page.locator('#game canvas')).toBeVisible();
+  await expect(page.locator('#player-name')).toHaveText('Verified <player>');
+  expect(await page.evaluate(()=>JSON.stringify(localStorage))).not.toContain('signed-test-credential');
+  await page.reload();
+  await expect(page.locator('#player-name')).toHaveText('Verified <player>');
+  await page.getByRole('button',{name:'Leave game'}).click();
+  await expect(page.locator('#auth-form')).toBeVisible();
+  expect(signedIn).toBe(false);
 });

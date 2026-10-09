@@ -1,5 +1,6 @@
 import { AuthError, getSession, guest, login, logout, register, type Session } from './auth/local-auth';
 import { locale, locales, setLocale, t, type Locale, type MessageKey } from './i18n';
+import { mountGoogle, googleLogin, googleSession, googleLogout, GoogleAuthError } from './auth/google-auth';
 import './style.css';
 
 const app = document.querySelector<HTMLDivElement>('#app')!;
@@ -7,6 +8,7 @@ let mode: 'login' | 'register' = 'login';
 let errorKey: MessageKey | null = null;
 let game: import('phaser').Game | null = null;
 let viewVersion = 0;
+let authenticating = false;
 setLocale(locale());
 const brand = '<div class="brand-mark" aria-hidden="true"><span class="wing left"></span><span class="gem"></span><span class="wing right"></span></div><div class="wordmark">MYTHRAVEN</div><div class="wordmark-sub"><span></span>ONLINE<span></span></div>';
 
@@ -37,9 +39,9 @@ function renderAuth(): void {
           <button class="primary" type="submit"><span>${t(mode==='login'?'enter':'create')}</span><span aria-hidden="true">→</span></button>
         </form>
         <div class="divider"><span></span>${t('or')}<span></span></div>
-        <div class="providers"><button type="button" disabled aria-describedby="provider-note"><span aria-hidden="true">G</span>${t('google')}</button>
+        <div class="providers"><div id="google-signin" aria-label="${t('google')}"></div>
         <button type="button" disabled aria-describedby="provider-note"><span aria-hidden="true">✉</span>${t('email')}</button></div>
-        <p id="provider-note" class="provider-note">${t('providerNote')}</p>
+        <p id="provider-note" class="provider-note">${t('providerNote')}</p><p id="google-status" class="provider-note" role="status"></p>
         <button type="button" class="guest" id="guest">${t('guest')} <span aria-hidden="true">↗</span></button>
         <p class="guest-hint">${t('guestHint')}</p>
         <div class="card-bottom"><span class="local-badge"><i></i>${t('local')}</span><label class="language"><span class="sr-only">${t('language')}</span><select id="language">${locales.map(l=>`<option value="${l.code}" ${l.code===locale()?'selected':''}>${l.label}</option>`).join('')}</select></label></div>
@@ -71,6 +73,9 @@ function renderAuth(): void {
     await runAuth(()=>mode==='register'?register(username,password):login(username,password));
   });
   app.querySelector('#guest')!.addEventListener('click',()=>void runAuth(async()=>guest()));
+  void mountGoogle(app.querySelector('#google-signin')!,app.querySelector('#google-status')!,credential=>{
+    void runAuth(async()=>{const session=await googleLogin(credential); try { logout(); } catch { /* Server session takes priority. */ } return session;});
+  });
 }
 function showError(key: MessageKey, field?: string): void {
   errorKey=key;
@@ -79,6 +84,10 @@ function showError(key: MessageKey, field?: string): void {
   if(field){ const input=app.querySelector<HTMLInputElement>('#'+field); input?.setAttribute('aria-invalid','true'); input?.focus(); }
 }
 async function runAuth(action:()=>Promise<Session>): Promise<void> {
+  if(authenticating) return;
+  authenticating = true;
+  const googleHost = app.querySelector<HTMLElement>('#google-signin');
+  if(googleHost) googleHost.inert = true;
   const controls=Array.from(app.querySelectorAll<HTMLInputElement|HTMLButtonElement|HTMLSelectElement>('input,button,select'));
   const originallyDisabled=controls.map(c=>c.disabled);
   controls.forEach(c=>c.disabled=true);
@@ -86,19 +95,30 @@ async function runAuth(action:()=>Promise<Session>): Promise<void> {
   try { const session=await action(); await showGame(session); }
   catch(error) {
     if(!app.querySelector('#auth-form')) renderAuth();
-    showError(error instanceof AuthError?error.code:'generic');
+    showError(error instanceof AuthError || error instanceof GoogleAuthError?error.code:'generic');
   } finally {
+    authenticating = false;
+    if(googleHost) googleHost.inert = false;
     controls.forEach((c,i)=>c.disabled=originallyDisabled[i]);
     if(label) label.textContent=t(mode==='login'?'enter':'create');
   }
 }
 async function showGame(session: Session): Promise<void> {
   const version=++viewVersion;
-  app.innerHTML=`<main class="game-page"><header class="game-header"><div><div class="mini-brand">MYTHRAVEN <span>ONLINE</span></div><p>${t('training')} · <span id="player-name"></span></p></div><button class="leave" id="logout">${t('logout')}</button></header><div id="game" aria-label="${t('training')}"><p class="loading">${t('loading')}</p></div><footer class="game-footer"><span>${t('controls')}</span><span>${t('placeholder')}</span></footer></main>`;
+  app.innerHTML=`<main class="game-page"><header class="game-header"><div><div class="mini-brand">MYTHRAVEN <span>ONLINE</span></div><p>${t('training')} · <span id="player-name"></span></p></div><button class="leave" id="logout">${t('logout')}</button></header><div id="game" aria-label="${t('training')}"><p class="loading">${t('loading')}</p></div><footer class="game-footer"><span>${t('controls')}</span><span>${t('placeholder')}</span></footer><p id="game-error" class="error" role="alert"></p></main>`;
   app.querySelector('#player-name')!.textContent=session.username;
-  app.querySelector('#logout')!.addEventListener('click',()=>{
-    try { logout(); } catch { return; }
-    game?.destroy(true); game=null; errorKey=null; renderAuth();
+  app.querySelector('#logout')!.addEventListener('click',async()=>{
+    const button=app.querySelector<HTMLButtonElement>('#logout')!; button.disabled=true;
+    try {
+      if(session.kind==='google') await googleLogout();
+      try { logout(); } catch(error) { if(session.kind!=='google') throw error; }
+      game?.destroy(true); game=null; errorKey=null;
+      if(session.kind==='google') { window.location.reload(); return; }
+      renderAuth();
+    } catch(error) {
+      button.disabled=false;
+      app.querySelector('#game-error')!.textContent=t(error instanceof GoogleAuthError?error.code:'storage');
+    }
   });
   const [{default:Phaser},{WorldScene}]=await Promise.all([import('phaser'),import('./scenes/WorldScene')]);
   if(version!==viewVersion) return;
@@ -107,6 +127,12 @@ async function showGame(session: Session): Promise<void> {
     scale:{mode:Phaser.Scale.FIT,autoCenter:Phaser.Scale.CENTER_BOTH,width:1120,height:680},
     scene:[WorldScene],render:{antialias:true}});
 }
-const session=getSession();
-if(session) void showGame(session).catch(()=>{renderAuth();showError('generic');});
-else renderAuth();
+async function start():Promise<void> {
+  // Verify the server cookie before considering any untrusted demo-browser session.
+  let verified:Session|null=null;
+  try { verified=await googleSession(); } catch { /* Local demo remains available while server is offline. */ }
+  const session=verified ?? getSession();
+  if(session) await showGame(session);
+  else renderAuth();
+}
+void start().catch(()=>{renderAuth();showError('generic');});

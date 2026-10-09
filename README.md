@@ -65,5 +65,12 @@ npm.cmd run dev -- --host 0.0.0.0
 
 เปิดหน้าเว็บแล้วเลือกเข้าสู่ระบบ สมัครบัญชีทดลอง หรือ Guest ได้ สลับไทย/อังกฤษจากเมนูภาษา
 Guest และ session จำเฉพาะ browser/origin นี้; ออกจากเกมเพื่อกลับหน้าบัญชี
-Google และอีเมลยังไม่เชื่อม provider จริง รายละเอียดและข้อจำกัดอยู่ใน [Local Auth](docs/LOCAL_AUTH.md)
+Google เชื่อมผ่าน GIS และ server verification แล้ว แต่ต้องตั้ง Client ID ของคุณก่อน ตาม [Google Auth Setup](docs/GOOGLE_AUTH_SETUP.md) ส่วนอีเมลอื่นยังไม่เปิดใช้ รายละเอียดบัญชีทดลองอยู่ใน [Local Auth](docs/LOCAL_AUTH.md)
 ทดสอบ flow ด้วย `npm.cmd run test:e2e` (ต้องมี Microsoft Edge)
+## Google sign-in จริง
+
+อ่าน [คู่มือตั้งค่า Google](docs/GOOGLE_AUTH_SETUP.md) เพื่อสร้าง Web Client ID และใส่ใน .env
+`npm.cmd run dev` เปิดทั้งเว็บ :5173 และ auth server :3001 ให้ใช้ http://localhost:5173 สำหรับ Google
+ตั้งค่าพอร์ตแบบ strict เพื่อให้ตรง Google Authorized JavaScript origins
+`npm.cmd run test:server` ทดสอบ token/session contract; `npm.cmd run test:e2e` ทดสอบหน้าเว็บ
+ยังไม่ได้ทดสอบบัญชี Google จริงจนกว่าจะมี Client ID และผู้ใช้เลือกบัญชีผ่าน Google สำเร็จ

@@ -1,7 +1,7 @@
 /** LOCAL DEMO ONLY. Browser records are editable, not a trusted authentication boundary.
  * Replace this adapter with a server-backed service before multiplayer or deployment.
  */
-export interface Session { id: string; username: string; kind: 'account' | 'guest'; }
+export interface Session { id: string; username: string; kind: 'account' | 'guest' | 'google'; }
 interface Account { username: string; salt: string; hash: string; }
 export type AuthErrorCode = 'invalidUsername' | 'shortPassword' | 'duplicate' | 'credentials' | 'storage' | 'unavailable';
 export class AuthError extends Error { constructor(public code: AuthErrorCode) { super(code); } }

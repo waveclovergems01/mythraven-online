@@ -4,17 +4,25 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "vite --host 127.0.0.1",
+    "dev": "concurrently --kill-others -n AUTH,WEB \"node server/index.mjs\" \"vite\"",
     "typecheck": "tsc --noEmit",
     "build": "npm run typecheck && vite build",
     "preview": "vite preview --host 127.0.0.1",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "dev:client": "vite",
+    "dev:server": "node server/index.mjs",
+    "test:server": "node --test server/auth.test.mjs"
   },
   "dependencies": {
+    "dotenv": "^18.0.7",
+    "express": "^5.3.0",
+    "express-rate-limit": "^8.7.1",
+    "google-auth-library": "^11.2.0",
     "phaser": "3.90.0"
   },
   "devDependencies": {
     "@playwright/test": "^1.64.0",
+    "concurrently": "^10.0.6",
     "typescript": "~5.9.3",
     "vite": "^7.0.0"
   },
