@@ -1,0 +1,80 @@
+.minimap {
+  position: absolute;
+  z-index: 2;
+  top: 76px;
+  right: 16px;
+  width: clamp(140px, 17vw, 230px);
+  box-sizing: border-box;
+  padding: 8px;
+  color: #d9ccab;
+  background: #101a20ed;
+  border: 1px solid #b79a58;
+  border-radius: 5px;
+  font-size: 11px;
+}
+.minimap strong { display: block; margin-bottom: 6px; }
+.minimap-image { position: relative; aspect-ratio: 1; overflow: hidden; }
+.minimap-image img { display: block; width: 100%; height: 100%; }
+.minimap-image svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+.minimap-legend { margin-top: 6px; }
+.minimap-stats { margin-top: 3px; color: #a9c6ca; }
+@media (max-width: 600px) { .minimap { top: 106px; right: 8px; font-size: 10px; } }
+@media (max-height: 480px) { .minimap { top: 64px; width: 144px; padding: 5px; } }
+/* The map owns the viewport; HUD sits above it without reducing canvas size. */
+.game-page {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100dvh;
+  max-width: none;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+}
+.game-page #game {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  aspect-ratio: auto;
+  border: 0;
+  border-radius: 0;
+}
+.game-page .game-header {
+  position: absolute;
+  z-index: 2;
+  inset: 16px 16px auto;
+  margin: 0;
+  align-items: flex-start;
+  pointer-events: none;
+}
+.game-header > div {
+  padding: 10px 14px;
+  border-radius: 4px;
+  background: #101a20db;
+}
+.game-header .leave { pointer-events: auto; }
+.game-page .game-footer {
+  position: absolute;
+  z-index: 2;
+  inset: auto 16px 12px;
+  margin: 0;
+  padding: 7px 10px;
+  background: #101a20c9;
+  pointer-events: none;
+}
+.game-page #game-error:not(:empty) {
+  position: absolute;
+  z-index: 3;
+  top: 88px;
+  right: 16px;
+  padding: 10px;
+  background: #311f1cee;
+}
+@media (max-width: 600px) {
+  .game-page .game-header { inset: 8px 8px auto; gap: 8px; }
+  .game-header > div { padding: 8px; }
+  .game-header p { margin-bottom: 0; font-size: 10px; }
+  .game-header .leave { padding: 9px; font-size: 12px; }
+  .game-page .game-footer { inset: auto 8px 8px; gap: 4px; font-size: 10px; }
+}

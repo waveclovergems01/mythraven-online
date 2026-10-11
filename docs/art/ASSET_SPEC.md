@@ -133,3 +133,6 @@ references/promptPath/sourcePath ว่างได้ในตัวอย่�
 5. ตรวจ loop seam, เท้าไถล, อาวุธสลับมือ, pixel/สีสั่น และขอบถูกตัด
 6. วางคู่ master ในเกมที่ runtimeScale; ตรวจ depth, blending, collision และความอ่านง่าย
 7. บันทึกผล QA ก่อนย้ายเป็น runtime-ready; manifest นี้ยังไม่มี automated validator
+
+## Daflak rectangular-grid preview
+User-requested runtime experiment: movement cells are 64 × 56 world pixels, displayed at 32 × 28 CSS pixels with camera zoom 0.5. The 40 × 40 terrain-block layout retains 2 × 2 movement cells per block. The existing baked city concept is displayed at 5120 × 4480 (vertical factor 0.875 relative to the earlier preview), including its baked props; this is a preview projection compromise, not a new image export or a general sprite transform. Character proportions and original assets remain unchanged. Minimap uses the same world aspect ratio.

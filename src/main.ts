@@ -2,6 +2,7 @@ import { AuthError, getSession, guest, login, logout, register, type Session } f
 import { locale, locales, setLocale, t, type Locale, type MessageKey } from './i18n';
 import { mountGoogle, googleLogin, googleSession, googleLogout, GoogleAuthError } from './auth/google-auth';
 import './style.css';
+import './game-viewport.css';
 import { fitAuthViewport } from './auth/fit-viewport';
 import { restrictInput, usernameCharacters, passwordCharacters, validUsername, validPasswordCharacters, MAX_PASSWORD_LENGTH } from './auth/input-policy';
 
@@ -121,7 +122,7 @@ async function showGame(session: Session): Promise<void> {
   stopFittingAuth?.();
   stopFittingAuth = undefined;
   const version=++viewVersion;
-  app.innerHTML=`<main class="game-page"><header class="game-header"><div><div class="mini-brand">MYTHRAVEN <span>ONLINE</span></div><p>${t('training')} · <span id="player-name"></span></p></div><button class="leave" id="logout">${t('logout')}</button></header><div id="game" aria-label="${t('training')}"><p class="loading">${t('loading')}</p></div><footer class="game-footer"><span>${t('controls')}</span><span>${t('placeholder')}</span></footer><p id="game-error" class="error" role="alert"></p></main>`;
+  app.innerHTML=`<main class="game-page"><header class="game-header"><div><div class="mini-brand">MYTHRAVEN <span>ONLINE</span></div><p>${t('city')} · <span id="player-name"></span></p></div><button class="leave" id="logout">${t('logout')}</button></header><div id="game" aria-label="${t('city')}"><p class="loading">${t('loading')}</p></div><footer class="game-footer"><span>${t('cityControls')}</span><span>${t('cityNote')}</span></footer><p id="game-error" class="error" role="alert"></p></main>`;
   app.querySelector('#player-name')!.textContent=session.username;
   app.querySelector('#logout')!.addEventListener('click',async()=>{
     const button=app.querySelector<HTMLButtonElement>('#logout')!; button.disabled=true;
@@ -140,7 +141,7 @@ async function showGame(session: Session): Promise<void> {
   if(version!==viewVersion) return;
   app.querySelector('.loading')?.remove();
   game=new Phaser.Game({type:Phaser.AUTO,parent:'game',backgroundColor:'#243b36',
-    scale:{mode:Phaser.Scale.FIT,autoCenter:Phaser.Scale.CENTER_BOTH,width:1120,height:680},
+    scale:{mode:Phaser.Scale.RESIZE,width:app.querySelector<HTMLElement>('#game')!.clientWidth,height:app.querySelector<HTMLElement>('#game')!.clientHeight},
     scene:[WorldScene],render:{antialias:true}});
 }
 async function start():Promise<void> {
