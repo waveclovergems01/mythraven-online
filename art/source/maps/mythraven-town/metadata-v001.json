@@ -1,0 +1,23 @@
+{
+  "assetId": "MAP-01",
+  "name": "Mythraven town",
+  "revision": "v001",
+  "status": "rejected-by-owner",
+  "ownerApproved": false,
+  "runtimeReady": false,
+  "style": "Soft Painted Fantasy 2D",
+  "tool": "image_gen.imagegen",
+  "model": "not exposed by built-in tool",
+  "createdDate": "2026-10-13",
+  "image": "mythraven-town-v001.png",
+  "prompt": "prompt-v001.txt",
+  "referencesAttached": [
+    "art/source/tiles/smooth-meadow/reference-1.png",
+    "art/source/tiles/smooth-meadow/reference-2.png"
+  ],
+  "review": {
+    "visualInspection": "Completed against returned image: organic river, outer banks, three bridges, connected central plaza, soft painted buildings, no UI or lettering.",
+    "limitations": "Concept only. Dense decorative detail and elevations need simplification for gameplay. No tile seams, collision, sprite separation or in-game validation performed.",
+    "nextGate": "Owner approval before additional art or runtime integration."
+  }
+}

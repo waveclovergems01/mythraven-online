@@ -1,0 +1,23 @@
+{
+  "status": "integrated",
+  "source": "mythraven-town-sand-v004.png",
+  "grass": "art/source/tiles/mythraven-grass-overlay/grass-v001.png",
+  "mask": "public/assets/maps/mythraven-grass-mask.png",
+  "navigation": "public/assets/maps/mythraven-navigation.png",
+  "dimensions": {
+    "format": "raw",
+    "width": 1368,
+    "height": 1150,
+    "channels": 3,
+    "depth": "uchar",
+    "premultiplied": false,
+    "hasAlpha": false,
+    "size": 4719600
+  },
+  "coveragePixels": {
+    "bare": 126327,
+    "partial": 811223,
+    "full": 369892
+  },
+  "notes": "Central lawn boosted to 92-100% coverage; outermost coverage unchanged. Deterministic soft coverage, soil-only; water classification navigation is conservative per movement cell. Objects not added."
+}

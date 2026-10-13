@@ -1,0 +1,21 @@
+{
+  "assetId": "BG-04",
+  "revision": "v001",
+  "status": "integrated",
+  "ownerApproved": true,
+  "runtimeReady": true,
+  "source": "original-v001.png",
+  "export": "grass-v001.png",
+  "prompt": "prompt-v001.txt",
+  "tool": "image_gen.imagegen",
+  "model": "not exposed",
+  "referencesAttached": [
+    "art/source/tiles/smooth-meadow/grass/original.png"
+  ],
+  "width": 512,
+  "height": 512,
+  "alpha": false,
+  "repeatPreview": "repeat-3x3-v001.png",
+  "review": "3x3 visual repeat checked: no prominent straight seam at preview scale; repeating foliage motifs remain visible. Denser foliage than prompt requested, pending owner visual preference. No in-game scale validation.",
+  "intendedUse": "Opaque repeating grass sampled through independent soft coverage mask over dirt; opacity and tint separate. Not a transparent tuft sprite. Runtime unchanged."
+}

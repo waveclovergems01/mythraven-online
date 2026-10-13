@@ -8,6 +8,7 @@ export let MAP_HEIGHT = TILE_HEIGHT * MAP_ROWS;
 export interface Cell { x: number; y: number }
 export let SPAWN: Cell = { x: 40, y: 39 };
 export function configureMap(viewportWidth: number, viewportHeight: number): void {
+  navigation = undefined;
   MAP_COLUMNS = Math.max(40, Math.ceil(viewportWidth * 2 / 32));
   MAP_ROWS = Math.max(40, Math.ceil(viewportHeight * 3 / 28));
   MAP_WIDTH = TILE_WIDTH * MAP_COLUMNS;
@@ -16,33 +17,24 @@ export function configureMap(viewportWidth: number, viewportHeight: number): voi
 }
 export const cellAt = (x: number, y: number): Cell => ({ x: Math.floor(x / TILE_WIDTH), y: Math.floor(y / TILE_HEIGHT) });
 export const centerOf = (c: Cell): Cell => ({ x: (c.x + 0.5) * TILE_WIDTH, y: (c.y + 0.5) * TILE_HEIGHT });
-// Vertices traced inside the generated current riverbanks, clockwise (normalized).
-export const island = [[0.19,0.12],[0.81,0.12],[0.89,0.20],[0.905,0.31],
-  [0.905,0.70],[0.86,0.80],[0.80,0.87],[0.20,0.87],[0.12,0.80],
-  [0.095,0.70],[0.095,0.30],[0.13,0.19]];
-function onLand(x: number, y: number): boolean {
-  let inside = false;
-  for (let i=0,j=island.length-1;i<island.length;j=i++) {
-    const [ax,ay]=island[i], [bx,by]=island[j];
-    if ((ay>y)!==(by>y) && x<(bx-ax)*(y-ay)/(by-ay)+ax) inside=!inside;
+let navigation: Uint8Array | undefined;
+/** Reject any cell overlapping water, not just its center, using a summed-area table. */
+export function configureNavigation(image: ImageData): void {
+  const {width,height,data}=image,stride=width+1;
+  const sum=new Uint32Array(stride*(height+1));
+  for(let y=0;y<height;y++)for(let x=0;x<width;x++){
+    const i=(y+1)*stride+x+1;
+    sum[i]=(data[(y*width+x)*4]<128?1:0)+sum[i-1]+sum[i-stride]-sum[i-stride-1];
   }
-  return inside;
+  navigation=new Uint8Array(MAP_COLUMNS*MAP_ROWS);
+  for(let y=0;y<MAP_ROWS;y++)for(let x=0;x<MAP_COLUMNS;x++){
+    const l=Math.floor(x*width/MAP_COLUMNS),r=Math.min(width,Math.ceil((x+1)*width/MAP_COLUMNS));
+    const t=Math.floor(y*height/MAP_ROWS),b=Math.min(height,Math.ceil((y+1)*height/MAP_ROWS));
+    navigation[y*MAP_COLUMNS+x]=Number(sum[b*stride+r]-sum[t*stride+r]-sum[b*stride+l]+sum[t*stride+l]===0);
+  }
 }
 export function walkable(c: Cell): boolean {
-  if (!Number.isInteger(c.x) || !Number.isInteger(c.y) || c.x < 0 || c.y < 0 || c.x >= MAP_COLUMNS || c.y >= MAP_ROWS) return false;
-  const left = c.x / MAP_COLUMNS, right = (c.x + 1) / MAP_COLUMNS;
-  const top = c.y / MAP_ROWS, bottom = (c.y + 1) / MAP_ROWS;
-  const land = [[left,top],[right,top],[left,bottom],[right,bottom]].every(([x,y])=>onLand(x,y));
-  const bridge = bridgeBounds();
-  const northSouthBridge = c.x*TILE_WIDTH >= bridge.left && (c.x+1)*TILE_WIDTH <= bridge.right;
-  const eastWestBridge = c.y*TILE_HEIGHT >= bridge.top && (c.y+1)*TILE_HEIGHT <= bridge.bottom;
-  return land || northSouthBridge || eastWestBridge;
-}
-// Three movement cells wide, independent of viewport and total map size.
-export function bridgeBounds() {
-  const left = (Math.floor(MAP_COLUMNS * 0.4975)-1)*TILE_WIDTH;
-  const top = (Math.floor(MAP_ROWS * 0.4725)-1)*TILE_HEIGHT;
-  return {left, right:left+3*TILE_WIDTH, top, bottom:top+3*TILE_HEIGHT};
+  return Number.isInteger(c.x)&&Number.isInteger(c.y)&&c.x>=0&&c.y>=0&&c.x<MAP_COLUMNS&&c.y<MAP_ROWS&&navigation?.[c.y*MAP_COLUMNS+c.x]===1;
 }
 export function findPath(start: Cell, end: Cell): Cell[] {
   if (!walkable(start) || !walkable(end)) return [];
@@ -63,3 +55,4 @@ export function findPath(start: Cell, end: Cell): Cell[] {
   }
   return [];
 }
+

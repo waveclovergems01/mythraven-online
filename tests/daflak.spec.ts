@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+test.use({video: {mode:'on',size:{width:1280,height:720}}});
 
 test('favicon assets decode and ICO has a valid container', async ({page,request}) => {
   await page.goto('/');
@@ -14,10 +15,10 @@ test('favicon assets decode and ICO has a valid container', async ({page,request
 });
 
 
-test('city viewport proportions, open ground, four bridges, water and minimap', async ({page}) => {
+test('city viewport proportions, painted grass, removed crossings, water and minimap', async ({page}) => {
   await page.route('**/src/scenes/WorldScene.ts*', async route => {
     const response = await route.fetch();
-    await route.fulfill({response, body: await response.text() + '\nconst oldCreate=WorldScene.prototype.create; WorldScene.prototype.create=function(){oldCreate.call(this);window.testScene=this;};'});
+    await route.fulfill({response, body: await response.text() + '\nconst oldCreate=WorldScene.prototype.create; WorldScene.prototype.create=function(){oldCreate.call(this);window.testScene=this;window.testGrid={MAP_COLUMNS:MAP_WIDTH/TILE_WIDTH,MAP_ROWS:MAP_HEIGHT/TILE_HEIGHT,SPAWN,findPath,walkable,cellAt};};'});
   });
   await page.setViewportSize({width:1280,height:720});
   await page.goto('/'); await page.locator('#guest').click();
@@ -34,12 +35,12 @@ test('city viewport proportions, open ground, four bridges, water and minimap', 
   await expect.poll(()=>page.evaluate(()=>{const s=(window as any).testScene;return [s.tile.x,s.tile.y];})).toEqual(dest);
   await expect.poll(()=>page.evaluate(()=>(window as any).testScene.cameras.main.scrollX)).toBeGreaterThan(start[2]);
   const result=await page.evaluate(async()=>{
-    const g=await import('/src/world/daflak-grid.ts'); g.configureMap(1280,720);
+    const g=(window as any).testGrid;
     const n=g.MAP_COLUMNS,m=g.MAP_ROWS;
-    const bridges=[{x:Math.floor(n*.49),y:0},{x:Math.floor(n*.49),y:m-1},{x:0,y:Math.floor(m*.47)},{x:n-1,y:Math.floor(m*.47)}];
+    const bridges=[{x:Math.floor(n*.49),y:0}];
     const routes=bridges.map(end=>g.findPath(g.SPAWN,end));
     const routeValid=routes.every(route=>route.length>0&&route.every((c:any,i:number)=>{const prev=i?route[i-1]:g.SPAWN;return g.walkable(c)&&Math.abs(c.x-prev.x)+Math.abs(c.y-prev.y)===1;}));
-    const water=[{x:Math.floor(n*.25),y:Math.floor(m*.06)},{x:Math.floor(n*.06),y:Math.floor(m*.25)},{x:Math.floor(n*.94),y:Math.floor(m*.25)},{x:Math.floor(n*.25),y:Math.floor(m*.94)}];
+    const water=[{x:Math.floor(n*.06),y:Math.floor(m*.49)},{x:Math.floor(n*.94),y:Math.floor(m*.49)},{x:Math.floor(n*.50),y:Math.floor(m*.91)},{x:Math.floor(n*.25),y:Math.floor(m*.06)}];
     const lawns=[.25,.4,.6,.75].flatMap(x=>[.25,.4,.6,.75].map(y=>g.walkable({x:Math.floor(n*x),y:Math.floor(m*y)})));
     return {routeValid,water:water.map(c=>g.walkable(c)),lawns,boundary:g.cellAt(64,55.9)};
   });
@@ -62,10 +63,37 @@ test('city viewport proportions, open ground, four bridges, water and minimap', 
     return {count:chunks.length, native:chunks.every((o:any)=>o.scaleX*s.cameras.main.zoom===1&&o.texture.getSourceImage().width<=513),mini:document.querySelector<HTMLImageElement>('.minimap-image img')!.src.startsWith('data:image/png')};
   });
   expect(terrain.count).toBeGreaterThan(1); expect(terrain.native).toBe(true);expect(terrain.mini).toBe(true);
-  await page.screenshot({path:'test-results/daflak-materials.png'});
+  await page.screenshot({path:'test-results/mythraven-grass.png'});
+  await page.evaluate(()=>{const s=(window as any).testScene,b=s.cameras.main.getBounds();s.cameras.main.stopFollow().centerOn(b.width*.21,b.height*.49);});
+  await page.waitForFunction(()=>{const s=(window as any).testScene,c=s.cameras.main;return Math.abs(c.midPoint.x-c.getBounds().width*.21)<5;});
+  await page.screenshot({path:'test-results/mythraven-paving-bank.png'});
+  const waterBefore=await page.screenshot({clip:{x:110,y:300,width:32,height:96}});
+  const phases:number[]=[];
+  for(let i=0;i<22;i++){
+    phases.push(await page.evaluate(()=>{const s=(window as any).testScene;return s.children.getByName('water-current').tilePositionX;}));
+    await page.waitForTimeout(500);
+  }
+  const waterAfter=await page.screenshot({clip:{x:110,y:300,width:32,height:96}});
+  expect(waterBefore.equals(waterAfter)).toBe(false);
+  const changes=phases.slice(1).map((x,i)=>x-phases[i]);
+  expect(changes.some(x=>x>1)).toBe(true);expect(changes.some(x=>x< -1)).toBe(true);
+  await page.screenshot({path:'test-results/mythraven-water-curves.png'});
+  const coverage=await page.evaluate(()=>{
+    const img=(window as any).testScene.textures.get('town-coverage').getSourceImage();
+    const c=document.createElement('canvas');c.width=img.width;c.height=img.height;
+    const ctx=c.getContext('2d')!;ctx.drawImage(img,0,0);const d=ctx.getImageData(0,0,c.width,c.height).data;
+    let bare=0,half=0,full=0;for(let i=3;i<d.length;i+=4){if(d[i]===0)bare++;if(d[i]>115&&d[i]<140)half++;if(d[i]>250)full++;}
+    return {bare,half,full};
+  });
+  expect(coverage.bare).toBeGreaterThan(1000);expect(coverage.half).toBeGreaterThan(1000);expect(coverage.full).toBeGreaterThan(1000);
   await page.locator('#logout').click(); await expect(page.locator('.minimap')).toHaveCount(0);
   await page.locator('#guest').click();
   await expect(page.locator('.minimap')).toHaveCount(1);
   await page.waitForFunction(()=>Boolean((window as any).testScene?.player));
   expect(await page.evaluate(()=>(window as any).testScene.textures.exists('town-ground-0-0'))).toBe(true);
+  expect(await page.evaluate(()=>(window as any).testScene.children.list.filter((o:any)=>o.name==='water-current'||o.name==='water-ripples').length)).toBe(2);
+  const video=page.video();await page.close();await video?.saveAs('test-results/mythraven-water-preview.webm');
 });
+
+
+

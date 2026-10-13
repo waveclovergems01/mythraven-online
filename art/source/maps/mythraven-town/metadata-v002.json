@@ -1,0 +1,10 @@
+{
+ "assetId":"MAP-01", "revision":"v002", "status":"candidate", "ownerApproved":false, "runtimeReady":false,
+ "image":"mythraven-town-ground-v002.png", "prompt":"prompt-v002.txt",
+ "tool":"image_gen.imagegen", "model":"not exposed by built-in tool",
+ "style":"Soft Painted Fantasy 2D", "referencesAttached":["walkable-ground-reference.png"],
+ "scope":"Ground-only walking map composition; no objects or runtime changes",
+ "cameraContract":{"viewportColumns":2,"viewportRows":3,"runtimeZoom":0.5,"runtimeSizing":"configureMap uses entry viewport, ceil to 32x28 screen cells and minimum 40 cells per axis","conceptNominalViewport":"16:9; requested full-map ratio 32:27; generator dimensions must be measured before export"},
+ "visualReview":"Ground-only image inspected: empty grass lots, connected paving, central plaza, low banks, water and flat crossings. No buildings, trees, characters or UI. North crossing also present in output. Ground texture density and stone scale remain subject to owner review.",
+ "validation":"Not a tileset. Collision, scale beside player and in-game camera not validated. No runtime export or playtest performed for this image-only request."
+}

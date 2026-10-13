@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
 import { t } from '../i18n';
-import { buildTownGround, MATERIALS, FLOWERS, GROUND_COVER } from '../world/town-ground';
+import { buildTownGround, TOWN_ASSETS } from '../world/town-ground';
 import { attachMinimap } from '../world/minimap';
 import { TILE_WIDTH, TILE_HEIGHT, MAP_WIDTH, MAP_HEIGHT, configureMap, SPAWN, cellAt, centerOf, walkable, findPath, type Cell } from '../world/daflak-grid';
 
@@ -18,15 +18,12 @@ export class WorldScene extends Phaser.Scene {
   private readonly speed = 420;
   constructor() { super('world'); }
   preload(): void {
-    this.load.atlas('castle-walls','/assets/props/castle/castle-walls.png','/assets/props/castle/castle-walls.json');
-    for(const name of GROUND_COVER)this.load.image(`groundcover-${name}`,`/assets/props/daflak-groundcover-${name}.png`);
-    for(const name of FLOWERS)this.load.image(`flower-${name}`,`/assets/props/daflak-${name}.png`);
-    for (const name of MATERIALS) this.load.image(`terrain-${name}`, `/assets/tiles/daflak-${name}.png`);
+    for (const [key,path] of Object.entries(TOWN_ASSETS)) this.load.image(key,path);
   }
   create(): void {
     configureMap(this.scale.width, this.scale.height);
     this.tile = { ...SPAWN }; this.path = []; this.stepTarget = null;
-    if (GROUND_COVER.some(name=>!this.textures.exists(`groundcover-${name}`)) || MATERIALS.some(name=>!this.textures.exists(`terrain-${name}`)) || FLOWERS.some(name=>!this.textures.exists(`flower-${name}`))) {
+    if (Object.keys(TOWN_ASSETS).some(key=>!this.textures.exists(key))) {
       this.add.text(40,40,t('mapLoadError'),{fontSize:'20px',color:'#ffccaa'}); return;
     }
     const minimapUrl = buildTownGround(this);

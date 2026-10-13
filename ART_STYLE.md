@@ -265,3 +265,35 @@ EXTRA_PROMPT = "irregular worn earth clearing with sparse soft grass fringe, iso
 
 ## PROP-CASTLE — Owner-supplied stone wall sheet
 Import the provided stone castle sheet as authored; no regeneration or new style is requested. Chroma-key magenta (#ff00ff), not blue (blue is used by banners/roofs). Preserve original under art/source/props/castle-walls. Export one transparent atlas with 29 named frames for towers, wall segments, corners and gates/junctions. The AI-style source is not an exact repeatable tileset: frame sizes vary and joins, anchors and collision need placement-specific validation before building a perimeter. Default bottom-center pivots are provisional. This import leaves terrain and gameplay placement unchanged.
+
+## MAP-01 — Mythraven town concept (2026-10-13)
+TYPE = map-concept (layout review only; template D in PROMPT_TEMPLATES.md)
+FILE_NAME = mythraven-town-v001.png
+VARIANTS = 1 (quota-conscious first review)
+STYLE = Soft Painted Fantasy 2D
+MUST_HAVE = organic canals, outer land, connected bridges and roads, central plaza, calm grass, soft object shadows
+MUST_NOT_HAVE = square moat, floating island, copied game assets, text, UI
+SOURCE = art/source/maps/mythraven-town
+STATUS = candidate; owner review pending; not runtime-ready
+TOOL = built-in image_gen; model version not exposed
+NOTES = Scene composition preview; individual ground/object suffixes apply when separate runtime assets are produced. Existing runtime exports and login remain unchanged.
+
+## MAP-01 correction — ground-only walking map (2026-10-13)
+The owner rejected v001 as a distant town overview. v002 must show only base terrain: grass, connected paving, empty plaza/court, low earth banks and peripheral water. No buildings, trees, flowers, furniture, characters, walls or other props. Use the latest gameplay screenshot for projection and scale only, not copied designs. Roads align to screen horizontal/vertical, not a rotated diamond diorama. Keep existing runtime map sizing: approximately two viewport widths by three viewport heights, snapped to cells; exact size depends on entry viewport. Objects and collision will be authored separately after review. One candidate only. Source and actual attached reference are in art/source/maps/mythraven-town. v001 is rejected, v002 pending review; neither is runtime-ready.
+
+## MAP-01 / BG-04 correction — dirt base and painted grass (2026-10-13)
+Owner requests a dirt base map and ONE separate repeating grass texture. MAP-01 v003 replaces grass with bare earth and removes west/east/south stone crossings; preserve streets/plazas and northern crossing. Separate bridge objects come later. BG-04 is an opaque 512x512 seamless grass candidate, palette #7fb55a/#72a850, low contrast, flat top-down, no objects or baked dirt/edge/shadow. Code will eventually control grass coverage through an independent soft opacity mask, with optional separate tint variation. No runtime integration until owner approval. Sources: art/source/maps/mythraven-town and art/source/tiles/mythraven-grass-overlay. One variant each, image_gen built-in tool; actual model version not exposed. Ground candidates require repeat inspection. Existing runtime assets unchanged.
+
+## MAP-01 / BG-04 integration approval — 2026-10-13
+Owner approved local use of dirt v003 and grass v001 with blended coverage. Exported runtime files are under public/assets/maps and public/assets/tiles. Coverage varies continuously from exposed earth through 50% to full grass. Source and prompt records retained. See ASSET_SPEC.md for navigation and validation details. This approval does not apply to rejected overview v001.
+
+### Central grass density adjustment — 2026-10-13
+Owner requested stronger, broader green coverage around the central plaza and branching roads while preserving the outer grounds. The coverage exporter now raises eligible central soil to 92-100% grass and gently removes this boost toward the perimeter. Paving/water exclusions, texture scale and navigation remain unchanged. This adjusts the procedural coverage mask only; no new raster art generated.
+
+## BG-05 — Separate paving tile (2026-10-13)
+Owner requests crisp repeating paving instead of enlarged baked roads. One 512x512 opaque seamless soft-painted warm stone candidate, low-medium detail, uniform lighting and no embedded grass/props. MAP-01 v004 removes paved pixels from the sand base; retain shoreline and northern land crossing. Runtime draws connected paths/plaza above grass at fixed texture scale, then irregular textured grass fringe above selected path edges, especially south-facing edges. Preserve central grass density, camera, navigation and outer coverage. Use built-in image_gen, actual model not exposed. No additional objects.
+
+BG-05 integration: one stone texture at 256x224 CSS-pixel repeat; independent path coverage in src/world/town-paving.ts. Sand v004 beneath grass and paving; irregular sparse grass fringe above paving. Local build and game-playtest passed; visual approval pending. No camera change.
+
+## BG-06 — Animated repeating canal water (2026-10-13)
+Owner requests one blue water tile matching the existing canal, animated drifting and reversing left/right, with unchanged shoreline/collision. Generate one 512x512 opaque seamless top-down material, Soft Painted Fantasy 2D, no shore/objects/UI. Built-in image_gen, model version not exposed. Water renders below transparent land chunks in two moving texture layers. Red-line path reference in art/source/maps/mythraven-town/curved-path-reference.png represents intentional bends: replace rigid ring/diagonal branches with smoothly meandering connected paths on both sides, retain main crossing connections and paving scale. No new environment objects.
