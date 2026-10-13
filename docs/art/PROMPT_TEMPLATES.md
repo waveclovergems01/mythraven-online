@@ -1,4 +1,7 @@
 # Image generation templates — MR-ART-v1
+
+> Current guide (2026-10-12): [ART_STYLE.md](../../ART_STYLE.md) is authoritative for new images. Its visual tokens, palette, ground/object rules, registry, naming and variant workflow override conflicting defaults below. This document retains legacy guidance and technical contracts; see [STYLE_MIGRATION.md](STYLE_MIGRATION.md). Existing assets are not automatically approved under the new guide.
+
 ใช้ shared block + template ประเภทภาพ + reference จริง + asset brief เสมอ
 แทนที่ทุก {placeholder} ก่อนส่ง ห้ามส่ง path เฉย ๆ แล้วถือว่าแนบ reference แล้ว
 เอกสารนี้เป็นกติกา ไม่ได้ร้องขอให้ generate ทุก template ตอนอ่าน

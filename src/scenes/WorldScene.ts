@@ -1,9 +1,10 @@
 import Phaser from 'phaser';
 import { t } from '../i18n';
+import { buildTownGround, MATERIALS, FLOWERS, GROUND_COVER } from '../world/town-ground';
 import { attachMinimap } from '../world/minimap';
-import { TILE_WIDTH, TILE_HEIGHT, MAP_WIDTH, MAP_HEIGHT, SPAWN, cellAt, centerOf, walkable, findPath, type Cell } from '../world/daflak-grid';
+import { TILE_WIDTH, TILE_HEIGHT, MAP_WIDTH, MAP_HEIGHT, configureMap, SPAWN, cellAt, centerOf, walkable, findPath, type Cell } from '../world/daflak-grid';
 
-/** Painted city preview with a separately authored logical movement grid. */
+/** Town built from fixed-scale materials with a shared movement grid. */
 export class WorldScene extends Phaser.Scene {
   private player!: Phaser.GameObjects.Container;
   private bodyArt!: Phaser.GameObjects.Container;
@@ -16,13 +17,19 @@ export class WorldScene extends Phaser.Scene {
   private stepTarget: Cell | null = null;
   private readonly speed = 420;
   constructor() { super('world'); }
-  preload(): void { this.load.image('daflak', '/assets/maps/daflak-city-v001.webp'); }
+  preload(): void {
+    this.load.atlas('castle-walls','/assets/props/castle/castle-walls.png','/assets/props/castle/castle-walls.json');
+    for(const name of GROUND_COVER)this.load.image(`groundcover-${name}`,`/assets/props/daflak-groundcover-${name}.png`);
+    for(const name of FLOWERS)this.load.image(`flower-${name}`,`/assets/props/daflak-${name}.png`);
+    for (const name of MATERIALS) this.load.image(`terrain-${name}`, `/assets/tiles/daflak-${name}.png`);
+  }
   create(): void {
+    configureMap(this.scale.width, this.scale.height);
     this.tile = { ...SPAWN }; this.path = []; this.stepTarget = null;
-    if (!this.textures.exists('daflak')) {
+    if (GROUND_COVER.some(name=>!this.textures.exists(`groundcover-${name}`)) || MATERIALS.some(name=>!this.textures.exists(`terrain-${name}`)) || FLOWERS.some(name=>!this.textures.exists(`flower-${name}`))) {
       this.add.text(40,40,t('mapLoadError'),{fontSize:'20px',color:'#ffccaa'}); return;
     }
-    this.add.image(0,0,'daflak').setOrigin(0).setDisplaySize(MAP_WIDTH,MAP_HEIGHT);
+    const minimapUrl = buildTownGround(this);
     this.hover = this.add.rectangle(0,0,TILE_WIDTH,TILE_HEIGHT,0x9dedbe,0.14).setOrigin(0).setStrokeStyle(2,0xc7ffe1).setDepth(10).setVisible(false);
     this.marker = this.add.rectangle(0,0,TILE_WIDTH,TILE_HEIGHT).setOrigin(0).setStrokeStyle(3,0xf3d48e).setDepth(11).setVisible(false);
     const spawn = centerOf(this.tile);
@@ -43,7 +50,7 @@ export class WorldScene extends Phaser.Scene {
     // RESIZE keeps one canvas unit per CSS pixel: 64×56 world px × 0.5 = 32×28 screen px.
     this.cameras.main.setBounds(0,0,MAP_WIDTH,MAP_HEIGHT).setZoom(0.5).startFollow(this.player,true,0.12,0.12);
     this.cameras.main.centerOn(spawn.x,spawn.y);
-    attachMinimap(this, this.player);
+    attachMinimap(this, this.player, minimapUrl);
     this.cursors = this.input.keyboard!.createCursorKeys();
     this.keys = this.input.keyboard!.addKeys('W,A,S,D') as Record<string,Phaser.Input.Keyboard.Key>;
     this.input.on('pointerdown',(pointer: Phaser.Input.Pointer) => {

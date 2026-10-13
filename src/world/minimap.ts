@@ -3,13 +3,13 @@ import { t } from '../i18n';
 import { MAP_WIDTH, MAP_HEIGHT } from './daflak-grid';
 
 /** Reuse the backdrop at full extent, with the actual rendered camera footprint. */
-export function attachMinimap(scene: Phaser.Scene, player: Phaser.GameObjects.Container): void {
+export function attachMinimap(scene: Phaser.Scene, player: Phaser.GameObjects.Container, groundUrl: string): void {
   const panel = document.createElement('aside');
   panel.className = 'minimap';
   panel.setAttribute('aria-label', t('minimap'));
   panel.innerHTML = `<strong>${t('city')}</strong>
-    <div class="minimap-image" style="aspect-ratio: ${MAP_WIDTH} / ${MAP_HEIGHT}">
-      <img src="/assets/maps/daflak-city-v001.webp" alt="${t('minimap')}" draggable="false">
+    <div class="minimap-image">
+      <img style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:${MAP_WIDTH/Math.max(MAP_WIDTH,MAP_HEIGHT)*100}%;height:${MAP_HEIGHT/Math.max(MAP_WIDTH,MAP_HEIGHT)*100}%;object-fit:fill" src="${groundUrl}" alt="${t('minimap')}" draggable="false">
       <svg viewBox="0 0 ${MAP_WIDTH} ${MAP_HEIGHT}" aria-hidden="true">
         <rect class="minimap-view" fill="#fff3" stroke="#fff1b8" stroke-width="1.5" vector-effect="non-scaling-stroke"/>
         <circle class="minimap-player" r="60" fill="#ffe18a" stroke="#172824" stroke-width="1.5" vector-effect="non-scaling-stroke"/>

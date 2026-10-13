@@ -1,19 +1,21 @@
 # Daflak local preview
 
-The selected city image is now loaded after any successful login or Guest entry.
+The viewport fills the browser. Movement cells display at 32 x 28 CSS pixels; the camera follows the player at zoom 0.5. World bounds are approximately two entry viewport widths by three heights and stay fixed until leaving the scene. Resize changes the visible area, not world size. The minimap shows the same terrain, player position and actual camera rectangle.
 
-- Terrain layout: 40 × 40 blocks across 5120 × 4480 world bounds. Each block is subdivided into 2 × 2 movement cells: 80 × 80 cells at 64 × 56 world pixels each. The collision footprint is preserved.
-- The canvas fills the browser viewport using Phaser RESIZE. Camera zoom 0.5 displays each movement/hover cell at 32×28 CSS pixels; resizing reveals more/less world without stretching cells. The preview backdrop is compressed vertically to 87.5% of its previous height to retain the 80 × 80 movement grid and collision alignment. Character scale is unchanged; the original image file is untouched. Header/footer are overlays.
-- Source artwork actually measures 1254 × 1254, not 2048 or 5120. It is scaled at runtime; no extra image detail is invented by that scale.
-- The backdrop is a single painted concept image, NOT a seamless reusable tileset. Painted walls, props and gates cannot yet occlude the player independently.
-- Hover uses the camera's world coordinates and snaps to cell corners; green means walkable and red blocked. Click targets cell centers. WASD/arrow movement finishes each cell edge, so it cannot cut blocked corners.
-- BFS routes along the main cardinal avenues and central plaza. The mask in src/world/daflak-grid.ts is deliberately conservative: gardens and side districts remain blocked pending manual object/collision authoring. Gates reach the map boundary; travel to another map is not implemented.
-- Camera follows the placeholder Novice. Its art remains a procedural test character.
-- Top-right minimap shows the entire existing backdrop, player dot and clipped camera worldView rectangle, synchronized after rendering. Width/height percentages describe how much of the whole city is visible; resize updates the footprint. It is a read-only HUD and does not trigger movement underneath.
-- Source, reference, original generation prompt and actual dimensions are in art/source/maps/daflak-city/v001.
+Grass is the base layer. Small cobblestones form roads and diagonal approaches; larger flagstones form a vertically compressed central patio (352 x 231 CSS pixels). Grass detail now caps the oversized flowers; 512px exports preserve source detail. The lawn uses plain fixed-orientation tiling without rotated or blended patches. Irregular grass patches overlap exposed paving edges, while junction interiors stay clear. Decorative overlap does not block movement.
 
-## Favicon
+All land is walkable; water is blocked except the four aligned bridge corridors. Bridge facades are procedural placeholders. Buildings, fountain and other depth-sorted props are not part of the ground artwork. Current materials are local preview candidates, not an approved art master.
 
-index.html links public/favicon.ico (a real ICO container with 16/32/48 PNG entries), PNG icons, Apple touch icon, and public/manifest.webmanifest. Manifest icons use purpose any, not maskable: this artwork was not designed for maskable safe areas. No service worker/offline support is implied.
+Terrain sources and provenance: `art/source/tiles/daflak-ground` and `art/source/tiles/daflak-water-bank`. Runtime materials: `public/assets/tiles/daflak-*.png`. Re-export using `node scripts/export-daflak-materials.mjs`. Textures repeat instead of stretching; cached chunks render at native screen resolution.
 
-Export again with node scripts/export-city-and-favicon.mjs (no input argument after initial import).
+Favicon source: `art/source/ui/favicon`; re-export using `node scripts/export-favicon.mjs`. UI and cursor originals remain under `art/source/ui/login` and `art/source/ui/cursors`.
+
+Per user request, active images use stable filenames, and superseded map concepts/material images have been removed. Current source atlases and their attached generation references remain for reproducible exports; unused quadrants of the water/bank atlas are not exported.
+
+Northern castle reservation: rectangular flagstone court centered on the north approach, joined to the ring road. Paving only, fully walkable until separate castle props/collision are authored. Grass uses a single fixed-orientation pattern at 460.8 x 403.2 CSS pixels. No rotated, feathered, mixed-scale lawn overlays.
+
+Water is a separate two-layer animated TileSprite beneath transparent ground chunks. Mirrored edge pixels remove hard repeat seams; layers use different scales, offsets and slow drift to soften repetition. Existing water art is reused, not a generated sprite sheet. Ground, bridges and collision stay static; minimap remains a still overview. Runtime water textures/listeners are released on scene shutdown.
+
+Current grass uses a standalone regenerated source in art/source/tiles/daflak-grass: plain grass blades only, no baked flowers or clover. Export stays 512 x 512 and world scale is unchanged. The older atlas now supplies only paving and plaza.
+
+Grass/detail separation: current grass is flower-free, with blades displayed 50% larger. Three transparent 128px flower exports (yellow wildflowers, clover, tulips) from art/source/props/daflak-flowers are drawn as seeded decorative clusters, 22-36 CSS px wide. Whole footprints exclude roads, court and water. They remain walkable low ground decals, not collision props; positions persist across reentry at the same world size. Export with node scripts/export-daflak-flowers.mjs.

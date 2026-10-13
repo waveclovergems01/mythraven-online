@@ -1,0 +1,8 @@
+<!doctype html><html lang="th"><meta charset="utf-8"><title>Castle wall assets</title>
+<style>body{margin:24px;background:#202b29;color:#eee;font:16px system-ui}header{display:flex;gap:24px;align-items:center;position:sticky;top:0;background:#202b29;padding:12px}main{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px}figure{margin:0;padding:16px;background:#4d6545;display:grid;place-items:center;border-radius:8px}canvas{max-width:100%;height:auto}figcaption{margin-top:12px;font-size:14px}select{padding:8px}</style>
+<header><h1>กำแพงปราสาท · 29 ชิ้น</h1><label>พื้นหลัง <select id="bg"><option value="#4d6545">หญ้า</option><option value="#ffffff">ขาว</option><option value="#111111">ดำ</option></select></label></header><p>ตรวจชิ้นภาพโปร่งใสก่อนจัดวางในเมือง — พิกัดยึดและพื้นที่ชนยังต้องกำหนดตามตำแหน่งวาง</p><main></main>
+<script type="module">
+const atlas=await (await fetch('/assets/props/castle/castle-walls.json')).json();const image=new Image();image.src='/assets/props/castle/castle-walls.png';await image.decode();
+for(const [name,{frame:f}]of Object.entries(atlas.frames)){const card=document.createElement('figure'),c=document.createElement('canvas');c.width=f.w;c.height=f.h;c.getContext('2d').drawImage(image,f.x,f.y,f.w,f.h,0,0,f.w,f.h);const label=document.createElement('figcaption');label.textContent=`${name} · ${f.w} × ${f.h}`;card.append(c,label);document.querySelector('main').append(card);}
+document.querySelector('#bg').onchange=e=>document.querySelectorAll('figure').forEach(f=>f.style.background=e.target.value);
+</script></html>

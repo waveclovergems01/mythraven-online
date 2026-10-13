@@ -1,7 +1,7 @@
 import sharp from 'sharp';
 import {copyFile, mkdir, writeFile} from 'node:fs/promises';
 import path from 'node:path';
-const sourceDir='art/source/ui/cursors-v001';
+const sourceDir='art/source/ui/cursors';
 const outDir='public/assets/ui/cursors';
 await mkdir(sourceDir,{recursive:true});
 await mkdir(outDir,{recursive:true});
@@ -19,7 +19,7 @@ for(const asset of assets){
  for(let y=0;y<info.height;y++)for(let x=0;x<info.width;x++){
   if(data[(y*info.width+x)*4+3]>0){left=Math.min(left,x);top=Math.min(top,y);right=Math.max(right,x);bottom=Math.max(bottom,y);}
  }
- const output=path.join(outDir,asset.id+'-v001.png');
+ const output=path.join(outDir,asset.id+'.png');
  await sharp(source).extract({left,top,width:right-left+1,height:bottom-top+1})
   .resize(36,36,{fit:'contain',background:'#00000000'})
   .extend({top:2,bottom:2,left:2,right:2,background:'#00000000'}).png().toFile(output);
@@ -34,7 +34,7 @@ for(const asset of assets){
  if(stats.isOpaque||!hotspot)throw Error('Invalid cursor alpha/hotspot');
  manifest.push({styleId:'MR-ART-v1',assetId:asset.id,revision:'v001',status:'reviewed',
  sourcePath:source,exportPath:output,promptPath:sourceDir+'/PROMPTS.md',
- references:['public/assets/ui/login-frame-v001.webp'],generationTool:'built-in image_gen',
+ references:['public/assets/ui/login-frame.webp'],generationTool:'built-in image_gen',
  width:40,height:40,runtimeScale:1,hotspotPx:hotspot,hasTransparency:true});
 }
 await writeFile(path.join(sourceDir,'metadata.json'),JSON.stringify(manifest,null,2)+'\n');

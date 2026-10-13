@@ -1,4 +1,7 @@
 # Mythraven Art Bible
+
+> Current guide (2026-10-12): [ART_STYLE.md](../../ART_STYLE.md) is authoritative for new images. Its visual tokens, palette, ground/object rules, registry, naming and variant workflow override conflicting defaults below. This document retains legacy guidance and technical contracts; see [STYLE_MIGRATION.md](STYLE_MIGRATION.md). Existing assets are not automatically approved under the new guide.
+
 Style ID: **MR-ART-v1**  
 Status: working baseline; visual master not yet established.
 

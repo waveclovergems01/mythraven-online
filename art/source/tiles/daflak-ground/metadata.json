@@ -1,0 +1,42 @@
+{
+  "styleId": "MR-ART-v1",
+  "assetId": "daflak-materials",
+  "revision": "v003",
+  "status": "reviewed-local-preview",
+  "generationTool": "built-in image_gen",
+  "sourcePath": "art/source/tiles/daflak-ground/original.png",
+  "references": [
+    "art/source/tiles/daflak-ground/reference.png"
+  ],
+  "promptPath": "art/source/tiles/daflak-ground/PROMPT.md",
+  "sourceDimensions": [
+    1254,
+    1254
+  ],
+  "exportDimensions": {
+    "paving": [
+      256,
+      256
+    ],
+    "plaza": [
+      256,
+      256
+    ]
+  },
+  "exports": [
+    "public/assets/tiles/daflak-paving.png",
+    "public/assets/tiles/daflak-plaza.png"
+  ],
+  "runtimeRepeat": {
+    "paving": [
+      128,
+      112
+    ],
+    "plaza": [
+      128,
+      89.6
+    ]
+  },
+  "validation": "Inspected repeated layers and road/plaza scale in browser; not an approved project master. Pattern repetition remains visible. Ground and raised props are separate; no fountain included.",
+  "composition": "Only paving and plaza quadrants are exported. Grass is replaced by standalone daflak-grass source; old grass/meadow quadrants are unused."
+}

@@ -14,7 +14,7 @@ let viewVersion = 0;
 let authenticating = false;
 let stopFittingAuth: (() => void) | undefined;
 setLocale(locale());
-const brand = '<img class="brand-logo" src="/assets/ui/mythraven-logo-v001.webp" width="640" height="320" alt="Mythraven Online" fetchpriority="high">';
+const brand = '<img class="brand-logo" src="/assets/ui/mythraven-logo.webp" width="640" height="320" alt="Mythraven Online" fetchpriority="high">';
 
 function renderAuth(): void {
   stopFittingAuth?.();

@@ -1,4 +1,7 @@
 # Asset and sprite contract — MR-ART-v1
+
+> Current guide (2026-10-12): [ART_STYLE.md](../../ART_STYLE.md) is authoritative for new images. Its visual tokens, palette, ground/object rules, registry, naming and variant workflow override conflicting defaults below. This document retains legacy guidance and technical contracts; see [STYLE_MIGRATION.md](STYLE_MIGRATION.md). Existing assets are not automatically approved under the new guide.
+
 ข้อกำหนด export ขั้นต้น ยังไม่ได้เพิ่ม loader หรือ asset pipeline ในโค้ดเกม
 
 ## Terms
@@ -79,21 +82,11 @@ Tiles ต้องมี variant/transition และทดสอบวางซ
 แยก ground / decals / props / overhead; collision/spawn/portals เป็นข้อมูล ไม่ใช่ภาพ generate
 
 ## Naming and storage
-ใช้ lowercase kebab-case:
-novice-male-base-walk-s-v001.png
-novice-male-base-walk-s-v001.json
-forest-grass-a-v001.png
-forest-oak-a-v001.png
-potion-health-small-icon-v001.png
-
-- art/source/<category>/<asset-id>/<revision>/ : original outputs, prompt.txt, metadata.json, raw frames
-- art/references/ : project masters ที่มีสถานะชัดเจน
-- docs/art/references/ : screenshots อ้างอิงจากผู้ใช้ ไม่ใช่ assets พร้อมใช้
-- public/assets/characters|monsters|tiles|props|items|ui|vfx/ : validated runtime files
-
-ไม่เพิ่ม raw candidates จำนวนมากใน public; ไม่ลบ source หลัง export; ไม่ overwrite revision เดิม
-metadata ทุกชิ้นบันทึก styleId, assetId, revision, status (candidate/reviewed/runtime-ready), references, prompt path, source path, export dimensions, scale และ pivot ที่เกี่ยวข้อง
-status เป็นการบันทึกผลการตรวจจริง ไม่ใช่คำสั่งให้ผู้ใช้อนุมัติซ้ำทุกภาพ
+Use stable lowercase kebab-case names without revision suffixes (user request, 2026-10-12), e.g. daflak-grass.png and mythraven-logo.webp.
+- art/source/<category>/<asset-id>/ keeps the current original, prompt and metadata.
+- public/assets/ contains only current runtime exports.
+- docs/art/references/ contains visual references, not runtime assets.
+Remove superseded images after checking code, exporters and metadata. Update all paths together. Do not keep abandoned image variants. Metadata may retain historical generation details; MR-ART-v1 remains the shared style identifier.
 
 ## Example metadata (illustrative, not a shipped asset)
 ```json
@@ -134,5 +127,20 @@ references/promptPath/sourcePath ว่างได้ในตัวอย่�
 6. วางคู่ master ในเกมที่ runtimeScale; ตรวจ depth, blending, collision และความอ่านง่าย
 7. บันทึกผล QA ก่อนย้ายเป็น runtime-ready; manifest นี้ยังไม่มี automated validator
 
-## Daflak rectangular-grid preview
-User-requested runtime experiment: movement cells are 64 × 56 world pixels, displayed at 32 × 28 CSS pixels with camera zoom 0.5. The 40 × 40 terrain-block layout retains 2 × 2 movement cells per block. The existing baked city concept is displayed at 5120 × 4480 (vertical factor 0.875 relative to the earlier preview), including its baked props; this is a preview projection compromise, not a new image export or a general sprite transform. Character proportions and original assets remain unchanged. Minimap uses the same world aspect ratio.
+## Daflak ground composition
+Movement cells are 64 x 56 world pixels, displayed at 32 x 28 CSS pixels with camera zoom 0.5. Map dimensions are frozen at entry, approximately two viewport widths by three viewport heights. Production multiplayer will require shared map dimensions.
+Grass repeats at 460.8 x 403.2 CSS pixels, paving at 128 x 112, plaza at 128 x 89.6. The central patio is 352 x 231 CSS pixels. This ground-only foreshortening leaves character proportions unchanged.
+Grass overlays form irregular visible encroachment along exposed paving edges; intersections remain connected. These decorative edges do not alter collision. Ground chunks and minimap share the same composition. Current bridge facades remain technical placeholders, not final directional sprite art.
+Sources: art/source/tiles/daflak-ground and art/source/tiles/daflak-water-bank. Export with node scripts/export-daflak-materials.mjs.
+
+Northern castle reservation: rectangular flagstone court centered on the north approach, joined to the ring road. Paving only, fully walkable until separate castle props/collision are authored. Grass uses a single fixed-orientation pattern at 460.8 x 403.2 CSS pixels. No rotated, feathered, mixed-scale lawn overlays.
+
+Water is a separate two-layer animated TileSprite beneath transparent ground chunks. Mirrored edge pixels remove hard repeat seams; layers use different scales, offsets and slow drift to soften repetition. Existing water art is reused, not a generated sprite sheet. Ground, bridges and collision stay static; minimap remains a still overview. Runtime water textures/listeners are released on scene shutdown.
+
+Current grass uses a standalone regenerated source in art/source/tiles/smooth-meadow/grass: plain grass blades only, no baked flowers or clover. Export stays 512 x 512 and world scale is unchanged. The older atlas now supplies only paving and plaza.
+
+Grass/detail separation: current grass is flower-free, with blades displayed 50% larger. Three transparent 128px flower exports (yellow wildflowers, clover, tulips) from art/source/props/daflak-flowers are drawn as seeded decorative clusters, 22-36 CSS px wide. Whole footprints exclude roads, court and water. They remain walkable low ground decals, not collision props; positions persist across reentry at the same world size. Export with node scripts/export-daflak-flowers.mjs.
+
+Latest 2026-10-13: smooth grass and separate transparent earth transitions replace dense grass. Current repeat preview: assets/_tests/grass-repeat.png. Re-export grass, earth and current low-cover sprites with scripts/export-meadow.mjs.
+
+Earth placement: seeded full 360-degree ground-plane rotation, varied width/aspect/opacity, 70% partial circular feathered source crops and 30% complete decals. Crop canvases are built once per scene, shared by cached chunks and minimap. Circumscribed placement footprints exclude paving, castle court and water. Source artwork is unchanged.

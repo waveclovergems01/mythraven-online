@@ -14,7 +14,7 @@
 }
 .minimap strong { display: block; margin-bottom: 6px; }
 .minimap-image { position: relative; aspect-ratio: 1; overflow: hidden; }
-.minimap-image img { display: block; width: 100%; height: 100%; }
+.minimap-image img { display: block; width: 100%; height: 100%; object-fit: contain; }
 .minimap-image svg { position: absolute; inset: 0; width: 100%; height: 100%; }
 .minimap-legend { margin-top: 6px; }
 .minimap-stats { margin-top: 3px; color: #a9c6ca; }

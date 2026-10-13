@@ -1,0 +1,25 @@
+{
+  "styleId": "MR-ART-v1",
+  "assetId": "mythraven-favicon",
+  "revision": "v001",
+  "status": "reviewed",
+  "sourcePath": "art/source/ui/favicon/original.png",
+  "promptPath": "art/source/ui/favicon/PROMPT.md",
+  "references": [
+    "public/assets/ui/mythraven-logo.webp"
+  ],
+  "generationTool": "built-in image_gen (earlier turn)",
+  "sizes": [
+    16,
+    32,
+    48,
+    180,
+    192,
+    512
+  ],
+  "icoSizes": [
+    16,
+    32,
+    48
+  ]
+}

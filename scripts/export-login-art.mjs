@@ -5,7 +5,7 @@ import path from 'node:path';
 // Export only: preserve artwork and alpha, resize/re-encode for browser delivery.
 // Optional argument: original generated-image folder, needed only on first import.
 const originalFolder = process.argv[2];
-const sourceFolder = 'art/source/ui/login-v001';
+const sourceFolder = 'art/source/ui/login';
 const outputFolder = 'public/assets/ui';
 await mkdir(sourceFolder,{recursive:true});
 await mkdir(outputFolder,{recursive:true});
@@ -16,19 +16,19 @@ const assets = [
 ];
 const manifest=[];
 for(const asset of assets) {
-  const source=path.join(sourceFolder,asset.id+'-v001.png');
+  const source=path.join(sourceFolder,asset.id+'.png');
   if(originalFolder) {
     try { await stat(source); } catch(error) {
       if(error.code!=='ENOENT') throw error;
       await copyFile(path.join(originalFolder,asset.original),source);
     }
   }
-  const output=path.join(outputFolder,asset.id+'-v001.webp');
+  const output=path.join(outputFolder,asset.id+'.webp');
   const result=await sharp(source).resize({width:asset.width,withoutEnlargement:true})
     .webp({lossless:asset.lossless,quality:78,effort:6}).toFile(output);
   const stats=await sharp(output).stats();
   manifest.push({styleId:'MR-ART-v1',assetId:asset.id,revision:'v001',status:'reviewed',
-    sourcePath:source,exportPath:output,promptPath:'art/source/ui/login-v001/PROMPTS.md',
+    sourcePath:source,exportPath:output,promptPath:'art/source/ui/login/PROMPTS.md',
     references:[],generationTool:'built-in image_gen (previous turn)',
     width:result.width,height:result.height,bytes:result.size,hasTransparency:!stats.isOpaque,
     ...(asset.id==='login-frame'?{nineSlicePx:[100,64,100,64],centerFill:false}:{}),

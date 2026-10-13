@@ -1,0 +1,14 @@
+[
+  {
+    "name": "grass",
+    "alpha": false,
+    "prompt": "2D hand-painted fantasy MMORPG game asset, soft painted style similar to classic Ragnarok Online, warm friendly medium-low saturation colors, soft top-left lighting. Mythraven Soft Painted Fantasy 2D candidate. Both attached sheets are STYLE REFERENCES only: emulate the soft meadow preview, NOT sheet arrangement, labels, grids, diamond outlines or normal maps. ONE square seamless grass ground material, filling the ENTIRE image edge to edge, viewed flat from above for use on an inclined game ground plane. IMPORTANT: 70% of the image is calm smooth matte olive-green turf with minimal texture, 30% has sparse soft broad short blade brushstrokes. No dense leaves, no tangled tiny curly strokes, no sharp yellow details, no grass tufts, no flowers or clover. Soft merged olive and moss greens around #7fb55a and #72a850, very subtle lightness difference. Make this MUCH LESS BUSY than the reference: broad quiet painted turf between sparse soft blades. Homogeneous density, no sweeping waves or bands, no mottled high contrast, no checkerboard or quadrants. Final square512. Perfectly uniform lighting, flat even surface, no objects, no shadows, no highlights, no text, no watermark, no vignette, no border, edges match perfectly for seamless tiling.",
+    "path": "C:\\Users\\WaveC\\.codex\\generated_images\\01a1212a-7952-7441-a8b9-228bc33219cc\\exec-2303d1ef-37d1-42e0-a1eb-2fdace376a92.png"
+  },
+  {
+    "name": "earth",
+    "alpha": true,
+    "prompt": "2D hand-painted fantasy MMORPG game asset, soft painted style similar to classic Ragnarok Online, warm friendly medium-low saturation colors, soft top-left lighting. Mythraven Soft Painted Fantasy 2D candidate. Both attached sheets are STYLE REFERENCES only: emulate the soft meadow preview, NOT sheet arrangement, labels, grids, diamond outlines or normal maps. DEC-02. One irregular elongated worn earth clearing / grass-to-dirt transition decal, flat top-down ground plane. Warm muted beige soil, smooth softly painted dust with only a few tiny embedded grains, sparse short olive-green grass along a ragged FEATHERED fringe blending into real transparency. Soil center irregular and quiet, no dark outline, no raised slab, no isometric diamond, no pedestal or shadows. Like the grass to dirt strips at the bottom of reference1, but ONE isolated natural oblong patch to layer over grass. No flowers, no rocks, no border, no text. Centered 10% transparent padding, genuine transparent background. 2-3 tone soft shading, low contrast.",
+    "path": "C:\\Users\\WaveC\\.codex\\generated_images\\01a1212a-7952-7441-a8b9-228bc33219cc\\exec-15635581-96d4-4cad-b4b6-e7a5f1056be6.png"
+  }
+]
