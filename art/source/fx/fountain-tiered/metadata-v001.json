@@ -1,0 +1,58 @@
+{
+  "assetId": "FX-FOUNTAIN-TIERED-WATER",
+  "revision": "v001",
+  "status": "integrated-and-validated",
+  "ownerApprovedDesign": true,
+  "ownerApprovedExport": false,
+  "runtimeReady": true,
+  "tool": "image_gen.imagegen",
+  "model": "not exposed",
+  "source": "original-v001.png",
+  "prompt": "prompt-v001.txt",
+  "referencesAttached": [
+    "art/source/props/mythraven-fountain/tiered-v002/original.png"
+  ],
+  "export": "public/assets/fx/fountain-tiered-water.png",
+  "exportSize": [
+    1024,
+    512
+  ],
+  "frameSize": [
+    256,
+    256
+  ],
+  "columns": 4,
+  "rows": 2,
+  "frameCount": 8,
+  "actions": {
+    "jet": {
+      "frames": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "rootPx": [
+        48,
+        112
+      ]
+    },
+    "fall": {
+      "frames": [
+        4,
+        5,
+        6,
+        7
+      ],
+      "rootPx": [
+        128,
+        32
+      ]
+    }
+  },
+  "frameRate": 7,
+  "normalization": "normalization.json; same 0.5 source scale for all frames and root alignment",
+  "runtime": "Four remapped arcing jets and four falls; src/world/fountain.ts",
+  "qa": "True alpha verified, no stone in FX sheet, four animation phases observed in game; shape stable within static prop, world emitter alignment, screenshots/video, scene restart and no page errors validated.",
+  "historicalReferenceNote": "Earlier generation reference removed after supersession per owner cleanup request; referencesAttached records historical input only."
+}

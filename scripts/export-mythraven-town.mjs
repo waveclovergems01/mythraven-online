@@ -4,7 +4,7 @@ const root='art/source/maps/mythraven-town/';
 const out='public/assets/maps';
 await mkdir(out,{recursive:true});
 await sharp(root+'mythraven-town-sand-v004.png').png().toFile(out+'/mythraven-dirt.png');
-await sharp('art/source/tiles/mythraven-grass-overlay/grass-v001.png').png().toFile('public/assets/tiles/mythraven-grass.png');
+await sharp('art/source/tiles/painted-town-v004/grass-source.png').resize(512,512).png().toFile('public/assets/tiles/mythraven-grass.png');
 const {data,info}=await sharp(root+'mythraven-town-sand-v004.png').removeAlpha().raw().toBuffer({resolveWithObject:true});
 const mask=Buffer.alloc(info.width*info.height*4),nav=Buffer.alloc(info.width*info.height*3);
 const smooth=t=>t*t*(3-2*t);
@@ -40,7 +40,7 @@ for(let y=0;y<info.height;y++)for(let x=0;x<info.width;x++){
 }
 await sharp(mask,{raw:{width:info.width,height:info.height,channels:4}}).png().toFile(out+'/mythraven-grass-mask.png');
 await sharp(nav,{raw:{width:info.width,height:info.height,channels:3}}).png().toFile(out+'/mythraven-navigation.png');
-await writeFile(root+'integration.json',JSON.stringify({status:'integrated',source:'mythraven-town-sand-v004.png',grass:'art/source/tiles/mythraven-grass-overlay/grass-v001.png',mask:'public/assets/maps/mythraven-grass-mask.png',navigation:'public/assets/maps/mythraven-navigation.png',dimensions:info,coveragePixels:levels,notes:'Central lawn boosted to 92-100% coverage; outermost coverage unchanged. Deterministic soft coverage, soil-only; water classification navigation is conservative per movement cell. Objects not added.'},null,2));
+await writeFile(root+'integration.json',JSON.stringify({status:'integrated',source:'mythraven-town-sand-v004.png',grass:'art/source/tiles/painted-town-v004/grass-source.png',mask:'public/assets/maps/mythraven-grass-mask.png',navigation:'public/assets/maps/mythraven-navigation.png',dimensions:info,coveragePixels:levels,notes:'Central lawn boosted to 92-100% coverage; outermost coverage unchanged. Deterministic soft coverage, soil-only; water classification navigation is conservative per movement cell. Objects not added.'},null,2));
 console.log(levels);
 
 

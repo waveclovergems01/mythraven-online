@@ -129,6 +129,7 @@ async function showGame(session: Session): Promise<void> {
     try {
       if(session.kind==='google') await googleLogout();
       try { logout(); } catch(error) { if(session.kind!=='google') throw error; }
+      window.dispatchEvent(new Event('mythraven:leave'));
       game?.destroy(true); game=null; errorKey=null;
       if(session.kind==='google') { window.location.reload(); return; }
       renderAuth();

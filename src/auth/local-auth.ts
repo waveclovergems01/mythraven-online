@@ -1,5 +1,6 @@
 /** LOCAL DEMO ONLY. Browser records are editable, not a trusted authentication boundary.
- * Replace this adapter with a server-backed service before multiplayer or deployment.
+ * Multiplayer currently creates separate server-assigned temporary guests; these browser records grant no game authority.
+ * Replace this adapter with verified server-backed account auth before persistent account gameplay.
  */
 import { validUsername, validPasswordCharacters, MAX_PASSWORD_LENGTH } from './input-policy';
 export interface Session { id: string; username: string; kind: 'account' | 'guest' | 'google'; }
@@ -8,11 +9,11 @@ export type AuthErrorCode = 'invalidUsername' | 'invalidPasswordCharacters' | 's
 export class AuthError extends Error { constructor(public code: AuthErrorCode) { super(code); } }
 const ACCOUNTS = 'mr.demo.accounts.v1', SESSION = 'mr.demo.session.v1', GUEST = 'mr.demo.guest.v1';
 function read(key: string): unknown {
-  try { const raw = localStorage.getItem(key); return raw ? JSON.parse(raw) : null; }
+  try { const raw = (key===ACCOUNTS?localStorage:sessionStorage).getItem(key); return raw ? JSON.parse(raw) : null; }
   catch { return null; }
 }
 function save(key: string, value: unknown): void {
-  try { localStorage.setItem(key, JSON.stringify(value)); } catch { throw new AuthError('storage'); }
+  try { (key===ACCOUNTS?localStorage:sessionStorage).setItem(key, JSON.stringify(value)); } catch { throw new AuthError('storage'); }
 }
 function validSession(value: unknown): value is Session {
   if (!value || typeof value !== 'object') return false;
@@ -35,7 +36,7 @@ export function getSession(): Session | null {
   return validSession(session) ? session : null;
 }
 export function logout(): void {
-  try { localStorage.removeItem(SESSION); } catch { throw new AuthError('storage'); }
+  try { sessionStorage.removeItem(SESSION); } catch { throw new AuthError('storage'); }
 }
 export async function register(username: string, password: string): Promise<Session> {
   if (password.length > MAX_PASSWORD_LENGTH) throw new AuthError('longPassword');
@@ -67,10 +68,10 @@ export async function login(username: string,password: string): Promise<Session>
   return session;
 }
 export function guest(): Session {
-  const previous = read(GUEST);
+
   if (!globalThis.crypto?.randomUUID) throw new AuthError('unavailable');
   const id = crypto.randomUUID();
-  const session: Session = validSession(previous) && previous.kind === 'guest' ? previous :
+  const session: Session =
     {id,username:'Guest-'+id.slice(0,6),kind:'guest'};
   save(GUEST,session);
   save(SESSION,session);

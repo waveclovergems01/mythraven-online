@@ -1,0 +1,149 @@
+{
+  "frames": [
+    {
+      "row": 0,
+      "index": 0,
+      "sourceRoot": [
+        70,
+        174
+      ],
+      "anchor": [
+        48,
+        112
+      ],
+      "scale": 0.5,
+      "offset": [
+        13,
+        25
+      ]
+    },
+    {
+      "row": 0,
+      "index": 1,
+      "sourceRoot": [
+        63,
+        174
+      ],
+      "anchor": [
+        48,
+        112
+      ],
+      "scale": 0.5,
+      "offset": [
+        17,
+        25
+      ]
+    },
+    {
+      "row": 0,
+      "index": 2,
+      "sourceRoot": [
+        61,
+        174
+      ],
+      "anchor": [
+        48,
+        112
+      ],
+      "scale": 0.5,
+      "offset": [
+        18,
+        25
+      ]
+    },
+    {
+      "row": 0,
+      "index": 3,
+      "sourceRoot": [
+        59,
+        174
+      ],
+      "anchor": [
+        48,
+        112
+      ],
+      "scale": 0.5,
+      "offset": [
+        19,
+        25
+      ]
+    },
+    {
+      "row": 1,
+      "index": 0,
+      "sourceRoot": [
+        220.8861788617886,
+        50
+      ],
+      "anchor": [
+        128,
+        32
+      ],
+      "scale": 0.5,
+      "offset": [
+        18,
+        7
+      ]
+    },
+    {
+      "row": 1,
+      "index": 1,
+      "sourceRoot": [
+        220.31560283687944,
+        50
+      ],
+      "anchor": [
+        128,
+        32
+      ],
+      "scale": 0.5,
+      "offset": [
+        18,
+        7
+      ]
+    },
+    {
+      "row": 1,
+      "index": 2,
+      "sourceRoot": [
+        221.8501872659176,
+        49
+      ],
+      "anchor": [
+        128,
+        32
+      ],
+      "scale": 0.5,
+      "offset": [
+        17,
+        8
+      ]
+    },
+    {
+      "row": 1,
+      "index": 3,
+      "sourceRoot": [
+        219.8097014925373,
+        50
+      ],
+      "anchor": [
+        128,
+        32
+      ],
+      "scale": 0.5,
+      "offset": [
+        18,
+        7
+      ]
+    }
+  ],
+  "frameSize": [
+    256,
+    256
+  ],
+  "sourceSize": [
+    1774,
+    887
+  ],
+  "scale": 0.5
+}

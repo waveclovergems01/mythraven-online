@@ -1,0 +1,11 @@
+{
+  "removed": [
+    "art/source/tiles/mythraven-paving/original-v001.png",
+    "art/source/tiles/mythraven-paving/paving-v001.png",
+    "art/source/tiles/mythraven-paving/repeat-3x3.png",
+    "art/source/tiles/mythraven-grass-overlay/grass-v001.png",
+    "art/source/tiles/mythraven-grass-overlay/original-v001.png",
+    "art/source/tiles/mythraven-grass-overlay/repeat-3x3-v001.png"
+  ],
+  "reason": "Superseded source and repeat previews; active source and approval reference retained."
+}

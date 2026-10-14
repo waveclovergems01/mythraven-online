@@ -17,7 +17,8 @@ Use the shared prompt block plus the relevant asset template, and attach actual 
 The user-provided screenshots establish direction, not approved Mythraven character designs. See docs/art/references/README.md.
 Until an approved project master exists, produce a clearly labelled candidate from the documented defaults; do not invent an approval or a completed reference file.
 A concept sheet or AI-generated grid is not automatically a production sprite sheet. Validate dimensions, alpha, frame order, feet alignment, identity and animation in-game before marking runtime-ready.
-Keep original generated outputs and prompt/metadata records under art/source; copy only validated exports to public/assets. Never point game code at temp files.
+Keep the current source outputs and prompt/metadata records under art/source; copy only validated exports to public/assets. Never point game code at temp files.
+After each asset replacement, audit references and remove superseded or unused game images and obsolete exporters after validation (explicit owner instruction, 2026-10-14). Keep only active source dependencies and intentional art references; record removals and do not delete assets solely because a dynamic reference was missed. This cleanup rule supersedes blanket retention of obsolete generated images.
 For new work follow ART_STYLE.md versioned candidates and unversioned approved outputs. This latest user guide supersedes the earlier no-version rule. Existing runtime filenames remain unchanged until a requested replacement. A user-requested style change must update the shared specifications and identify affected assets.
 Use the available image-generation skill/tool for raster generation/editing. Exact export dimensions below describe finished assets, not guaranteed generation-tool output sizes.
 Do not generate art merely because the rules are being edited. Rules alone do not authorize generating a complete asset library.

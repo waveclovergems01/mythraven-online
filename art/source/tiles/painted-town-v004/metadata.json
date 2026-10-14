@@ -1,0 +1,25 @@
+{
+  "tool": "image_gen.imagegen",
+  "model": "not exposed",
+  "reference": "art/source/previews/ground-v004/terrain-style-v001.png",
+  "status": "approved direction; generated tile derivatives integrated and locally validated",
+  "tileSize": [
+    512,
+    512
+  ],
+  "grid": "Each square image is one repeating material tile; no town layout baked in.",
+  "grassRepeatCSS": [
+    512,
+    512
+  ],
+  "pavingRepeatCSS": [
+    256,
+    224
+  ],
+  "transitions": "Reusable runtime alpha boundary mask in src/world/terrain-materials.ts; material pixels remain sharp.",
+  "exports": [
+    "public/assets/tiles/mythraven-grass.png",
+    "public/assets/tiles/mythraven-paving.png"
+  ],
+  "validation": "Build passed; 3 Playwright tests passed. Actual town screenshots inspected, desktop resize returns 50% x33%, click movement and fountain collision/depth intact."
+}

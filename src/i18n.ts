@@ -1,6 +1,6 @@
 export const messages = {
   th: {
-    minimap: 'แผนที่เมืองทั้งหมด', minimapLegend: '● คุณอยู่ที่นี่ · กรอบ = พื้นที่กล้อง', minimapVisible: 'มองเห็น (กว้าง × สูง)',
+    minimap: 'แผนที่เมืองทั้งหมด', minimapLegend: 'เหลือง = คุณ · เทา = ผู้เล่นอื่น · กรอบ = พื้นที่กล้อง', minimapVisible: 'มองเห็น (กว้าง × สูง)',
     mapLoadError: 'โหลดแผนที่ไม่สำเร็จ กรุณารีเฟรชหน้าเว็บ',
     city: 'Mythraven · เมืองหลัก', cityControls: 'WASD / ลูกศร หรือคลิกช่องสีเขียวเพื่อเดิน', cityNote: 'พื้นดินและแปลงหญ้า · ข้ามคลองได้ทางเหนือ',
     googleSetup: 'ต้องตั้งค่า Google Client ID ก่อน ดูคู่มือ GOOGLE_AUTH_SETUP.md',
@@ -17,7 +17,7 @@ export const messages = {
     invalidPasswordCharacters: 'รหัสผ่านรับเฉพาะอังกฤษ ตัวเลข และสัญลักษณ์ เช่น !@#$% ไม่รับภาษาไทยหรือช่องว่าง',
     enter: 'เข้าเกม', create: 'สมัครและเข้าเกม', or: 'หรือเดินทางต่อด้วย', google: 'ดำเนินการต่อด้วย Google',
     email: 'เข้าสู่ระบบด้วยอีเมล', providerNote: 'การเข้าใช้งานด้วยอีเมลอื่นจะเพิ่มภายหลัง',
-    guest: 'เล่นเป็น Guest', guestHint: 'ไม่ต้องสมัคร · จำ Guest บนเบราว์เซอร์นี้',
+    guest: 'เล่นเป็น Guest', guestHint: 'ไม่ต้องสมัคร · Guest แยกแต่ละแท็บ',
     local: 'เวอร์ชันทดลองบนเครื่อง', localNote: 'ชื่อผู้ใช้/รหัสผ่านยังเป็นบัญชีทดลอง ส่วน Google ยืนยันผ่านเซิร์ฟเวอร์',
     footer: 'เขียนเรื่องราวของคุณ ในโลกที่กำลังถือกำเนิด', language: 'ภาษา', show: 'แสดง', hide: 'ซ่อน',
     busy: 'กำลังดำเนินการ…', invalidUsername: 'ชื่อผู้ใช้ต้องมี 3–16 ตัว ใช้ a–z, 0–9 หรือ _',
@@ -30,7 +30,7 @@ export const messages = {
     loading: 'กำลังเปิดโลก…', worldTitle: 'MYTHRAVEN / ลานฝึกซ้อม', session: 'เล่นบนเครื่อง · ผู้เล่นคนเดียว',
   },
   en: {
-    minimap: 'Full city map', minimapLegend: '● You · Frame = camera view', minimapVisible: 'Visible (width × height)',
+    minimap: 'Full city map', minimapLegend: 'Yellow = you · Gray = other players · Frame = camera view', minimapVisible: 'Visible (width × height)',
     mapLoadError: 'Map could not load. Please refresh the page.',
     city: 'Mythraven · Main city', cityControls: 'WASD / arrows, or click a green tile to move', cityNote: 'Painted grass over earth · Northern crossing',
     googleSetup: 'Set your Google Client ID first. See GOOGLE_AUTH_SETUP.md.',
@@ -47,7 +47,7 @@ export const messages = {
     invalidPasswordCharacters: 'Use English letters, numbers and ASCII symbols such as !@#$%. No Thai or spaces.',
     enter: 'Enter the world', create: 'Create account & play', or: 'Or continue your journey with', google: 'Continue with Google',
     email: 'Sign in with email', providerNote: 'Other email sign-in will be added later',
-    guest: 'Play as Guest', guestHint: 'No registration · Guest remembered in this browser',
+    guest: 'Play as Guest', guestHint: 'No registration · Separate Guest per tab',
     local: 'Local preview', localNote: 'Username/password accounts are local demos. Google sign-in is server-verified.',
     footer: 'Your story, in a world taking shape', language: 'Language', show: 'Show', hide: 'Hide',
     busy: 'Please wait…', invalidUsername: 'Use 3–16 characters: a–z, 0–9 or _',

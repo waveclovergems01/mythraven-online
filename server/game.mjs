@@ -1,0 +1,14 @@
+import 'dotenv/config';
+import sharp from 'sharp';
+import {fileURLToPath} from 'node:url';
+import {Server} from '@colyseus/core';
+import {WebSocketTransport} from '@colyseus/ws-transport';
+import {configureNavigation} from '../shared/town-grid.mjs';
+import {TownRoom} from './town-room.mjs';
+const {data,info}=await sharp(fileURLToPath(new URL('../public/assets/maps/mythraven-navigation.png',import.meta.url))).ensureAlpha().raw().toBuffer({resolveWithObject:true});
+configureNavigation({data,width:info.width,height:info.height});
+const server=new Server({transport:new WebSocketTransport(),greet:false});
+server.define('mythraven-town',TownRoom);
+const port=Number(process.env.GAME_PORT||2567);
+await server.listen(port,'127.0.0.1');
+console.log(`Colyseus local game server: ws://127.0.0.1:${port}`);

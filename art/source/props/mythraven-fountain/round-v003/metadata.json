@@ -1,0 +1,29 @@
+{
+  "tool": "image_gen.imagegen",
+  "model": "not exposed by tool",
+  "status": "approved design integrated; static derivative validated in game",
+  "source": "original.png",
+  "identityReference": "approved-design.png",
+  "placementReference": "approved-placement.png",
+  "export": "public/assets/props/fountain/mythraven-fountain.png",
+  "crop": [
+    158,
+    14,
+    1100,
+    1140
+  ],
+  "size": [
+    768,
+    796
+  ],
+  "groundAnchor": [
+    367,
+    584
+  ],
+  "worldWidth": 846,
+  "collisionRadii": [
+    400,
+    220
+  ],
+  "qa": "Build and city playtest passed; alpha, alignment, water animation, detour, depth and screenshot checked."
+}

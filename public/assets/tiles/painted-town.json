@@ -1,0 +1,16 @@
+{
+  "tilewidth": 512,
+  "tileheight": 512,
+  "materials": [
+    {
+      "id": 0,
+      "name": "grass",
+      "image": "mythraven-grass.png"
+    },
+    {
+      "id": 1,
+      "name": "paving",
+      "image": "mythraven-paving.png"
+    }
+  ]
+}

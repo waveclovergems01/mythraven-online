@@ -94,7 +94,7 @@ test('registration, validation, logout, login and saved session', async ({ page 
   expect(errors).toEqual([]);
 });
 
-test('guest identity survives refresh and logout; locales persist', async ({page})=>{
+test('guest identity survives tab refresh; new login creates a new guest', async ({page})=>{
   await page.goto('/');
   await page.selectOption('#language','en');
   await page.getByRole('button',{name:'Play as Guest'}).click();
@@ -104,7 +104,7 @@ test('guest identity survives refresh and logout; locales persist', async ({page
   await expect(page.locator('#player-name')).toHaveText(name!);
   await page.getByRole('button',{name:'Leave game'}).click();
   await page.getByRole('button',{name:'Play as Guest'}).click();
-  await expect(page.locator('#player-name')).toHaveText(name!);
+  await expect(page.locator('#player-name')).not.toHaveText(name!);
   await page.getByRole('button',{name:'Leave game'}).click();
   await page.selectOption('#language','th');
   await page.reload();
