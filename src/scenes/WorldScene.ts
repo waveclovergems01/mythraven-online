@@ -3,7 +3,7 @@ import {t} from '../i18n';
 import {attachFountain,FOUNTAIN_JET} from '../world/fountain';
 import {buildTownGround,TOWN_ASSETS} from '../world/town-ground';
 import {attachMinimap} from '../world/minimap';
-import {createPlayerView} from '../world/player-view';
+import {createPlayerView,NOVICE_IDLE,NOVICE_WALK} from '../world/player-view';
 import {TownClient} from '../network/town-client';
 import {TILE_WIDTH,TILE_HEIGHT,MAP_WIDTH,MAP_HEIGHT,configureMap,SPAWN,cellAt,centerOf,walkable} from '../world/daflak-grid';
 export class WorldScene extends Phaser.Scene {
@@ -17,6 +17,8 @@ export class WorldScene extends Phaser.Scene {
  private lastDirection='0,0';private lastSent=0;private following=false;
  constructor(){super('world');}
  preload(){
+  this.load.spritesheet(NOVICE_IDLE.key,NOVICE_IDLE.path,{frameWidth:NOVICE_IDLE.frameWidth,frameHeight:NOVICE_IDLE.frameHeight});
+  this.load.spritesheet(NOVICE_WALK.key,NOVICE_WALK.path,{frameWidth:NOVICE_WALK.frameWidth,frameHeight:NOVICE_WALK.frameHeight});
   this.load.spritesheet(FOUNTAIN_JET.key,FOUNTAIN_JET.path,{frameWidth:256,frameHeight:256});
   for(const [key,path] of Object.entries(TOWN_ASSETS))this.load.image(key,path);
  }
@@ -63,7 +65,7 @@ export class WorldScene extends Phaser.Scene {
    // Smooth received authoritative positions; no browser-owned movement simulation.
    const alpha=1-Math.exp(-Math.min(delta,100)/45);
    view.container.x+= (state.x-view.container.x)*alpha;view.container.y+=(state.y-view.container.y)*alpha;
-   view.container.setDepth(view.container.y);view.body.scaleX=state.facing*1.6;view.body.y=state.moving?Math.sin(time/85)*2:0;
+   view.container.setDepth(view.container.y);view.updatePose(state.x,state.y,state.moving);
    if(mine){
     this.player.setPosition(view.container.x,view.container.y);
     if(!this.following){this.cameras.main.centerOn(state.x,state.y);this.following=true;}
@@ -73,3 +75,4 @@ export class WorldScene extends Phaser.Scene {
   for(const [id,view] of this.views)if(!this.network.players.has(id)){view.container.destroy();this.views.delete(id);}
  }
 }
+

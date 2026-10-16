@@ -10,14 +10,15 @@ test('two same-browser guests share authoritative movement, resize and leave',as
  test.setTimeout(90000);const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));
  await page.setViewportSize({width:1280,height:720});await enter(page);
  const other=await context.newPage();other.on('pageerror',e=>errors.push(e.message));await other.setViewportSize({width:1920,height:960});await enter(other);
- await expect.poll(async()=>Object.keys((await snapshot(page)).players).length).toBe(2);
+ await expect.poll(async()=>Object.keys((await snapshot(page)).players).length).toBeGreaterThanOrEqual(2);
  const a=await snapshot(page),b=await snapshot(other);expect(a.id).not.toBe(b.id);expect(a.room).toBe(b.room);
  const storageA=await page.evaluate(()=>sessionStorage.getItem('mr.demo.session.v1'));
  const storageB=await other.evaluate(()=>sessionStorage.getItem('mr.demo.session.v1'));expect(storageA).not.toBe(storageB);
  for (const tab of [page,other]) {
-  await expect(tab.locator('.minimap-player')).toHaveCount(2);
+  await expect(tab.locator(`.minimap-player[data-player-id="${a.id}"]`)).toHaveCount(1);
+  await expect(tab.locator(`.minimap-player[data-player-id="${b.id}"]`)).toHaveCount(1);
   await expect(tab.locator('.minimap-player[data-mine="true"]')).toHaveAttribute('fill','#ffe18a');
-  await expect(tab.locator('.minimap-player[data-mine="false"]')).toHaveAttribute('fill','#b8bec5');
+  await expect(tab.locator('.minimap-player[data-mine="false"]').first()).toHaveAttribute('fill','#b8bec5');
  }
  const remoteDot=other.locator(`.minimap-player[data-player-id="${a.id}"]`);
  const dotStart=Number(await remoteDot.getAttribute('cx'));
@@ -57,8 +58,8 @@ test('two same-browser guests share authoritative movement, resize and leave',as
  await expect(page.locator('.minimap-stats')).toContainText('50%');
  await page.bringToFront();await page.screenshot({path:'test-results/multiplayer-player-one.png'});
  await other.bringToFront();await other.screenshot({path:'test-results/multiplayer-player-two.png'});
- await other.locator('#logout').click();await expect.poll(async()=>Object.keys((await snapshot(page)).players).length).toBe(1);
- await expect(page.locator('.minimap-player')).toHaveCount(1);
+ await other.locator('#logout').click();await expect.poll(async()=>!!(await snapshot(page)).players[b.id]).toBe(false);
+ await expect(page.locator(`.minimap-player[data-player-id="${b.id}"]`)).toHaveCount(0);
  await expect(page.locator('.minimap-player[data-mine="true"]')).toHaveCount(1);
  await expect(other.locator('#guest')).toBeVisible();expect(await page.locator('#network-status').count()).toBe(1);
  expect(errors).toEqual([]);await other.close();

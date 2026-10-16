@@ -5,7 +5,7 @@ await mkdir('public/assets/icons',{recursive:true});
 const pngs=[];
 for(const size of [16,32,48,180,192,512]){
  const png=await sharp(iconSource+'/original.png').resize(size,size,{fit:'contain',background:'#00000000'}).png().toBuffer();
- await writeFile('public/assets/icons/mythraven-'+size+'.png',png);
+ if(size!==48)await writeFile('public/assets/icons/mythraven-'+size+'.png',png);
  if(size<=48)pngs.push({size,png});
 }
 // ICO container with three PNG-encoded entries, not a PNG renamed to .ico.

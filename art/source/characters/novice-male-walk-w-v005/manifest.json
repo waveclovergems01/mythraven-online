@@ -1,0 +1,34 @@
+{
+  "assetId": "novice-male-walk-w",
+  "revision": "v005",
+  "status": "idle-identity-correction",
+  "ownerApproved": false,
+  "poseOwnerApproved": true,
+  "frameCount": 8,
+  "frameSize": [
+    240,
+    240
+  ],
+  "sheetSize": [
+    960,
+    480
+  ],
+  "anchor": [
+    120,
+    216
+  ],
+  "fps": 10,
+  "mirrorEast": true,
+  "source": "walk-before.png",
+  "identity": [
+    "idle-w.png",
+    "idle-e.png"
+  ],
+  "sheet": "novice-male-walk-w-v005.png",
+  "prompt": "prompt.json",
+  "method": "Existing generated walk + exact idle head composition + shared material palette normalization",
+  "imageGenerationAttempt": "Generated full-sheet edit inspected, but not selected: exact idle hair silhouette and original walking geometry take precedence.",
+  "runtimeIntegrated": true,
+  "inGameValidated": true,
+  "validation": "Two existing Playwright movement/idle tests passed, W/E screenshots inspected, exact W idle head and unchanged body alpha checked for all eight frames."
+}

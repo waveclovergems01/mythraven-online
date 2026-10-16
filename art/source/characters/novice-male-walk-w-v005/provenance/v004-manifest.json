@@ -1,0 +1,58 @@
+{
+  "assetId": "novice-male-walk-w",
+  "revision": "v004",
+  "status": "owner-approved-horizontal-walk",
+  "direction": "W",
+  "frameCount": 8,
+  "frameDimensions": [
+    240,
+    240
+  ],
+  "sheetDimensions": [
+    960,
+    480
+  ],
+  "sheet": "novice-male-walk-w-v004.png",
+  "anchor": [
+    120,
+    216
+  ],
+  "fps": 10,
+  "availableFps": [
+    2,
+    4,
+    6,
+    8,
+    10,
+    12,
+    14
+  ],
+  "repeat": -1,
+  "tool": "image_gen.imagegen + constrained compositing and export",
+  "model": "not exposed",
+  "sources": [
+    "frame-02-edit-source.png",
+    "shoulder-edit-source.png"
+  ],
+  "prompts": [
+    "prompt.json",
+    "shoulder-prompt.json"
+  ],
+  "references": [
+    "pose-base.png",
+    "owner-shoulder-motion-reference.png",
+    "idle-identity-reference.png"
+  ],
+  "base": "pose-base.png",
+  "changes": [
+    "Frame2 recovering right leg closer to support left leg.",
+    "Generated chest/shoulder/waist patches with original head and distal limb pixels protected.",
+    "Frame4 uses the matching forward-arm shoulder from generated frame5, since generated frame4 changed arm swing.",
+    "Frame8 uses frame1 upper-body donor for matching torso phase; pre-existing distal arms and leg pose remain distinct."
+  ],
+  "runtimeReady": true,
+  "runtimeIntegrated": true,
+  "ownerApproved": true,
+  "runtimePath": "public/assets/characters/novice-male-walk-w.png",
+  "mirrorEast": true
+}

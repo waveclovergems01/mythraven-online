@@ -1,0 +1,297 @@
+{
+  "status": "completed",
+  "files": [
+    {
+      "path": "art/source/characters/novice-male-walk-w-v004/base-frames/frame-01.png",
+      "bytes": 91508,
+      "reason": "Superseded v004 authoring/preview assets; accepted pose atlas retained as v005/walk-before.png and prompt provenance retained."
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-w-v004/base-frames/frame-02.png",
+      "bytes": 78003,
+      "reason": "Superseded v004 authoring/preview assets; accepted pose atlas retained as v005/walk-before.png and prompt provenance retained."
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-w-v004/base-frames/frame-03.png",
+      "bytes": 77842,
+      "reason": "Superseded v004 authoring/preview assets; accepted pose atlas retained as v005/walk-before.png and prompt provenance retained."
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-w-v004/base-frames/frame-04.png",
+      "bytes": 93333,
+      "reason": "Superseded v004 authoring/preview assets; accepted pose atlas retained as v005/walk-before.png and prompt provenance retained."
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-w-v004/base-frames/frame-05.png",
+      "bytes": 92262,
+      "reason": "Superseded v004 authoring/preview assets; accepted pose atlas retained as v005/walk-before.png and prompt provenance retained."
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-w-v004/base-frames/frame-06.png",
+      "bytes": 78818,
+      "reason": "Superseded v004 authoring/preview assets; accepted pose atlas retained as v005/walk-before.png and prompt provenance retained."
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-w-v004/base-frames/frame-07.png",
+      "bytes": 76704,
+      "reason": "Superseded v004 authoring/preview assets; accepted pose atlas retained as v005/walk-before.png and prompt provenance retained."
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-w-v004/base-frames/frame-08.png",
+      "bytes": 92046,
+      "reason": "Superseded v004 authoring/preview assets; accepted pose atlas retained as v005/walk-before.png and prompt provenance retained."
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-w-v004/base-mask-reference.json",
+      "bytes": 4960,
+      "reason": "Superseded v004 authoring/preview assets; accepted pose atlas retained as v005/walk-before.png and prompt provenance retained."
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-w-v004/browser-qa.json",
+      "bytes": 456,
+      "reason": "Superseded v004 authoring/preview assets; accepted pose atlas retained as v005/walk-before.png and prompt provenance retained."
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-w-v004/check-preview.mjs",
+      "bytes": 2322,
+      "reason": "Superseded v004 authoring/preview assets; accepted pose atlas retained as v005/walk-before.png and prompt provenance retained."
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-w-v004/export.mjs",
+      "bytes": 5916,
+      "reason": "Superseded v004 authoring/preview assets; accepted pose atlas retained as v005/walk-before.png and prompt provenance retained."
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-w-v004/frame-02-edit-source.png",
+      "bytes": 365336,
+      "reason": "Superseded v004 authoring/preview assets; accepted pose atlas retained as v005/walk-before.png and prompt provenance retained."
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-w-v004/frames/frame-01-edit-mask.png",
+      "bytes": 3445,
+      "reason": "Superseded v004 authoring/preview assets; accepted pose atlas retained as v005/walk-before.png and prompt provenance retained."
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-w-v004/frames/frame-01-preview.png",
+      "bytes": 92202,
+      "reason": "Superseded v004 authoring/preview assets; accepted pose atlas retained as v005/walk-before.png and prompt provenance retained."
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-w-v004/frames/frame-01.png",
+      "bytes": 24782,
+      "reason": "Superseded v004 authoring/preview assets; accepted pose atlas retained as v005/walk-before.png and prompt provenance retained."
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-w-v004/frames/frame-02-edit-mask.png",
+      "bytes": 3402,
+      "reason": "Superseded v004 authoring/preview assets; accepted pose atlas retained as v005/walk-before.png and prompt provenance retained."
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-w-v004/frames/frame-02-preview.png",
+      "bytes": 79019,
+      "reason": "Superseded v004 authoring/preview assets; accepted pose atlas retained as v005/walk-before.png and prompt provenance retained."
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-w-v004/frames/frame-02.png",
+      "bytes": 21456,
+      "reason": "Superseded v004 authoring/preview assets; accepted pose atlas retained as v005/walk-before.png and prompt provenance retained."
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-w-v004/frames/frame-03-edit-mask.png",
+      "bytes": 3321,
+      "reason": "Superseded v004 authoring/preview assets; accepted pose atlas retained as v005/walk-before.png and prompt provenance retained."
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-w-v004/frames/frame-03-preview.png",
+      "bytes": 78553,
+      "reason": "Superseded v004 authoring/preview assets; accepted pose atlas retained as v005/walk-before.png and prompt provenance retained."
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-w-v004/frames/frame-03.png",
+      "bytes": 21087,
+      "reason": "Superseded v004 authoring/preview assets; accepted pose atlas retained as v005/walk-before.png and prompt provenance retained."
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-w-v004/frames/frame-04-edit-mask.png",
+      "bytes": 3893,
+      "reason": "Superseded v004 authoring/preview assets; accepted pose atlas retained as v005/walk-before.png and prompt provenance retained."
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-w-v004/frames/frame-04-preview.png",
+      "bytes": 94021,
+      "reason": "Superseded v004 authoring/preview assets; accepted pose atlas retained as v005/walk-before.png and prompt provenance retained."
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-w-v004/frames/frame-04.png",
+      "bytes": 25197,
+      "reason": "Superseded v004 authoring/preview assets; accepted pose atlas retained as v005/walk-before.png and prompt provenance retained."
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-w-v004/frames/frame-05-edit-mask.png",
+      "bytes": 3842,
+      "reason": "Superseded v004 authoring/preview assets; accepted pose atlas retained as v005/walk-before.png and prompt provenance retained."
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-w-v004/frames/frame-05-preview.png",
+      "bytes": 93129,
+      "reason": "Superseded v004 authoring/preview assets; accepted pose atlas retained as v005/walk-before.png and prompt provenance retained."
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-w-v004/frames/frame-05.png",
+      "bytes": 24959,
+      "reason": "Superseded v004 authoring/preview assets; accepted pose atlas retained as v005/walk-before.png and prompt provenance retained."
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-w-v004/frames/frame-06-edit-mask.png",
+      "bytes": 3106,
+      "reason": "Superseded v004 authoring/preview assets; accepted pose atlas retained as v005/walk-before.png and prompt provenance retained."
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-w-v004/frames/frame-06-preview.png",
+      "bytes": 79374,
+      "reason": "Superseded v004 authoring/preview assets; accepted pose atlas retained as v005/walk-before.png and prompt provenance retained."
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-w-v004/frames/frame-06.png",
+      "bytes": 21311,
+      "reason": "Superseded v004 authoring/preview assets; accepted pose atlas retained as v005/walk-before.png and prompt provenance retained."
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-w-v004/frames/frame-07-edit-mask.png",
+      "bytes": 3318,
+      "reason": "Superseded v004 authoring/preview assets; accepted pose atlas retained as v005/walk-before.png and prompt provenance retained."
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-w-v004/frames/frame-07-preview.png",
+      "bytes": 77224,
+      "reason": "Superseded v004 authoring/preview assets; accepted pose atlas retained as v005/walk-before.png and prompt provenance retained."
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-w-v004/frames/frame-07.png",
+      "bytes": 20712,
+      "reason": "Superseded v004 authoring/preview assets; accepted pose atlas retained as v005/walk-before.png and prompt provenance retained."
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-w-v004/frames/frame-08-edit-mask.png",
+      "bytes": 3458,
+      "reason": "Superseded v004 authoring/preview assets; accepted pose atlas retained as v005/walk-before.png and prompt provenance retained."
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-w-v004/frames/frame-08-preview.png",
+      "bytes": 92805,
+      "reason": "Superseded v004 authoring/preview assets; accepted pose atlas retained as v005/walk-before.png and prompt provenance retained."
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-w-v004/frames/frame-08.png",
+      "bytes": 24890,
+      "reason": "Superseded v004 authoring/preview assets; accepted pose atlas retained as v005/walk-before.png and prompt provenance retained."
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-w-v004/idle-identity-reference.png",
+      "bytes": 346581,
+      "reason": "Superseded v004 authoring/preview assets; accepted pose atlas retained as v005/walk-before.png and prompt provenance retained."
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-w-v004/manifest.json",
+      "bytes": 1400,
+      "reason": "Superseded v004 authoring/preview assets; accepted pose atlas retained as v005/walk-before.png and prompt provenance retained."
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-w-v004/novice-male-walk-w-v004.png",
+      "bytes": 180578,
+      "reason": "Superseded v004 authoring/preview assets; accepted pose atlas retained as v005/walk-before.png and prompt provenance retained."
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-w-v004/owner-shoulder-motion-reference.png",
+      "bytes": 1025410,
+      "reason": "Superseded v004 authoring/preview assets; accepted pose atlas retained as v005/walk-before.png and prompt provenance retained."
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-w-v004/playback-check.png",
+      "bytes": 323233,
+      "reason": "Superseded v004 authoring/preview assets; accepted pose atlas retained as v005/walk-before.png and prompt provenance retained."
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-w-v004/pose-base.png",
+      "bytes": 663890,
+      "reason": "Superseded v004 authoring/preview assets; accepted pose atlas retained as v005/walk-before.png and prompt provenance retained."
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-w-v004/preview.html",
+      "bytes": 6033,
+      "reason": "Superseded v004 authoring/preview assets; accepted pose atlas retained as v005/walk-before.png and prompt provenance retained."
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-w-v004/prompt.json",
+      "bytes": 2701,
+      "reason": "Superseded v004 authoring/preview assets; accepted pose atlas retained as v005/walk-before.png and prompt provenance retained."
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-w-v004/qa.json",
+      "bytes": 5686,
+      "reason": "Superseded v004 authoring/preview assets; accepted pose atlas retained as v005/walk-before.png and prompt provenance retained."
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-w-v004/README.md",
+      "bytes": 1581,
+      "reason": "Superseded v004 authoring/preview assets; accepted pose atlas retained as v005/walk-before.png and prompt provenance retained."
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-w-v004/registered-edit/1.png",
+      "bytes": 98752,
+      "reason": "Superseded v004 authoring/preview assets; accepted pose atlas retained as v005/walk-before.png and prompt provenance retained."
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-w-v004/registered-edit/2.png",
+      "bytes": 88111,
+      "reason": "Superseded v004 authoring/preview assets; accepted pose atlas retained as v005/walk-before.png and prompt provenance retained."
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-w-v004/registered-edit/3.png",
+      "bytes": 82444,
+      "reason": "Superseded v004 authoring/preview assets; accepted pose atlas retained as v005/walk-before.png and prompt provenance retained."
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-w-v004/registered-edit/5.png",
+      "bytes": 93792,
+      "reason": "Superseded v004 authoring/preview assets; accepted pose atlas retained as v005/walk-before.png and prompt provenance retained."
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-w-v004/registered-edit/6.png",
+      "bytes": 81422,
+      "reason": "Superseded v004 authoring/preview assets; accepted pose atlas retained as v005/walk-before.png and prompt provenance retained."
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-w-v004/registered-edit/7.png",
+      "bytes": 77599,
+      "reason": "Superseded v004 authoring/preview assets; accepted pose atlas retained as v005/walk-before.png and prompt provenance retained."
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-w-v004/shoulder-edit-source.png",
+      "bytes": 1078920,
+      "reason": "Superseded v004 authoring/preview assets; accepted pose atlas retained as v005/walk-before.png and prompt provenance retained."
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-w-v004/shoulder-prompt.json",
+      "bytes": 3253,
+      "reason": "Superseded v004 authoring/preview assets; accepted pose atlas retained as v005/walk-before.png and prompt provenance retained."
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-w-v004/walk-preview.gif",
+      "bytes": 192457,
+      "reason": "Superseded v004 authoring/preview assets; accepted pose atlas retained as v005/walk-before.png and prompt provenance retained."
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-w-v005/identity-edit-source.png",
+      "bytes": 590130,
+      "reason": "Generated edit not selected; exact idle head and geometry-preserving palette normalization used."
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-w-v005/idle-e-reference.png",
+      "bytes": 26234,
+      "reason": "Unused enlarged duplicate; actual idle-e.png retained for comparison."
+    }
+  ],
+  "totalFiles": 58,
+  "totalBytes": 6928219
+}

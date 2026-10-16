@@ -1,0 +1,2299 @@
+{
+  "status": "completed",
+  "scope": "Owner-requested unused game images and obsolete exporters",
+  "retained": "Runtime textures, current source/export dependencies, approved walk preview, explicit art references; no blanket deletion by text-match alone.",
+  "files": [
+    {
+      "path": "art/source/characters/novice-male-brown-v001/metadata.json",
+      "bytes": 3468,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-male-brown-v001/novice-brown-front-v001.png",
+      "bytes": 1777999,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-male-brown-v001/selected-reference.png",
+      "bytes": 115853,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-male-v001/novice-a-v002.png",
+      "bytes": 1118555,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-male-v001/novice-b-v002.png",
+      "bytes": 1104330,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-male-v001/novice-c-v002.png",
+      "bytes": 1021683,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-male-v001/prompts.json",
+      "bytes": 6616,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-male-v001/revisions.json",
+      "bytes": 3984,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-sw-v001/gait-reference.png",
+      "bytes": 104349,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-sw-v001/identity-seed.png",
+      "bytes": 21910,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-sw-v001/manifest.json",
+      "bytes": 2629,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-sw-v001/pose-guide.png",
+      "bytes": 134377,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-sw-v001/pose-guide.svg",
+      "bytes": 30177,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-sw-v001/prompts.json",
+      "bytes": 12104,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-sw-v001/qa.json",
+      "bytes": 3768,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-sw-v001/walk-source.png",
+      "bytes": 1003351,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-sw-v002/alpha-review.png",
+      "bytes": 476879,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-sw-v002/check-preview.mjs",
+      "bytes": 2372,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-sw-v002/cleanup.json",
+      "bytes": 723,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-sw-v002/export.mjs",
+      "bytes": 4138,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-sw-v002/frames/sw-0.png",
+      "bytes": 22116,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-sw-v002/frames/sw-1.png",
+      "bytes": 21186,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-sw-v002/frames/sw-2.png",
+      "bytes": 21495,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-sw-v002/frames/sw-3.png",
+      "bytes": 22378,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-sw-v002/frames/sw-4.png",
+      "bytes": 22061,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-sw-v002/frames/sw-5.png",
+      "bytes": 21281,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-sw-v002/frames/sw-6.png",
+      "bytes": 19700,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-sw-v002/frames/sw-7.png",
+      "bytes": 22141,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-sw-v002/identity-seed.png",
+      "bytes": 21910,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-sw-v002/leg-identity-diagnostic.png",
+      "bytes": 1015584,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-sw-v002/leg-tracking-qa.json",
+      "bytes": 2394,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-sw-v002/manifest.json",
+      "bytes": 3025,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-sw-v002/novice-male-walk-sw-v002.png",
+      "bytes": 169198,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-sw-v002/playback-review.png",
+      "bytes": 178147,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-sw-v002/playtest.json",
+      "bytes": 327,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-sw-v002/pose-guide.png",
+      "bytes": 134377,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-sw-v002/preview.html",
+      "bytes": 4728,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-sw-v002/preview.png",
+      "bytes": 139813,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-sw-v002/prompts.json",
+      "bytes": 6611,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-sw-v002/qa.json",
+      "bytes": 3907,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-sw-v002/walk-preview.gif",
+      "bytes": 61331,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-sw-v002/walk-source.png",
+      "bytes": 996337,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-w-v001/assembly-qa.json",
+      "bytes": 1674,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-w-v001/character-control-reference.png",
+      "bytes": 1964883,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-w-v001/export.mjs",
+      "bytes": 3091,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-w-v001/frame-01-preview.png",
+      "bytes": 81123,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-w-v001/frame-01-source.png",
+      "bytes": 474282,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-w-v001/frame-01.png",
+      "bytes": 22531,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-w-v001/frame-02-preview.png",
+      "bytes": 75849,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-w-v001/frame-02-source.png",
+      "bytes": 453898,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-w-v001/frame-02.png",
+      "bytes": 21003,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-w-v001/frame-03-preview-v002.png",
+      "bytes": 63003,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-w-v001/frame-03-source-v002.png",
+      "bytes": 499401,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-w-v001/frame-03-source.png",
+      "bytes": 424052,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-w-v001/frame-03-v002-prompt.json",
+      "bytes": 2967,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-w-v001/frame-03-v002.png",
+      "bytes": 17439,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-w-v001/frame-04-preview.png",
+      "bytes": 77372,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-w-v001/frame-04-source.png",
+      "bytes": 471591,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-w-v001/frame-04.png",
+      "bytes": 21491,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-w-v001/frames-05-08-v001/export.mjs",
+      "bytes": 4238,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-w-v001/frames-05-08-v001/frame-05-preview.png",
+      "bytes": 72545,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-w-v001/frames-05-08-v001/frame-05-source.png",
+      "bytes": 447930,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-w-v001/frames-05-08-v001/frame-05.png",
+      "bytes": 20262,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-w-v001/frames-05-08-v001/frame-06-preview.png",
+      "bytes": 60681,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-w-v001/frames-05-08-v001/frame-06-source.png",
+      "bytes": 383015,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-w-v001/frames-05-08-v001/frame-06.png",
+      "bytes": 16864,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-w-v001/frames-05-08-v001/frame-07-preview.png",
+      "bytes": 58595,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-w-v001/frames-05-08-v001/frame-07-source.png",
+      "bytes": 374626,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-w-v001/frames-05-08-v001/frame-07.png",
+      "bytes": 16053,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-w-v001/frames-05-08-v001/frame-08-preview.png",
+      "bytes": 75073,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-w-v001/frames-05-08-v001/frame-08-source.png",
+      "bytes": 469891,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-w-v001/frames-05-08-v001/frame-08.png",
+      "bytes": 21013,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-w-v001/frames-05-08-v001/manifest.json",
+      "bytes": 4188,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-w-v001/frames-05-08-v001/prompts.json",
+      "bytes": 15223,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-w-v001/frames-05-08-v001/qa.json",
+      "bytes": 3205,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-w-v001/identity-w.png",
+      "bytes": 16103,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-w-v001/make-preview.mjs",
+      "bytes": 3601,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-w-v001/manifest.json",
+      "bytes": 7241,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-w-v001/novice-male-walk-w-v001.png",
+      "bytes": 153866,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-w-v001/playback-check.png",
+      "bytes": 156247,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-w-v001/preview.html",
+      "bytes": 249,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-w-v001/prompts.json",
+      "bytes": 17603,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-w-v001/qa.json",
+      "bytes": 3733,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-w-v001/walk-frames-01-08-v001.gif",
+      "bytes": 171241,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-w-v002/appearance-pass-01.png",
+      "bytes": 1163741,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-w-v002/appearance-source-v002.png",
+      "bytes": 1051892,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-w-v002/approved-pose-guide.png",
+      "bytes": 560688,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-w-v002/export.mjs",
+      "bytes": 4400,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-w-v002/frames/frame-01-preview.png",
+      "bytes": 91378,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-w-v002/frames/frame-01.png",
+      "bytes": 24479,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-w-v002/frames/frame-02-preview.png",
+      "bytes": 85357,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-w-v002/frames/frame-02.png",
+      "bytes": 22964,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-w-v002/frames/frame-03-preview.png",
+      "bytes": 77401,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-w-v002/frames/frame-03.png",
+      "bytes": 20598,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-w-v002/frames/frame-04-preview.png",
+      "bytes": 93333,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-w-v002/frames/frame-04.png",
+      "bytes": 25042,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-w-v002/frames/frame-05-preview.png",
+      "bytes": 92262,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-w-v002/frames/frame-05.png",
+      "bytes": 24742,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-w-v002/frames/frame-06-preview.png",
+      "bytes": 77782,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-w-v002/frames/frame-06.png",
+      "bytes": 20872,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-w-v002/frames/frame-07-preview.png",
+      "bytes": 76223,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-w-v002/frames/frame-07.png",
+      "bytes": 20418,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-w-v002/frames/frame-08-preview.png",
+      "bytes": 92014,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-w-v002/frames/frame-08.png",
+      "bytes": 24711,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-w-v002/idle-identity-reference.png",
+      "bytes": 346581,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-w-v002/idle-reference.png",
+      "bytes": 16103,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-w-v002/manifest.json",
+      "bytes": 4894,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-w-v002/novice-male-walk-w-v002.png",
+      "bytes": 179932,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-w-v002/playback-check.png",
+      "bytes": 191140,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-w-v002/preview.html",
+      "bytes": 258,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-w-v002/prompt-pass-01.json",
+      "bytes": 4138,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-w-v002/prompt-pass-02.json",
+      "bytes": 2774,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-w-v002/qa.json",
+      "bytes": 1107,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-w-v002/walk-preview.gif",
+      "bytes": 194913,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-w-v003/edit-cells/3.png",
+      "bytes": 81271,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-w-v003/export.mjs",
+      "bytes": 5197,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-w-v003/frames/frame-01-edit-mask.png",
+      "bytes": 1522,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-w-v003/frames/frame-01-preview.png",
+      "bytes": 91508,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-w-v003/frames/frame-01.png",
+      "bytes": 24501,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-w-v003/frames/frame-02-edit-mask.png",
+      "bytes": 1490,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-w-v003/frames/frame-02-preview.png",
+      "bytes": 85468,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-w-v003/frames/frame-02.png",
+      "bytes": 22991,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-w-v003/frames/frame-03-edit-mask.png",
+      "bytes": 1410,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-w-v003/frames/frame-03-preview.png",
+      "bytes": 77842,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-w-v003/frames/frame-03.png",
+      "bytes": 20699,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-w-v003/frames/frame-04-edit-mask.png",
+      "bytes": 994,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-w-v003/frames/frame-04-preview.png",
+      "bytes": 93333,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-w-v003/frames/frame-04.png",
+      "bytes": 25042,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-w-v003/frames/frame-05-edit-mask.png",
+      "bytes": 994,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-w-v003/frames/frame-05-preview.png",
+      "bytes": 92262,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-w-v003/frames/frame-05.png",
+      "bytes": 24742,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-w-v003/frames/frame-06-edit-mask.png",
+      "bytes": 1476,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-w-v003/frames/frame-06-preview.png",
+      "bytes": 78818,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-w-v003/frames/frame-06.png",
+      "bytes": 21077,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-w-v003/frames/frame-07-edit-mask.png",
+      "bytes": 1415,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-w-v003/frames/frame-07-preview.png",
+      "bytes": 76704,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-w-v003/frames/frame-07.png",
+      "bytes": 20525,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-w-v003/frames/frame-08-edit-mask.png",
+      "bytes": 1533,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-w-v003/frames/frame-08-preview.png",
+      "bytes": 92046,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-w-v003/frames/frame-08.png",
+      "bytes": 24703,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-w-v003/manifest.json",
+      "bytes": 1786,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-w-v003/novice-male-walk-w-v003.png",
+      "bytes": 178236,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-w-v003/playback-check.png",
+      "bytes": 307812,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-w-v003/preview.html",
+      "bytes": 5812,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-w-v003/prompt.json",
+      "bytes": 2335,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-w-v003/qa.json",
+      "bytes": 4960,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-w-v003/torso-edit-source.png",
+      "bytes": 1075618,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-w-v003/walk-preview.gif",
+      "bytes": 193258,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-walk-east-v001/check.mjs",
+      "bytes": 1458,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-walk-east-v001/export-repair.json",
+      "bytes": 1756,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-walk-east-v001/export.mjs",
+      "bytes": 1360,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-walk-east-v001/frames/e-0.png",
+      "bytes": 24421,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-walk-east-v001/frames/e-1.png",
+      "bytes": 20481,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-walk-east-v001/frames/e-2.png",
+      "bytes": 18738,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-walk-east-v001/frames/e-3.png",
+      "bytes": 24156,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-walk-east-v001/frames/e-4.png",
+      "bytes": 23379,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-walk-east-v001/frames/e-5.png",
+      "bytes": 20404,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-walk-east-v001/frames/e-6.png",
+      "bytes": 18756,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-walk-east-v001/frames/e-7.png",
+      "bytes": 22985,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-walk-east-v001/make-preview.py",
+      "bytes": 455,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-walk-east-v001/playtest.json",
+      "bytes": 96,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-walk-east-v001/preview.html",
+      "bytes": 3228,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-walk-east-v001/preview.png",
+      "bytes": 179894,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-walk-east-v001/prompts.json",
+      "bytes": 3803,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-walk-east-v001/qa.json",
+      "bytes": 341,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-walk-east-v001/verify-alpha.py",
+      "bytes": 625,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-walk-east-v001/walk-atlas.png",
+      "bytes": 169951,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-walk-east-v001/walk-preview.gif",
+      "bytes": 66349,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-walk-east-v001/walk-source.png",
+      "bytes": 1878477,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-walk-east-v002/check.mjs",
+      "bytes": 1460,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-walk-east-v002/correction-456/compose-eight.mjs",
+      "bytes": 1119,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-walk-east-v002/correction-456/eight-frames-review.png",
+      "bytes": 1324636,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-walk-east-v002/correction-456/export.mjs",
+      "bytes": 620,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-walk-east-v002/correction-456/frame-4.png",
+      "bytes": 665142,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-walk-east-v002/correction-456/frame-5.png",
+      "bytes": 675921,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-walk-east-v002/correction-456/frame-6.png",
+      "bytes": 568917,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-walk-east-v002/correction-456/frame3-reference.png",
+      "bytes": 306863,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-walk-east-v002/correction-456/frames-4-5-6.png",
+      "bytes": 2266371,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-walk-east-v002/correction-456/prompts.json",
+      "bytes": 4733,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-walk-east-v002/correction-456/source.png",
+      "bytes": 1700988,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-walk-east-v002/export.mjs",
+      "bytes": 1362,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-walk-east-v002/four-frame-step/export.mjs",
+      "bytes": 977,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-walk-east-v002/four-frame-step/flipped/combine-eight.mjs",
+      "bytes": 1181,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-walk-east-v002/four-frame-step/flipped/eight-frames-review.json",
+      "bytes": 1113,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-walk-east-v002/four-frame-step/flipped/eight-frames-review.png",
+      "bytes": 1273130,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-walk-east-v002/four-frame-step/flipped/four-frames.png",
+      "bytes": 663517,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-walk-east-v002/four-frame-step/flipped/frame-1.png",
+      "bytes": 179660,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-walk-east-v002/four-frame-step/flipped/frame-2.png",
+      "bytes": 159934,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-walk-east-v002/four-frame-step/flipped/frame-3.png",
+      "bytes": 151382,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-walk-east-v002/four-frame-step/flipped/frame-4.png",
+      "bytes": 159467,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-walk-east-v002/four-frame-step/flipped/frame5-candidate/frame-5.png",
+      "bytes": 174875,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-walk-east-v002/four-frame-step/flipped/frame5-candidate/prompts.json",
+      "bytes": 3830,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-walk-east-v002/four-frame-step/flipped/frame5-candidate/source.png",
+      "bytes": 925432,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-walk-east-v002/four-frame-step/flipped/frame5-thigh-v002/frame-5.png",
+      "bytes": 244498,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-walk-east-v002/four-frame-step/flipped/frame5-thigh-v002/prompt.json",
+      "bytes": 2209,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-walk-east-v002/four-frame-step/flipped/frame5-thigh-v002/source.png",
+      "bytes": 935451,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-walk-east-v002/four-frame-step/flipped/frame6-candidate/frame-6.png",
+      "bytes": 238489,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-walk-east-v002/four-frame-step/flipped/frame6-candidate/prompt.json",
+      "bytes": 2627,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-walk-east-v002/four-frame-step/flipped/frame6-candidate/source.png",
+      "bytes": 902779,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-walk-east-v002/four-frame-step/flipped/frame7-candidate/frame-7.png",
+      "bytes": 264994,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-walk-east-v002/four-frame-step/flipped/frame7-candidate/prompt.json",
+      "bytes": 2421,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-walk-east-v002/four-frame-step/flipped/frame7-candidate/source.png",
+      "bytes": 1047910,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-walk-east-v002/four-frame-step/flipped/frame8-candidate/prompt.json",
+      "bytes": 2282,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-walk-east-v002/four-frame-step/flipped/frame8-candidate/source.png",
+      "bytes": 980327,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-walk-east-v002/four-frame-step/flipped/normalized-v001/alignment.json",
+      "bytes": 421,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-walk-east-v002/four-frame-step/flipped/normalized-v001/export.mjs",
+      "bytes": 2393,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-walk-east-v002/four-frame-step/flipped/normalized-v001/frame-1.png",
+      "bytes": 176453,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-walk-east-v002/four-frame-step/flipped/normalized-v001/frame-2.png",
+      "bytes": 161248,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-walk-east-v002/four-frame-step/flipped/normalized-v001/frame-3.png",
+      "bytes": 145949,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-walk-east-v002/four-frame-step/flipped/normalized-v001/frame-4.png",
+      "bytes": 170699,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-walk-east-v002/four-frame-step/flipped/normalized-v001/frame-5.png",
+      "bytes": 155816,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-walk-east-v002/four-frame-step/flipped/normalized-v001/frame-6.png",
+      "bytes": 150071,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-walk-east-v002/four-frame-step/flipped/normalized-v001/frame-7.png",
+      "bytes": 169934,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-walk-east-v002/four-frame-step/flipped/normalized-v001/prompt.json",
+      "bytes": 1961,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-walk-east-v002/four-frame-step/flipped/normalized-v001/seven-frames.png",
+      "bytes": 1129136,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-walk-east-v002/four-frame-step/flipped/normalized-v001/source.png",
+      "bytes": 1208087,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-walk-east-v002/four-frame-step/flipped/preview-seven.html",
+      "bytes": 3600,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-walk-east-v002/four-frame-step/flipped/seven-preview-check.png",
+      "bytes": 286103,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-walk-east-v002/four-frame-step/four-frames.png",
+      "bytes": 663633,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-walk-east-v002/four-frame-step/frame-1.png",
+      "bytes": 179810,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-walk-east-v002/four-frame-step/frame-2.png",
+      "bytes": 160122,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-walk-east-v002/four-frame-step/frame-3.png",
+      "bytes": 151310,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-walk-east-v002/four-frame-step/frame-4.png",
+      "bytes": 159397,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-walk-east-v002/four-frame-step/frame4-source.png",
+      "bytes": 1544838,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-walk-east-v002/four-frame-step/prompt.json",
+      "bytes": 2277,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-walk-east-v002/frames/e-0.png",
+      "bytes": 24811,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-walk-east-v002/frames/e-1.png",
+      "bytes": 22023,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-walk-east-v002/frames/e-2.png",
+      "bytes": 20760,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-walk-east-v002/frames/e-3.png",
+      "bytes": 23714,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-walk-east-v002/frames/e-4.png",
+      "bytes": 22992,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-walk-east-v002/frames/e-5.png",
+      "bytes": 21908,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-walk-east-v002/frames/e-6.png",
+      "bytes": 20875,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-walk-east-v002/frames/e-7.png",
+      "bytes": 24361,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-walk-east-v002/make-preview.py",
+      "bytes": 457,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-walk-east-v002/playtest.json",
+      "bytes": 96,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-walk-east-v002/preview.html",
+      "bytes": 3352,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-walk-east-v002/preview.png",
+      "bytes": 190271,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-walk-east-v002/prompts.json",
+      "bytes": 7205,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-walk-east-v002/qa.json",
+      "bytes": 341,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-walk-east-v002/QA.md",
+      "bytes": 672,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-walk-east-v002/verify-alpha.py",
+      "bytes": 627,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-walk-east-v002/walk-atlas.png",
+      "bytes": 178370,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-walk-east-v002/walk-preview.gif",
+      "bytes": 69868,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-walk-east-v002/walk-source.png",
+      "bytes": 2578283,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-walk-west-v001/check.mjs",
+      "bytes": 1456,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-walk-west-v001/export.mjs",
+      "bytes": 1358,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-walk-west-v001/frames/w-0.png",
+      "bytes": 23159,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-walk-west-v001/frames/w-1.png",
+      "bytes": 21472,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-walk-west-v001/frames/w-2.png",
+      "bytes": 20440,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-walk-west-v001/frames/w-3.png",
+      "bytes": 23487,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-walk-west-v001/frames/w-4.png",
+      "bytes": 22990,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-walk-west-v001/frames/w-5.png",
+      "bytes": 21775,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-walk-west-v001/frames/w-6.png",
+      "bytes": 21067,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-walk-west-v001/frames/w-7.png",
+      "bytes": 22566,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-walk-west-v001/gait-reference.png",
+      "bytes": 131709,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-walk-west-v001/make-preview.py",
+      "bytes": 451,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-walk-west-v001/manifest.json",
+      "bytes": 671,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-walk-west-v001/playtest.json",
+      "bytes": 96,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-walk-west-v001/preview.html",
+      "bytes": 3239,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-walk-west-v001/preview.png",
+      "bytes": 177602,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-walk-west-v001/prompts.json",
+      "bytes": 3284,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-walk-west-v001/repair-prompt.json",
+      "bytes": 2471,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-walk-west-v001/walk-atlas.png",
+      "bytes": 173141,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-walk-west-v001/walk-preview.gif",
+      "bytes": 67421,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-walk-west-v001/walk-source.png",
+      "bytes": 1884821,
+      "reason": "Superseded character experiment; active idle/walk sources consolidated"
+    },
+    {
+      "path": "art/source/characters/novice-eight-directions-v001/build-pose-guides.mjs",
+      "bytes": 1565,
+      "reason": "Superseded idle/walk experiment; actual idle generation references relocated"
+    },
+    {
+      "path": "art/source/characters/novice-eight-directions-v001/check-idle-frames.mjs",
+      "bytes": 2300,
+      "reason": "Superseded idle/walk experiment; actual idle generation references relocated"
+    },
+    {
+      "path": "art/source/characters/novice-eight-directions-v001/idle/e.png",
+      "bytes": 14709,
+      "reason": "Superseded idle/walk experiment; actual idle generation references relocated"
+    },
+    {
+      "path": "art/source/characters/novice-eight-directions-v001/idle/n.png",
+      "bytes": 21711,
+      "reason": "Superseded idle/walk experiment; actual idle generation references relocated"
+    },
+    {
+      "path": "art/source/characters/novice-eight-directions-v001/idle/ne.png",
+      "bytes": 20352,
+      "reason": "Superseded idle/walk experiment; actual idle generation references relocated"
+    },
+    {
+      "path": "art/source/characters/novice-eight-directions-v001/idle/nw.png",
+      "bytes": 20719,
+      "reason": "Superseded idle/walk experiment; actual idle generation references relocated"
+    },
+    {
+      "path": "art/source/characters/novice-eight-directions-v001/idle/s.png",
+      "bytes": 22190,
+      "reason": "Superseded idle/walk experiment; actual idle generation references relocated"
+    },
+    {
+      "path": "art/source/characters/novice-eight-directions-v001/idle/se.png",
+      "bytes": 21136,
+      "reason": "Superseded idle/walk experiment; actual idle generation references relocated"
+    },
+    {
+      "path": "art/source/characters/novice-eight-directions-v001/idle/sw.png",
+      "bytes": 21093,
+      "reason": "Superseded idle/walk experiment; actual idle generation references relocated"
+    },
+    {
+      "path": "art/source/characters/novice-eight-directions-v001/idle/w.png",
+      "bytes": 15004,
+      "reason": "Superseded idle/walk experiment; actual idle generation references relocated"
+    },
+    {
+      "path": "art/source/characters/novice-eight-directions-v001/idle-atlas.png",
+      "bytes": 153764,
+      "reason": "Superseded idle/walk experiment; actual idle generation references relocated"
+    },
+    {
+      "path": "art/source/characters/novice-eight-directions-v001/idle-key-source.png",
+      "bytes": 1843289,
+      "reason": "Superseded idle/walk experiment; actual idle generation references relocated"
+    },
+    {
+      "path": "art/source/characters/novice-eight-directions-v001/manifest.json",
+      "bytes": 3401,
+      "reason": "Superseded idle/walk experiment; actual idle generation references relocated"
+    },
+    {
+      "path": "art/source/characters/novice-eight-directions-v001/pack-six.mjs",
+      "bytes": 2112,
+      "reason": "Superseded idle/walk experiment; actual idle generation references relocated"
+    },
+    {
+      "path": "art/source/characters/novice-eight-directions-v001/pack-walk.mjs",
+      "bytes": 1640,
+      "reason": "Superseded idle/walk experiment; actual idle generation references relocated"
+    },
+    {
+      "path": "art/source/characters/novice-eight-directions-v001/prepare-six.mjs",
+      "bytes": 507,
+      "reason": "Superseded idle/walk experiment; actual idle generation references relocated"
+    },
+    {
+      "path": "art/source/characters/novice-eight-directions-v001/preview.html",
+      "bytes": 4002,
+      "reason": "Superseded idle/walk experiment; actual idle generation references relocated"
+    },
+    {
+      "path": "art/source/characters/novice-eight-directions-v001/prompts.json",
+      "bytes": 18604,
+      "reason": "Superseded idle/walk experiment; actual idle generation references relocated"
+    },
+    {
+      "path": "art/source/characters/novice-eight-directions-v001/qa.json",
+      "bytes": 738,
+      "reason": "Superseded idle/walk experiment; actual idle generation references relocated"
+    },
+    {
+      "path": "art/source/characters/novice-eight-directions-v001/six-frame-v002/guide-e.png",
+      "bytes": 60053,
+      "reason": "Superseded idle/walk experiment; actual idle generation references relocated"
+    },
+    {
+      "path": "art/source/characters/novice-eight-directions-v001/six-frame-v002/guide-n.png",
+      "bytes": 47673,
+      "reason": "Superseded idle/walk experiment; actual idle generation references relocated"
+    },
+    {
+      "path": "art/source/characters/novice-eight-directions-v001/six-frame-v002/guide-ne.png",
+      "bytes": 62515,
+      "reason": "Superseded idle/walk experiment; actual idle generation references relocated"
+    },
+    {
+      "path": "art/source/characters/novice-eight-directions-v001/six-frame-v002/guide-nw.png",
+      "bytes": 62289,
+      "reason": "Superseded idle/walk experiment; actual idle generation references relocated"
+    },
+    {
+      "path": "art/source/characters/novice-eight-directions-v001/six-frame-v002/guide-s.png",
+      "bytes": 47083,
+      "reason": "Superseded idle/walk experiment; actual idle generation references relocated"
+    },
+    {
+      "path": "art/source/characters/novice-eight-directions-v001/six-frame-v002/guide-se.png",
+      "bytes": 61989,
+      "reason": "Superseded idle/walk experiment; actual idle generation references relocated"
+    },
+    {
+      "path": "art/source/characters/novice-eight-directions-v001/six-frame-v002/guide-sw.png",
+      "bytes": 62305,
+      "reason": "Superseded idle/walk experiment; actual idle generation references relocated"
+    },
+    {
+      "path": "art/source/characters/novice-eight-directions-v001/six-frame-v002/guide-w.png",
+      "bytes": 59635,
+      "reason": "Superseded idle/walk experiment; actual idle generation references relocated"
+    },
+    {
+      "path": "art/source/characters/novice-eight-directions-v001/six-frame-v002/preview-staged.html",
+      "bytes": 5649,
+      "reason": "Superseded idle/walk experiment; actual idle generation references relocated"
+    },
+    {
+      "path": "art/source/characters/novice-eight-directions-v001/six-frame-v002/qa.json",
+      "bytes": 983,
+      "reason": "Superseded idle/walk experiment; actual idle generation references relocated"
+    },
+    {
+      "path": "art/source/characters/novice-eight-directions-v001/six-frame-v002/repair-record.json",
+      "bytes": 5261,
+      "reason": "Superseded idle/walk experiment; actual idle generation references relocated"
+    },
+    {
+      "path": "art/source/characters/novice-eight-directions-v001/six-frame-v002/seed-e.png",
+      "bytes": 156655,
+      "reason": "Superseded idle/walk experiment; actual idle generation references relocated"
+    },
+    {
+      "path": "art/source/characters/novice-eight-directions-v001/six-frame-v002/seed-n.png",
+      "bytes": 238077,
+      "reason": "Superseded idle/walk experiment; actual idle generation references relocated"
+    },
+    {
+      "path": "art/source/characters/novice-eight-directions-v001/six-frame-v002/seed-ne.png",
+      "bytes": 217467,
+      "reason": "Superseded idle/walk experiment; actual idle generation references relocated"
+    },
+    {
+      "path": "art/source/characters/novice-eight-directions-v001/six-frame-v002/seed-nw.png",
+      "bytes": 216757,
+      "reason": "Superseded idle/walk experiment; actual idle generation references relocated"
+    },
+    {
+      "path": "art/source/characters/novice-eight-directions-v001/six-frame-v002/seed-s.png",
+      "bytes": 247683,
+      "reason": "Superseded idle/walk experiment; actual idle generation references relocated"
+    },
+    {
+      "path": "art/source/characters/novice-eight-directions-v001/six-frame-v002/seed-se.png",
+      "bytes": 232581,
+      "reason": "Superseded idle/walk experiment; actual idle generation references relocated"
+    },
+    {
+      "path": "art/source/characters/novice-eight-directions-v001/six-frame-v002/seed-sw.png",
+      "bytes": 232553,
+      "reason": "Superseded idle/walk experiment; actual idle generation references relocated"
+    },
+    {
+      "path": "art/source/characters/novice-eight-directions-v001/six-frame-v002/seed-w.png",
+      "bytes": 162223,
+      "reason": "Superseded idle/walk experiment; actual idle generation references relocated"
+    },
+    {
+      "path": "art/source/characters/novice-eight-directions-v001/six-frame-v002/sw-contact-edit.png",
+      "bytes": 331716,
+      "reason": "Superseded idle/walk experiment; actual idle generation references relocated"
+    },
+    {
+      "path": "art/source/characters/novice-eight-directions-v001/six-frame-v002/walk-e-source.png",
+      "bytes": 1701552,
+      "reason": "Superseded idle/walk experiment; actual idle generation references relocated"
+    },
+    {
+      "path": "art/source/characters/novice-eight-directions-v001/six-frame-v002/walk-n-source.png",
+      "bytes": 1628382,
+      "reason": "Superseded idle/walk experiment; actual idle generation references relocated"
+    },
+    {
+      "path": "art/source/characters/novice-eight-directions-v001/six-frame-v002/walk-ne-source.png",
+      "bytes": 1812001,
+      "reason": "Superseded idle/walk experiment; actual idle generation references relocated"
+    },
+    {
+      "path": "art/source/characters/novice-eight-directions-v001/six-frame-v002/walk-nw-source.png",
+      "bytes": 1718654,
+      "reason": "Superseded idle/walk experiment; actual idle generation references relocated"
+    },
+    {
+      "path": "art/source/characters/novice-eight-directions-v001/six-frame-v002/walk-s-source.png",
+      "bytes": 1730721,
+      "reason": "Superseded idle/walk experiment; actual idle generation references relocated"
+    },
+    {
+      "path": "art/source/characters/novice-eight-directions-v001/six-frame-v002/walk-se-source.png",
+      "bytes": 1840949,
+      "reason": "Superseded idle/walk experiment; actual idle generation references relocated"
+    },
+    {
+      "path": "art/source/characters/novice-eight-directions-v001/six-frame-v002/walk-sw-source.png",
+      "bytes": 1746165,
+      "reason": "Superseded idle/walk experiment; actual idle generation references relocated"
+    },
+    {
+      "path": "art/source/characters/novice-eight-directions-v001/six-frame-v002/walk-w-source.png",
+      "bytes": 1766504,
+      "reason": "Superseded idle/walk experiment; actual idle generation references relocated"
+    },
+    {
+      "path": "art/source/characters/novice-eight-directions-v001/walk/e-0.png",
+      "bytes": 22440,
+      "reason": "Superseded idle/walk experiment; actual idle generation references relocated"
+    },
+    {
+      "path": "art/source/characters/novice-eight-directions-v001/walk/e-1.png",
+      "bytes": 17683,
+      "reason": "Superseded idle/walk experiment; actual idle generation references relocated"
+    },
+    {
+      "path": "art/source/characters/novice-eight-directions-v001/walk/e-2.png",
+      "bytes": 22692,
+      "reason": "Superseded idle/walk experiment; actual idle generation references relocated"
+    },
+    {
+      "path": "art/source/characters/novice-eight-directions-v001/walk/e-3.png",
+      "bytes": 17937,
+      "reason": "Superseded idle/walk experiment; actual idle generation references relocated"
+    },
+    {
+      "path": "art/source/characters/novice-eight-directions-v001/walk/n-0.png",
+      "bytes": 20188,
+      "reason": "Superseded idle/walk experiment; actual idle generation references relocated"
+    },
+    {
+      "path": "art/source/characters/novice-eight-directions-v001/walk/n-1.png",
+      "bytes": 19886,
+      "reason": "Superseded idle/walk experiment; actual idle generation references relocated"
+    },
+    {
+      "path": "art/source/characters/novice-eight-directions-v001/walk/n-2.png",
+      "bytes": 20215,
+      "reason": "Superseded idle/walk experiment; actual idle generation references relocated"
+    },
+    {
+      "path": "art/source/characters/novice-eight-directions-v001/walk/n-3.png",
+      "bytes": 19941,
+      "reason": "Superseded idle/walk experiment; actual idle generation references relocated"
+    },
+    {
+      "path": "art/source/characters/novice-eight-directions-v001/walk/ne-0.png",
+      "bytes": 21666,
+      "reason": "Superseded idle/walk experiment; actual idle generation references relocated"
+    },
+    {
+      "path": "art/source/characters/novice-eight-directions-v001/walk/ne-1.png",
+      "bytes": 19054,
+      "reason": "Superseded idle/walk experiment; actual idle generation references relocated"
+    },
+    {
+      "path": "art/source/characters/novice-eight-directions-v001/walk/ne-2.png",
+      "bytes": 21540,
+      "reason": "Superseded idle/walk experiment; actual idle generation references relocated"
+    },
+    {
+      "path": "art/source/characters/novice-eight-directions-v001/walk/ne-3.png",
+      "bytes": 19326,
+      "reason": "Superseded idle/walk experiment; actual idle generation references relocated"
+    },
+    {
+      "path": "art/source/characters/novice-eight-directions-v001/walk/nw-0.png",
+      "bytes": 22127,
+      "reason": "Superseded idle/walk experiment; actual idle generation references relocated"
+    },
+    {
+      "path": "art/source/characters/novice-eight-directions-v001/walk/nw-1.png",
+      "bytes": 19457,
+      "reason": "Superseded idle/walk experiment; actual idle generation references relocated"
+    },
+    {
+      "path": "art/source/characters/novice-eight-directions-v001/walk/nw-2.png",
+      "bytes": 22120,
+      "reason": "Superseded idle/walk experiment; actual idle generation references relocated"
+    },
+    {
+      "path": "art/source/characters/novice-eight-directions-v001/walk/nw-3.png",
+      "bytes": 18943,
+      "reason": "Superseded idle/walk experiment; actual idle generation references relocated"
+    },
+    {
+      "path": "art/source/characters/novice-eight-directions-v001/walk/s-0.png",
+      "bytes": 21151,
+      "reason": "Superseded idle/walk experiment; actual idle generation references relocated"
+    },
+    {
+      "path": "art/source/characters/novice-eight-directions-v001/walk/s-1.png",
+      "bytes": 20445,
+      "reason": "Superseded idle/walk experiment; actual idle generation references relocated"
+    },
+    {
+      "path": "art/source/characters/novice-eight-directions-v001/walk/s-2.png",
+      "bytes": 20585,
+      "reason": "Superseded idle/walk experiment; actual idle generation references relocated"
+    },
+    {
+      "path": "art/source/characters/novice-eight-directions-v001/walk/s-3.png",
+      "bytes": 20836,
+      "reason": "Superseded idle/walk experiment; actual idle generation references relocated"
+    },
+    {
+      "path": "art/source/characters/novice-eight-directions-v001/walk/se-0.png",
+      "bytes": 22876,
+      "reason": "Superseded idle/walk experiment; actual idle generation references relocated"
+    },
+    {
+      "path": "art/source/characters/novice-eight-directions-v001/walk/se-1.png",
+      "bytes": 18618,
+      "reason": "Superseded idle/walk experiment; actual idle generation references relocated"
+    },
+    {
+      "path": "art/source/characters/novice-eight-directions-v001/walk/se-2.png",
+      "bytes": 22911,
+      "reason": "Superseded idle/walk experiment; actual idle generation references relocated"
+    },
+    {
+      "path": "art/source/characters/novice-eight-directions-v001/walk/se-3.png",
+      "bytes": 18506,
+      "reason": "Superseded idle/walk experiment; actual idle generation references relocated"
+    },
+    {
+      "path": "art/source/characters/novice-eight-directions-v001/walk/sw-0.png",
+      "bytes": 22138,
+      "reason": "Superseded idle/walk experiment; actual idle generation references relocated"
+    },
+    {
+      "path": "art/source/characters/novice-eight-directions-v001/walk/sw-1.png",
+      "bytes": 19544,
+      "reason": "Superseded idle/walk experiment; actual idle generation references relocated"
+    },
+    {
+      "path": "art/source/characters/novice-eight-directions-v001/walk/sw-2.png",
+      "bytes": 22702,
+      "reason": "Superseded idle/walk experiment; actual idle generation references relocated"
+    },
+    {
+      "path": "art/source/characters/novice-eight-directions-v001/walk/sw-3.png",
+      "bytes": 19542,
+      "reason": "Superseded idle/walk experiment; actual idle generation references relocated"
+    },
+    {
+      "path": "art/source/characters/novice-eight-directions-v001/walk/w-0.png",
+      "bytes": 23472,
+      "reason": "Superseded idle/walk experiment; actual idle generation references relocated"
+    },
+    {
+      "path": "art/source/characters/novice-eight-directions-v001/walk/w-1.png",
+      "bytes": 18609,
+      "reason": "Superseded idle/walk experiment; actual idle generation references relocated"
+    },
+    {
+      "path": "art/source/characters/novice-eight-directions-v001/walk/w-2.png",
+      "bytes": 23267,
+      "reason": "Superseded idle/walk experiment; actual idle generation references relocated"
+    },
+    {
+      "path": "art/source/characters/novice-eight-directions-v001/walk/w-3.png",
+      "bytes": 18101,
+      "reason": "Superseded idle/walk experiment; actual idle generation references relocated"
+    },
+    {
+      "path": "art/source/characters/novice-eight-directions-v001/walk-atlas.png",
+      "bytes": 644984,
+      "reason": "Superseded idle/walk experiment; actual idle generation references relocated"
+    },
+    {
+      "path": "art/source/characters/novice-eight-directions-v001/walk-e-source.png",
+      "bytes": 1493187,
+      "reason": "Superseded idle/walk experiment; actual idle generation references relocated"
+    },
+    {
+      "path": "art/source/characters/novice-eight-directions-v001/walk-n-source.png",
+      "bytes": 1482078,
+      "reason": "Superseded idle/walk experiment; actual idle generation references relocated"
+    },
+    {
+      "path": "art/source/characters/novice-eight-directions-v001/walk-ne-source.png",
+      "bytes": 1461551,
+      "reason": "Superseded idle/walk experiment; actual idle generation references relocated"
+    },
+    {
+      "path": "art/source/characters/novice-eight-directions-v001/walk-nw-source.png",
+      "bytes": 1544346,
+      "reason": "Superseded idle/walk experiment; actual idle generation references relocated"
+    },
+    {
+      "path": "art/source/characters/novice-eight-directions-v001/walk-preview-light.png",
+      "bytes": 183474,
+      "reason": "Superseded idle/walk experiment; actual idle generation references relocated"
+    },
+    {
+      "path": "art/source/characters/novice-eight-directions-v001/walk-preview-small.png",
+      "bytes": 79750,
+      "reason": "Superseded idle/walk experiment; actual idle generation references relocated"
+    },
+    {
+      "path": "art/source/characters/novice-eight-directions-v001/walk-preview.gif",
+      "bytes": 229232,
+      "reason": "Superseded idle/walk experiment; actual idle generation references relocated"
+    },
+    {
+      "path": "art/source/characters/novice-eight-directions-v001/walk-s-source.png",
+      "bytes": 1524014,
+      "reason": "Superseded idle/walk experiment; actual idle generation references relocated"
+    },
+    {
+      "path": "art/source/characters/novice-eight-directions-v001/walk-se-source.png",
+      "bytes": 1591759,
+      "reason": "Superseded idle/walk experiment; actual idle generation references relocated"
+    },
+    {
+      "path": "art/source/characters/novice-eight-directions-v001/walk-sw-source.png",
+      "bytes": 1540341,
+      "reason": "Superseded idle/walk experiment; actual idle generation references relocated"
+    },
+    {
+      "path": "art/source/characters/novice-eight-directions-v001/walk-w-source.png",
+      "bytes": 1530645,
+      "reason": "Superseded idle/walk experiment; actual idle generation references relocated"
+    },
+    {
+      "path": "art/source/characters/novice-eight-directions-v001/idle-breathing-v001/frames/e-0.png",
+      "bytes": 15986,
+      "reason": "Redundant idle preview derivatives; approved atlas and raw sources retained"
+    },
+    {
+      "path": "art/source/characters/novice-eight-directions-v001/idle-breathing-v001/frames/e-1.png",
+      "bytes": 16188,
+      "reason": "Redundant idle preview derivatives; approved atlas and raw sources retained"
+    },
+    {
+      "path": "art/source/characters/novice-eight-directions-v001/idle-breathing-v001/frames/e-2.png",
+      "bytes": 16310,
+      "reason": "Redundant idle preview derivatives; approved atlas and raw sources retained"
+    },
+    {
+      "path": "art/source/characters/novice-eight-directions-v001/idle-breathing-v001/frames/e-3.png",
+      "bytes": 15976,
+      "reason": "Redundant idle preview derivatives; approved atlas and raw sources retained"
+    },
+    {
+      "path": "art/source/characters/novice-eight-directions-v001/idle-breathing-v001/frames/n-0.png",
+      "bytes": 23748,
+      "reason": "Redundant idle preview derivatives; approved atlas and raw sources retained"
+    },
+    {
+      "path": "art/source/characters/novice-eight-directions-v001/idle-breathing-v001/frames/n-1.png",
+      "bytes": 23892,
+      "reason": "Redundant idle preview derivatives; approved atlas and raw sources retained"
+    },
+    {
+      "path": "art/source/characters/novice-eight-directions-v001/idle-breathing-v001/frames/n-2.png",
+      "bytes": 24299,
+      "reason": "Redundant idle preview derivatives; approved atlas and raw sources retained"
+    },
+    {
+      "path": "art/source/characters/novice-eight-directions-v001/idle-breathing-v001/frames/n-3.png",
+      "bytes": 24002,
+      "reason": "Redundant idle preview derivatives; approved atlas and raw sources retained"
+    },
+    {
+      "path": "art/source/characters/novice-eight-directions-v001/idle-breathing-v001/frames/ne-0.png",
+      "bytes": 22068,
+      "reason": "Redundant idle preview derivatives; approved atlas and raw sources retained"
+    },
+    {
+      "path": "art/source/characters/novice-eight-directions-v001/idle-breathing-v001/frames/ne-1.png",
+      "bytes": 22608,
+      "reason": "Redundant idle preview derivatives; approved atlas and raw sources retained"
+    },
+    {
+      "path": "art/source/characters/novice-eight-directions-v001/idle-breathing-v001/frames/ne-2.png",
+      "bytes": 23069,
+      "reason": "Redundant idle preview derivatives; approved atlas and raw sources retained"
+    },
+    {
+      "path": "art/source/characters/novice-eight-directions-v001/idle-breathing-v001/frames/ne-3.png",
+      "bytes": 22167,
+      "reason": "Redundant idle preview derivatives; approved atlas and raw sources retained"
+    },
+    {
+      "path": "art/source/characters/novice-eight-directions-v001/idle-breathing-v001/frames/nw-0.png",
+      "bytes": 21904,
+      "reason": "Redundant idle preview derivatives; approved atlas and raw sources retained"
+    },
+    {
+      "path": "art/source/characters/novice-eight-directions-v001/idle-breathing-v001/frames/nw-1.png",
+      "bytes": 22312,
+      "reason": "Redundant idle preview derivatives; approved atlas and raw sources retained"
+    },
+    {
+      "path": "art/source/characters/novice-eight-directions-v001/idle-breathing-v001/frames/nw-2.png",
+      "bytes": 22684,
+      "reason": "Redundant idle preview derivatives; approved atlas and raw sources retained"
+    },
+    {
+      "path": "art/source/characters/novice-eight-directions-v001/idle-breathing-v001/frames/nw-3.png",
+      "bytes": 22262,
+      "reason": "Redundant idle preview derivatives; approved atlas and raw sources retained"
+    },
+    {
+      "path": "art/source/characters/novice-eight-directions-v001/idle-breathing-v001/frames/s-0.png",
+      "bytes": 22973,
+      "reason": "Redundant idle preview derivatives; approved atlas and raw sources retained"
+    },
+    {
+      "path": "art/source/characters/novice-eight-directions-v001/idle-breathing-v001/frames/s-1.png",
+      "bytes": 23357,
+      "reason": "Redundant idle preview derivatives; approved atlas and raw sources retained"
+    },
+    {
+      "path": "art/source/characters/novice-eight-directions-v001/idle-breathing-v001/frames/s-2.png",
+      "bytes": 23414,
+      "reason": "Redundant idle preview derivatives; approved atlas and raw sources retained"
+    },
+    {
+      "path": "art/source/characters/novice-eight-directions-v001/idle-breathing-v001/frames/s-3.png",
+      "bytes": 23131,
+      "reason": "Redundant idle preview derivatives; approved atlas and raw sources retained"
+    },
+    {
+      "path": "art/source/characters/novice-eight-directions-v001/idle-breathing-v001/frames/se-0.png",
+      "bytes": 22272,
+      "reason": "Redundant idle preview derivatives; approved atlas and raw sources retained"
+    },
+    {
+      "path": "art/source/characters/novice-eight-directions-v001/idle-breathing-v001/frames/se-1.png",
+      "bytes": 22456,
+      "reason": "Redundant idle preview derivatives; approved atlas and raw sources retained"
+    },
+    {
+      "path": "art/source/characters/novice-eight-directions-v001/idle-breathing-v001/frames/se-2.png",
+      "bytes": 23142,
+      "reason": "Redundant idle preview derivatives; approved atlas and raw sources retained"
+    },
+    {
+      "path": "art/source/characters/novice-eight-directions-v001/idle-breathing-v001/frames/se-3.png",
+      "bytes": 22740,
+      "reason": "Redundant idle preview derivatives; approved atlas and raw sources retained"
+    },
+    {
+      "path": "art/source/characters/novice-eight-directions-v001/idle-breathing-v001/frames/sw-0.png",
+      "bytes": 21910,
+      "reason": "Redundant idle preview derivatives; approved atlas and raw sources retained"
+    },
+    {
+      "path": "art/source/characters/novice-eight-directions-v001/idle-breathing-v001/frames/sw-1.png",
+      "bytes": 22739,
+      "reason": "Redundant idle preview derivatives; approved atlas and raw sources retained"
+    },
+    {
+      "path": "art/source/characters/novice-eight-directions-v001/idle-breathing-v001/frames/sw-2.png",
+      "bytes": 22974,
+      "reason": "Redundant idle preview derivatives; approved atlas and raw sources retained"
+    },
+    {
+      "path": "art/source/characters/novice-eight-directions-v001/idle-breathing-v001/frames/sw-3.png",
+      "bytes": 22187,
+      "reason": "Redundant idle preview derivatives; approved atlas and raw sources retained"
+    },
+    {
+      "path": "art/source/characters/novice-eight-directions-v001/idle-breathing-v001/frames/w-0.png",
+      "bytes": 16103,
+      "reason": "Redundant idle preview derivatives; approved atlas and raw sources retained"
+    },
+    {
+      "path": "art/source/characters/novice-eight-directions-v001/idle-breathing-v001/frames/w-1.png",
+      "bytes": 16421,
+      "reason": "Redundant idle preview derivatives; approved atlas and raw sources retained"
+    },
+    {
+      "path": "art/source/characters/novice-eight-directions-v001/idle-breathing-v001/frames/w-2.png",
+      "bytes": 16504,
+      "reason": "Redundant idle preview derivatives; approved atlas and raw sources retained"
+    },
+    {
+      "path": "art/source/characters/novice-eight-directions-v001/idle-breathing-v001/frames/w-3.png",
+      "bytes": 16085,
+      "reason": "Redundant idle preview derivatives; approved atlas and raw sources retained"
+    },
+    {
+      "path": "art/source/characters/novice-eight-directions-v001/idle-breathing-v001/idle-preview.gif",
+      "bytes": 216765,
+      "reason": "Redundant idle preview derivatives; approved atlas and raw sources retained"
+    },
+    {
+      "path": "art/source/characters/novice-eight-directions-v001/idle-breathing-v001/make-preview.py",
+      "bytes": 1041,
+      "reason": "Redundant idle preview derivatives; approved atlas and raw sources retained"
+    },
+    {
+      "path": "art/source/characters/novice-eight-directions-v001/idle-breathing-v001/preview.png",
+      "bytes": 152203,
+      "reason": "Redundant idle preview derivatives; approved atlas and raw sources retained"
+    },
+    {
+      "path": "art/source/characters/novice-eight-directions-v001/idle-breathing-v001/preview-small.png",
+      "bytes": 67316,
+      "reason": "Redundant idle preview derivatives; approved atlas and raw sources retained"
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-w-v004/prepare.mjs",
+      "bytes": 2280,
+      "reason": "Obsolete pre-approval preparation tied to deleted experiments; pose-base and export dependencies are local"
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-w-v004/build-preview.mjs",
+      "bytes": 2600,
+      "reason": "Obsolete pre-approval preparation tied to deleted experiments; pose-base and export dependencies are local"
+    },
+    {
+      "path": "art/source/props/castle-walls/metadata.json",
+      "bytes": 371,
+      "reason": "Not referenced by current runtime; retired asset family or obsolete exporter"
+    },
+    {
+      "path": "art/source/props/castle-walls/original.png",
+      "bytes": 2898268,
+      "reason": "Not referenced by current runtime; retired asset family or obsolete exporter"
+    },
+    {
+      "path": "art/source/props/castle-walls/preview.png",
+      "bytes": 2360227,
+      "reason": "Not referenced by current runtime; retired asset family or obsolete exporter"
+    },
+    {
+      "path": "public/assets/props/castle/castle-walls.json",
+      "bytes": 11711,
+      "reason": "Not referenced by current runtime; retired asset family or obsolete exporter"
+    },
+    {
+      "path": "public/assets/props/castle/castle-walls.png",
+      "bytes": 2666062,
+      "reason": "Not referenced by current runtime; retired asset family or obsolete exporter"
+    },
+    {
+      "path": "public/castle-preview.html",
+      "bytes": 1818,
+      "reason": "Not referenced by current runtime; retired asset family or obsolete exporter"
+    },
+    {
+      "path": "scripts/export-castle-walls.mjs",
+      "bytes": 2718,
+      "reason": "Not referenced by current runtime; retired asset family or obsolete exporter"
+    },
+    {
+      "path": "art/source/props/daflak-flowers/clover.png",
+      "bytes": 739094,
+      "reason": "Not referenced by current runtime; retired asset family or obsolete exporter"
+    },
+    {
+      "path": "art/source/props/daflak-flowers/metadata.json",
+      "bytes": 1643,
+      "reason": "Not referenced by current runtime; retired asset family or obsolete exporter"
+    },
+    {
+      "path": "art/source/props/daflak-flowers/PROMPTS.md",
+      "bytes": 2731,
+      "reason": "Not referenced by current runtime; retired asset family or obsolete exporter"
+    },
+    {
+      "path": "art/source/props/daflak-flowers/tulip.png",
+      "bytes": 825786,
+      "reason": "Not referenced by current runtime; retired asset family or obsolete exporter"
+    },
+    {
+      "path": "art/source/props/daflak-flowers/yellow.png",
+      "bytes": 839609,
+      "reason": "Not referenced by current runtime; retired asset family or obsolete exporter"
+    },
+    {
+      "path": "art/source/tiles/continuous-meadow/clover/original.png",
+      "bytes": 1191103,
+      "reason": "Not referenced by current runtime; retired asset family or obsolete exporter"
+    },
+    {
+      "path": "art/source/tiles/continuous-meadow/clover/PROMPT.md",
+      "bytes": 855,
+      "reason": "Not referenced by current runtime; retired asset family or obsolete exporter"
+    },
+    {
+      "path": "art/source/tiles/continuous-meadow/leaves/original.png",
+      "bytes": 1029633,
+      "reason": "Not referenced by current runtime; retired asset family or obsolete exporter"
+    },
+    {
+      "path": "art/source/tiles/continuous-meadow/leaves/PROMPT.md",
+      "bytes": 855,
+      "reason": "Not referenced by current runtime; retired asset family or obsolete exporter"
+    },
+    {
+      "path": "art/source/tiles/continuous-meadow/records.json",
+      "bytes": 3221,
+      "reason": "Not referenced by current runtime; retired asset family or obsolete exporter"
+    },
+    {
+      "path": "art/source/tiles/continuous-meadow/reference.png",
+      "bytes": 1196012,
+      "reason": "Not referenced by current runtime; retired asset family or obsolete exporter"
+    },
+    {
+      "path": "art/source/tiles/continuous-meadow/tufts/original.png",
+      "bytes": 1094882,
+      "reason": "Not referenced by current runtime; retired asset family or obsolete exporter"
+    },
+    {
+      "path": "art/source/tiles/continuous-meadow/tufts/PROMPT.md",
+      "bytes": 861,
+      "reason": "Not referenced by current runtime; retired asset family or obsolete exporter"
+    },
+    {
+      "path": "art/source/tiles/daflak-ground/metadata.json",
+      "bytes": 1151,
+      "reason": "Not referenced by current runtime; retired asset family or obsolete exporter"
+    },
+    {
+      "path": "art/source/tiles/daflak-ground/original.png",
+      "bytes": 3273833,
+      "reason": "Not referenced by current runtime; retired asset family or obsolete exporter"
+    },
+    {
+      "path": "art/source/tiles/daflak-ground/PROMPT.md",
+      "bytes": 2053,
+      "reason": "Not referenced by current runtime; retired asset family or obsolete exporter"
+    },
+    {
+      "path": "art/source/tiles/daflak-ground/reference.png",
+      "bytes": 4527901,
+      "reason": "Not referenced by current runtime; retired asset family or obsolete exporter"
+    },
+    {
+      "path": "art/source/tiles/daflak-water-bank/metadata.json",
+      "bytes": 1151,
+      "reason": "Not referenced by current runtime; retired asset family or obsolete exporter"
+    },
+    {
+      "path": "art/source/tiles/daflak-water-bank/original.png",
+      "bytes": 3247423,
+      "reason": "Not referenced by current runtime; retired asset family or obsolete exporter"
+    },
+    {
+      "path": "art/source/tiles/daflak-water-bank/PROMPT.md",
+      "bytes": 2051,
+      "reason": "Not referenced by current runtime; retired asset family or obsolete exporter"
+    },
+    {
+      "path": "art/source/tiles/daflak-water-bank/reference.png",
+      "bytes": 4026922,
+      "reason": "Not referenced by current runtime; retired asset family or obsolete exporter"
+    },
+    {
+      "path": "art/source/tiles/smooth-meadow/earth/original.png",
+      "bytes": 2269837,
+      "reason": "Not referenced by current runtime; retired asset family or obsolete exporter"
+    },
+    {
+      "path": "art/source/tiles/smooth-meadow/earth/PROMPT.md",
+      "bytes": 1035,
+      "reason": "Not referenced by current runtime; retired asset family or obsolete exporter"
+    },
+    {
+      "path": "art/source/tiles/smooth-meadow/grass/original.png",
+      "bytes": 2487902,
+      "reason": "Not referenced by current runtime; retired asset family or obsolete exporter"
+    },
+    {
+      "path": "art/source/tiles/smooth-meadow/grass/PROMPT.md",
+      "bytes": 1252,
+      "reason": "Not referenced by current runtime; retired asset family or obsolete exporter"
+    },
+    {
+      "path": "art/source/tiles/smooth-meadow/records.json",
+      "bytes": 2721,
+      "reason": "Not referenced by current runtime; retired asset family or obsolete exporter"
+    },
+    {
+      "path": "art/source/tiles/smooth-meadow/reference-1.png",
+      "bytes": 3362443,
+      "reason": "Not referenced by current runtime; retired asset family or obsolete exporter"
+    },
+    {
+      "path": "art/source/tiles/smooth-meadow/reference-2.png",
+      "bytes": 2607125,
+      "reason": "Not referenced by current runtime; retired asset family or obsolete exporter"
+    },
+    {
+      "path": "art/source/tiles/mythraven-grass-overlay/metadata-v001.json",
+      "bytes": 881,
+      "reason": "Not referenced by current runtime; retired asset family or obsolete exporter"
+    },
+    {
+      "path": "art/source/tiles/mythraven-grass-overlay/prompt-v001.txt",
+      "bytes": 1664,
+      "reason": "Not referenced by current runtime; retired asset family or obsolete exporter"
+    },
+    {
+      "path": "art/source/tiles/mythraven-paving/metadata-v001.json",
+      "bytes": 668,
+      "reason": "Not referenced by current runtime; retired asset family or obsolete exporter"
+    },
+    {
+      "path": "art/source/tiles/mythraven-paving/prompt-v001.txt",
+      "bytes": 1429,
+      "reason": "Not referenced by current runtime; retired asset family or obsolete exporter"
+    },
+    {
+      "path": "art/source/fx/fountain-jet/metadata-v002.json",
+      "bytes": 1436,
+      "reason": "Not referenced by current runtime; retired asset family or obsolete exporter"
+    },
+    {
+      "path": "art/source/fx/fountain-jet/normalization.json",
+      "bytes": 880,
+      "reason": "Not referenced by current runtime; retired asset family or obsolete exporter"
+    },
+    {
+      "path": "art/source/fx/fountain-jet/prompt-v001.txt",
+      "bytes": 2105,
+      "reason": "Not referenced by current runtime; retired asset family or obsolete exporter"
+    },
+    {
+      "path": "art/source/fx/fountain-jet/prompt-v002.txt",
+      "bytes": 632,
+      "reason": "Not referenced by current runtime; retired asset family or obsolete exporter"
+    },
+    {
+      "path": "art/source/props/mythraven-fountain/tiered-v002/metadata.json",
+      "bytes": 1765,
+      "reason": "Not referenced by current runtime; retired asset family or obsolete exporter"
+    },
+    {
+      "path": "art/source/props/mythraven-fountain/tiered-v002/prompt.txt",
+      "bytes": 1389,
+      "reason": "Not referenced by current runtime; retired asset family or obsolete exporter"
+    },
+    {
+      "path": "assets/_tests/grass-repeat.png",
+      "bytes": 2068908,
+      "reason": "Not referenced by current runtime; retired asset family or obsolete exporter"
+    },
+    {
+      "path": "assets/objects/dec01_groundcover_clover_v1.png",
+      "bytes": 85849,
+      "reason": "Not referenced by current runtime; retired asset family or obsolete exporter"
+    },
+    {
+      "path": "assets/objects/dec01_groundcover_leaves_v1.png",
+      "bytes": 75354,
+      "reason": "Not referenced by current runtime; retired asset family or obsolete exporter"
+    },
+    {
+      "path": "assets/objects/dec01_groundcover_tufts_v1.png",
+      "bytes": 75209,
+      "reason": "Not referenced by current runtime; retired asset family or obsolete exporter"
+    },
+    {
+      "path": "scripts/export-daflak-flowers.mjs",
+      "bytes": 925,
+      "reason": "Not referenced by current runtime; retired asset family or obsolete exporter"
+    },
+    {
+      "path": "scripts/export-daflak-materials.mjs",
+      "bytes": 837,
+      "reason": "Not referenced by current runtime; retired asset family or obsolete exporter"
+    },
+    {
+      "path": "scripts/export-meadow.mjs",
+      "bytes": 1445,
+      "reason": "Not referenced by current runtime; retired asset family or obsolete exporter"
+    },
+    {
+      "path": "scripts/export-mythraven-paving.mjs",
+      "bytes": 76,
+      "reason": "Not referenced by current runtime; retired asset family or obsolete exporter"
+    },
+    {
+      "path": "scripts/preview-mythraven-grass.mjs",
+      "bytes": 76,
+      "reason": "Not referenced by current runtime; retired asset family or obsolete exporter"
+    },
+    {
+      "path": "art/source/maps/mythraven-town/mythraven-town-v001.png",
+      "bytes": 3889329,
+      "reason": "Superseded map candidate; active sand-v004 and intentional references retained"
+    },
+    {
+      "path": "art/source/maps/mythraven-town/mythraven-town-ground-v002.png",
+      "bytes": 3049389,
+      "reason": "Superseded map candidate; active sand-v004 and intentional references retained"
+    },
+    {
+      "path": "art/source/maps/mythraven-town/mythraven-town-dirt-v003.png",
+      "bytes": 2275383,
+      "reason": "Superseded map candidate; active sand-v004 and intentional references retained"
+    },
+    {
+      "path": "art/source/maps/mythraven-town/metadata-v001.json",
+      "bytes": 991,
+      "reason": "Superseded map candidate; active sand-v004 and intentional references retained"
+    },
+    {
+      "path": "art/source/maps/mythraven-town/metadata-v002.json",
+      "bytes": 1176,
+      "reason": "Superseded map candidate; active sand-v004 and intentional references retained"
+    },
+    {
+      "path": "art/source/maps/mythraven-town/metadata-v003.json",
+      "bytes": 576,
+      "reason": "Superseded map candidate; active sand-v004 and intentional references retained"
+    },
+    {
+      "path": "art/source/maps/mythraven-town/prompt-v001.txt",
+      "bytes": 3474,
+      "reason": "Superseded map candidate; active sand-v004 and intentional references retained"
+    },
+    {
+      "path": "art/source/maps/mythraven-town/prompt-v002.txt",
+      "bytes": 4588,
+      "reason": "Superseded map candidate; active sand-v004 and intentional references retained"
+    },
+    {
+      "path": "art/source/maps/mythraven-town/prompt-v003.txt",
+      "bytes": 1806,
+      "reason": "Superseded map candidate; active sand-v004 and intentional references retained"
+    },
+    {
+      "path": "public/assets/icons/mythraven-48.png",
+      "bytes": 5671,
+      "reason": "Not loaded by page or webmanifest; ICO embeds its own 48px entry"
+    }
+  ],
+  "totalFiles": 458,
+  "totalBytes": 141181464
+}

@@ -1,0 +1,15 @@
+{
+  "passed": true,
+  "framesSeen": [
+    0,
+    1,
+    2,
+    3
+  ],
+  "eightImagesLoaded": true,
+  "pause": true,
+  "step": true,
+  "constantCssTransforms": true,
+  "mobileOverflow": false,
+  "errors": []
+}
