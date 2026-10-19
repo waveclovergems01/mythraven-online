@@ -24,3 +24,6 @@ Use the available image-generation skill/tool for raster generation/editing. Exa
 Do not generate art merely because the rules are being edited. Rules alone do not authorize generating a complete asset library.
 
 The guide names GPT Image 2.5; use only a verified available image tool/model and record the actual tool used. Do not claim an unavailable model was selected.
+
+## Permanent motion reference — owner request 2026-10-19
+Retain art/references/novice-male-sprite-control-reference.png during cleanup. The owner explicitly requested this reusable reference. Attach it for future novice walking generation alongside actual runtime idle/walk images, which remain the appearance authority. Anatomical L/R means the character's own sides. In corrected Pose A: RIGHT arm forward (screen-left, red), LEFT arm back (screen-right, blue), matching the actual painted Pose A clean view: near left shoulder/sleeve extends rearward, far right upper arm is occluded by torso and only its forearm emerges beneath the chest. Do not replace this with a visible red shoulder-to-hand chain. LEFT leg forward and RIGHT leg back. In corrected Pose B: RIGHT leg forward (screen-left, red); LEFT leg back (screen-right, blue). This named permanent reference is exempt from temporary-reference cleanup; it does not authorize preserving other drafts.
