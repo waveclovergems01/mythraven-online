@@ -1,5 +1,5 @@
 import sharp from 'sharp';
-import { copyFile, mkdir, stat, writeFile } from 'node:fs/promises';
+import { copyFile, mkdir, stat } from 'node:fs/promises';
 import path from 'node:path';
 
 // Export only: preserve artwork and alpha, resize/re-encode for browser delivery.
@@ -28,11 +28,10 @@ for(const asset of assets) {
     .webp({lossless:asset.lossless,quality:78,effort:6}).toFile(output);
   const stats=await sharp(output).stats();
   manifest.push({styleId:'MR-ART-v1',assetId:asset.id,revision:'v001',status:'reviewed',
-    sourcePath:source,exportPath:output,promptPath:'art/source/ui/login/PROMPTS.md',
+    sourcePath:source,exportPath:output,
     references:[],generationTool:'built-in image_gen (previous turn)',
     width:result.width,height:result.height,bytes:result.size,hasTransparency:!stats.isOpaque,
     ...(asset.id==='login-frame'?{nineSlicePx:[100,64,100,64],centerFill:false}:{}),
   });
   console.log(asset.id+': '+result.width+'x'+result.height+', '+result.size+' bytes, alpha='+!stats.isOpaque);
 }
-await writeFile(path.join(sourceFolder,'metadata.json'),JSON.stringify(manifest,null,2)+'\n');

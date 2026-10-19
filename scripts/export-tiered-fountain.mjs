@@ -5,7 +5,7 @@ await sharp(source).extract({left:158,top:14,width:1100,height:1140}).resize({wi
 const dir='art/source/fx/fountain-tiered/';
 const src=dir+'original-v001.png';
 const meta=await sharp(src).metadata();
-const layers=[],records=[];
+const layers=[];
 for(let row=0;row<2;row++)for(let i=0;i<4;i++){
  const left=Math.round(i*meta.width/4),right=Math.round((i+1)*meta.width/4),top=Math.round(row*meta.height/2),bottom=Math.round((row+1)*meta.height/2);
  const {data,info}=await sharp(src).extract({left,top,width:right-left,height:bottom-top}).ensureAlpha().raw().toBuffer({resolveWithObject:true});
@@ -20,9 +20,8 @@ for(let row=0;row<2;row++)for(let i=0;i<4;i++){
  if(offsetX<0||offsetY<0)throw new Error('Invalid frame padding');
  const frame=await sharp({create:{width:256,height:256,channels:4,background:'#00000000'}}).composite([{input,left:offsetX,top:offsetY}]).png().toBuffer();
 
- layers.push({input:frame,left:i*256,top:row*256});records.push({row,index:i,sourceRoot:[ax,ay],anchor,scale:.5,offset:[offsetX,offsetY]});
+ layers.push({input:frame,left:i*256,top:row*256});
 }
 await sharp({create:{width:1024,height:512,channels:4,background:'#00000000'}}).composite(layers).png().toFile('public/assets/fx/fountain-tiered-water.png');
-await writeFile(dir+'normalization.json',JSON.stringify({frames:records,frameSize:[256,256],sourceSize:[meta.width,meta.height],scale:.5},null,2));
 console.log('exported base and 8 anchored water frames');
 

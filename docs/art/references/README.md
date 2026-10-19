@@ -8,4 +8,4 @@
 
 ภาพ sprite เหล่านี้เป็น screenshot มี DevTools และลายตารางแสดง alpha ห้ามเอา screenshot ไปตัดแล้วใช้เป็น sprite ของ Mythraven
 ไม่อนุมานว่า 8 ช่องคือ 8 ทิศ และไม่ยืนยัน action จากภาพนิ่ง
-art/references/ จะเก็บ master ของ Mythraven เมื่อสร้างและเลือกแล้ว ขณะนี้ยังไม่มี approved master
+หลังการอนุมัติและล้างไฟล์วันที่ 2026-10-19 ให้ใช้ public/assets/characters/novice-male-idle.png, novice-male-walk-w.png และ novice-male-walk-sw.png เป็นภาพอ้างอิงตัวละครที่ใช้อยู่จริง ไม่มีคลังสำเนา master ใน art/references แล้ว

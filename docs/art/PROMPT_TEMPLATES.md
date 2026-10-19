@@ -128,3 +128,7 @@ Brief → attach available references → generate candidate → inspect style/i
 revise with references → export/align/pack → validate per ASSET_SPEC →
 preview in game → record QA and status → integrate runtime export.
 การปรับขนาด/จัด grid ไม่แก้ anatomy หรือสไตล์ที่ผิด ต้องแก้ภาพต้นทางก่อน
+
+
+## Source cleanup policy — owner instruction 2026-10-19
+After approval and integration, discard temporary generation sources, references, individual frames, PNG/GIF/HTML previews, QA JSON and obsolete scripts. Approved runtime character atlases in public/assets/characters are the source of truth for future character work. art/source now retains only13 original images required by maintained non-character exporters; see art/README.md. Browser QA writes to test-results. Earlier source paths and prompt-retention statements above are historical and superseded; do not recreate deleted archives. Active generation may use ignored art/.scratch temporarily and must clean it on completion. Removal audit: docs/art/cleanup-2026-10-19.json.

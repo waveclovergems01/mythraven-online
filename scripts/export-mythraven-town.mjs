@@ -40,7 +40,6 @@ for(let y=0;y<info.height;y++)for(let x=0;x<info.width;x++){
 }
 await sharp(mask,{raw:{width:info.width,height:info.height,channels:4}}).png().toFile(out+'/mythraven-grass-mask.png');
 await sharp(nav,{raw:{width:info.width,height:info.height,channels:3}}).png().toFile(out+'/mythraven-navigation.png');
-await writeFile(root+'integration.json',JSON.stringify({status:'integrated',source:'mythraven-town-sand-v004.png',grass:'art/source/tiles/painted-town-v004/grass-source.png',mask:'public/assets/maps/mythraven-grass-mask.png',navigation:'public/assets/maps/mythraven-navigation.png',dimensions:info,coveragePixels:levels,notes:'Central lawn boosted to 92-100% coverage; outermost coverage unchanged. Deterministic soft coverage, soil-only; water classification navigation is conservative per movement cell. Objects not added.'},null,2));
 console.log(levels);
 
 

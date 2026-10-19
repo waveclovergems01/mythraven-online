@@ -1,5 +1,5 @@
 import sharp from 'sharp';
-import {copyFile, mkdir, writeFile} from 'node:fs/promises';
+import {copyFile, mkdir} from 'node:fs/promises';
 import path from 'node:path';
 const sourceDir='art/source/ui/cursors';
 const outDir='public/assets/ui/cursors';
@@ -33,10 +33,9 @@ for(const asset of assets){
  const stats=await sharp(output).stats();
  if(stats.isOpaque||!hotspot)throw Error('Invalid cursor alpha/hotspot');
  manifest.push({styleId:'MR-ART-v1',assetId:asset.id,revision:'v001',status:'reviewed',
- sourcePath:source,exportPath:output,promptPath:sourceDir+'/PROMPTS.md',
+ sourcePath:source,exportPath:output,
  references:['public/assets/ui/login-frame.webp'],generationTool:'built-in image_gen',
  width:40,height:40,runtimeScale:1,hotspotPx:hotspot,hasTransparency:true});
 }
-await writeFile(path.join(sourceDir,'metadata.json'),JSON.stringify(manifest,null,2)+'\n');
 console.log(JSON.stringify(manifest,null,2));
 

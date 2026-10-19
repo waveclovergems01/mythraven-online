@@ -1,0 +1,1004 @@
+{
+  "date": "2026-10-19",
+  "reason": "Owner requested deletion of completed generation trials, previews, references, proofs and obsolete scripts after runtime integration.",
+  "removedFiles": 217,
+  "removedBytes": 69534350,
+  "retainedSources": [
+    "README.md",
+    "source/fx/fountain-tiered/original-v001.png",
+    "source/maps/mythraven-town/mythraven-town-sand-v004.png",
+    "source/props/mythraven-fountain/round-v003/original.png",
+    "source/tiles/mythraven-granite/original-v001.png",
+    "source/tiles/mythraven-water/original-v001.png",
+    "source/tiles/painted-town-v004/grass-source.png",
+    "source/tiles/painted-town-v004/paving-source.png",
+    "source/ui/cursors/cursor-default.png",
+    "source/ui/cursors/cursor-pointer.png",
+    "source/ui/favicon/original.png",
+    "source/ui/login/login-background.png",
+    "source/ui/login/login-frame.png",
+    "source/ui/login/mythraven-logo.png"
+  ],
+  "removed": [
+    {
+      "path": "art/references/.gitkeep",
+      "bytes": 0
+    },
+    {
+      "path": "art/source/.gitkeep",
+      "bytes": 0
+    },
+    {
+      "path": "art/source/characters/novice-eight-directions-v001/export.mjs",
+      "bytes": 1397
+    },
+    {
+      "path": "art/source/characters/novice-eight-directions-v001/pack-idle-breathing.mjs",
+      "bytes": 1426
+    },
+    {
+      "path": "art/source/characters/novice-eight-directions-v001/idle-breathing-v001/asset-qa.json",
+      "bytes": 951
+    },
+    {
+      "path": "art/source/characters/novice-eight-directions-v001/idle-breathing-v001/e-source.png",
+      "bytes": 1113325
+    },
+    {
+      "path": "art/source/characters/novice-eight-directions-v001/idle-breathing-v001/idle-atlas.png",
+      "bytes": 657648
+    },
+    {
+      "path": "art/source/characters/novice-eight-directions-v001/idle-breathing-v001/manifest.json",
+      "bytes": 5511
+    },
+    {
+      "path": "art/source/characters/novice-eight-directions-v001/idle-breathing-v001/ne-source.png",
+      "bytes": 1430221
+    },
+    {
+      "path": "art/source/characters/novice-eight-directions-v001/idle-breathing-v001/n-source.png",
+      "bytes": 1456020
+    },
+    {
+      "path": "art/source/characters/novice-eight-directions-v001/idle-breathing-v001/nw-background-repair.json",
+      "bytes": 1148
+    },
+    {
+      "path": "art/source/characters/novice-eight-directions-v001/idle-breathing-v001/nw-source.png",
+      "bytes": 1785037
+    },
+    {
+      "path": "art/source/characters/novice-eight-directions-v001/idle-breathing-v001/playtest.json",
+      "bytes": 208
+    },
+    {
+      "path": "art/source/characters/novice-eight-directions-v001/idle-breathing-v001/prompts.json",
+      "bytes": 17762
+    },
+    {
+      "path": "art/source/characters/novice-eight-directions-v001/idle-breathing-v001/QA.md",
+      "bytes": 1395
+    },
+    {
+      "path": "art/source/characters/novice-eight-directions-v001/idle-breathing-v001/se-source.png",
+      "bytes": 1471475
+    },
+    {
+      "path": "art/source/characters/novice-eight-directions-v001/idle-breathing-v001/s-source.png",
+      "bytes": 1465680
+    },
+    {
+      "path": "art/source/characters/novice-eight-directions-v001/idle-breathing-v001/sw-source.png",
+      "bytes": 1540773
+    },
+    {
+      "path": "art/source/characters/novice-eight-directions-v001/idle-breathing-v001/w-source.png",
+      "bytes": 1076204
+    },
+    {
+      "path": "art/source/characters/novice-eight-directions-v001/idle-breathing-v001/references/seed-e.png",
+      "bytes": 156655
+    },
+    {
+      "path": "art/source/characters/novice-eight-directions-v001/idle-breathing-v001/references/seed-ne.png",
+      "bytes": 217467
+    },
+    {
+      "path": "art/source/characters/novice-eight-directions-v001/idle-breathing-v001/references/seed-n.png",
+      "bytes": 238077
+    },
+    {
+      "path": "art/source/characters/novice-eight-directions-v001/idle-breathing-v001/references/seed-nw.png",
+      "bytes": 216757
+    },
+    {
+      "path": "art/source/characters/novice-eight-directions-v001/idle-breathing-v001/references/seed-se.png",
+      "bytes": 232581
+    },
+    {
+      "path": "art/source/characters/novice-eight-directions-v001/idle-breathing-v001/references/seed-s.png",
+      "bytes": 247683
+    },
+    {
+      "path": "art/source/characters/novice-eight-directions-v001/idle-breathing-v001/references/seed-sw.png",
+      "bytes": 232553
+    },
+    {
+      "path": "art/source/characters/novice-eight-directions-v001/idle-breathing-v001/references/seed-w.png",
+      "bytes": 162223
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-sw-v003/export.mjs",
+      "bytes": 1733
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-sw-v003/manifest.json",
+      "bytes": 3393
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-sw-v003/prompts.json",
+      "bytes": 10380
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-sw-v003/frames/frame-01.png",
+      "bytes": 103475
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-sw-v003/frames/frame-02.png",
+      "bytes": 92636
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-sw-v003/frames/frame-03.png",
+      "bytes": 92333
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-sw-v003/frames/frame-04.png",
+      "bytes": 102740
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-sw-v003/frames/frame-05.png",
+      "bytes": 100807
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-sw-v003/frames/frame-06.png",
+      "bytes": 86269
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-sw-v003/frames/frame-07.png",
+      "bytes": 89970
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-sw-v003/frames/frame-08.png",
+      "bytes": 103475
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-sw-v003/references/earlier-sw-phase-3.png",
+      "bytes": 457949
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-sw-v003/references/idle-sw.png",
+      "bytes": 314459
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-sw-v003/references/walk-phase-1.png",
+      "bytes": 338634
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-sw-v003/references/walk-phase-2.png",
+      "bytes": 297639
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-sw-v003/references/walk-phase-3.png",
+      "bytes": 288211
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-sw-v003/references/walk-phase-4.png",
+      "bytes": 347248
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-sw-v003/references/walk-phase-5.png",
+      "bytes": 343420
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-sw-v003/references/walk-phase-6.png",
+      "bytes": 293193
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-sw-v003/references/walk-phase-7.png",
+      "bytes": 280600
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-sw-v003/references/walk-phase-8.png",
+      "bytes": 341881
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-sw-v003/source/frame-01.png",
+      "bytes": 483854
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-sw-v003/source/frame-02.png",
+      "bytes": 439544
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-sw-v003/source/frame-03.png",
+      "bytes": 442241
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-sw-v003/source/frame-04.png",
+      "bytes": 472375
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-sw-v003/source/frame-05.png",
+      "bytes": 473173
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-sw-v003/source/frame-06.png",
+      "bytes": 403118
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-sw-v003/source/frame-07.png",
+      "bytes": 427806
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-sw-v003/source/frame-08.png",
+      "bytes": 483854
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-sw-v004/export.mjs",
+      "bytes": 1478
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-sw-v004/frame-01.png",
+      "bytes": 91323
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-sw-v004/frame-01-source.png",
+      "bytes": 408077
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-sw-v004/frame-02.png",
+      "bytes": 82057
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-sw-v004/frame-02-source.png",
+      "bytes": 397427
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-sw-v004/frame-03.png",
+      "bytes": 87025
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-sw-v004/frame-03-source.png",
+      "bytes": 412620
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-sw-v004/frame-04.png",
+      "bytes": 79846
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-sw-v004/frame-04-source.png",
+      "bytes": 384694
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-sw-v004/frame-05.png",
+      "bytes": 79990
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-sw-v004/frame-05-source.png",
+      "bytes": 385413
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-sw-v004/frame-06.png",
+      "bytes": 88627
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-sw-v004/frame-06-source.png",
+      "bytes": 420552
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-sw-v004/frame-07.png",
+      "bytes": 79953
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-sw-v004/frame-07-source.png",
+      "bytes": 388772
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-sw-v004/frame-08.png",
+      "bytes": 89594
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-sw-v004/frame-08-source.png",
+      "bytes": 422102
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-sw-v004/prompt-frame-02.json",
+      "bytes": 3448
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-sw-v004/prompt-frame-03.json",
+      "bytes": 3344
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-sw-v004/prompt-frame-04-arm-occlusion.json",
+      "bytes": 1775
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-sw-v004/prompt-frame-04.json",
+      "bytes": 3286
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-sw-v004/prompt-frame-05.json",
+      "bytes": 4199
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-sw-v004/prompt-frame-06.json",
+      "bytes": 2759
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-sw-v004/prompt-frame-07-action-swap.json",
+      "bytes": 2343
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-sw-v004/prompt-frame-07.json",
+      "bytes": 4166
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-sw-v004/prompt-frame-07-leg-correction.json",
+      "bytes": 4571
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-sw-v004/prompt-frame-07-style-forward.json",
+      "bytes": 5984
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-sw-v004/prompt-frame-07-support-correction.json",
+      "bytes": 4158
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-sw-v004/prompt-frame-08.json",
+      "bytes": 3031
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-sw-v004/prompt.json",
+      "bytes": 4205
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-sw-v004/qa.json",
+      "bytes": 2666
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-sw-v004/references/bone-reference.png",
+      "bytes": 1964883
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-sw-v004/references/frame-04-before-arm-occlusion.png",
+      "bytes": 396832
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-sw-v004/references/frame-07-before-action-swap.png",
+      "bytes": 414923
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-sw-v004/references/frame-07-before-leg-correction.png",
+      "bytes": 419589
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-sw-v004/references/frame-07-before-style-correction.png",
+      "bytes": 419007
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-sw-v004/references/frame-07-before-support-correction.png",
+      "bytes": 403783
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-sw-v004/references/frame-07-forward-swing-study.png",
+      "bytes": 398855
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-sw-v004/references/frame-07-leg-pose-study.png",
+      "bytes": 619363
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-sw-v004/references/frame-07-straight-support-study.png",
+      "bytes": 426414
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-sw-v004/references/idle-sw.png",
+      "bytes": 314459
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-sw-v004/references/walk-w-frame-01.png",
+      "bytes": 338634
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-sw-v004/references/walk-w-frame-02.png",
+      "bytes": 297639
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-sw-v004/references/walk-w-frame-03.png",
+      "bytes": 288211
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-sw-v004/references/walk-w-frame-04.png",
+      "bytes": 347248
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-sw-v004/references/walk-w-frame-05.png",
+      "bytes": 343420
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-sw-v004/references/walk-w-frame-06.png",
+      "bytes": 293193
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-sw-v004/references/walk-w-frame-07.png",
+      "bytes": 280600
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-sw-v005/export.mjs",
+      "bytes": 4299
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-sw-v005/export-preview.py",
+      "bytes": 3009
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-sw-v005/frames-01-08-review.png",
+      "bytes": 186199
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-sw-v005/html-preview-qa.json",
+      "bytes": 229
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-sw-v005/identity-comparison-animated.gif",
+      "bytes": 236246
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-sw-v005/identity-comparison.png",
+      "bytes": 87667
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-sw-v005/in-game-se.png",
+      "bytes": 1715947
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-sw-v005/in-game-sw.png",
+      "bytes": 1768493
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-sw-v005/integration.json",
+      "bytes": 1265
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-sw-v005/measure.mjs",
+      "bytes": 930
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-sw-v005/novice-male-walk-sw-candidate.png",
+      "bytes": 193292
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-sw-v005/prepare.mjs",
+      "bytes": 1320
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-sw-v005/preview-browser.png",
+      "bytes": 148147
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-sw-v005/preview.html",
+      "bytes": 8444
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-sw-v005/prompt.json",
+      "bytes": 5656
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-sw-v005/qa.json",
+      "bytes": 5126
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-sw-v005/README.md",
+      "bytes": 2518
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-sw-v005/source-sheet.png",
+      "bytes": 869471
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-sw-v005/walk-preview-10fps.gif",
+      "bytes": 161296
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-sw-v005/walk-preview-12fps.gif",
+      "bytes": 161296
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-sw-v005/walk-preview-14fps.gif",
+      "bytes": 161296
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-sw-v005/frames/frame-01.png",
+      "bytes": 26628
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-sw-v005/frames/frame-02.png",
+      "bytes": 24866
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-sw-v005/frames/frame-03.png",
+      "bytes": 25397
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-sw-v005/frames/frame-04.png",
+      "bytes": 23259
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-sw-v005/frames/frame-05.png",
+      "bytes": 23101
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-sw-v005/frames/frame-06.png",
+      "bytes": 22325
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-sw-v005/frames/frame-07.png",
+      "bytes": 24531
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-sw-v005/frames/frame-08.png",
+      "bytes": 26572
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-sw-v005/references/approved-eight-poses.png",
+      "bytes": 677749
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-sw-v005/references/runtime-idle-s-sw-w-e.png",
+      "bytes": 293352
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-sw-v005/references/runtime-idle-sw.png",
+      "bytes": 84148
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-sw-v005/references/runtime-west-walk.png",
+      "bytes": 576202
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-sw-v005/references/whole-sheet-before-head-refinement.png",
+      "bytes": 935769
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-w-v004/preview.html",
+      "bytes": 231
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-w-v005/before-comparison.png",
+      "bytes": 206446
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-w-v005/before-measurements.json",
+      "bytes": 1110
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-w-v005/browser-qa.json",
+      "bytes": 239
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-w-v005/check-preview.mjs",
+      "bytes": 1422
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-w-v005/comparison-browser.png",
+      "bytes": 110689
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-w-v005/comparison-east.png",
+      "bytes": 114895
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-w-v005/comparison.png",
+      "bytes": 73973
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-w-v005/export.mjs",
+      "bytes": 4715
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-w-v005/idle-e.png",
+      "bytes": 15985
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-w-v005/idle-w.png",
+      "bytes": 16103
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-w-v005/idle-w-reference.png",
+      "bytes": 26278
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-w-v005/manifest.json",
+      "bytes": 974
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-w-v005/novice-male-walk-w-v005.png",
+      "bytes": 149992
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-w-v005/preview.html",
+      "bytes": 4562
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-w-v005/prompt.json",
+      "bytes": 3363
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-w-v005/qa.json",
+      "bytes": 5176
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-w-v005/README.md",
+      "bytes": 1857
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-w-v005/walk-before.png",
+      "bytes": 180578
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-w-v005/walk-pose-reference.png",
+      "bytes": 687111
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-w-v005/walk-preview.gif",
+      "bytes": 119165
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-w-v005/frames/frame-01.png",
+      "bytes": 24093
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-w-v005/frames/frame-01-preview.png",
+      "bytes": 29352
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-w-v005/frames/frame-02.png",
+      "bytes": 21012
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-w-v005/frames/frame-02-preview.png",
+      "bytes": 25731
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-w-v005/frames/frame-03.png",
+      "bytes": 20417
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-w-v005/frames/frame-03-preview.png",
+      "bytes": 25112
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-w-v005/frames/frame-04.png",
+      "bytes": 24578
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-w-v005/frames/frame-04-preview.png",
+      "bytes": 30025
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-w-v005/frames/frame-05.png",
+      "bytes": 24407
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-w-v005/frames/frame-05-preview.png",
+      "bytes": 29700
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-w-v005/frames/frame-06.png",
+      "bytes": 20821
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-w-v005/frames/frame-06-preview.png",
+      "bytes": 25531
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-w-v005/frames/frame-07.png",
+      "bytes": 20001
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-w-v005/frames/frame-07-preview.png",
+      "bytes": 24387
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-w-v005/frames/frame-08.png",
+      "bytes": 24358
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-w-v005/frames/frame-08-preview.png",
+      "bytes": 29691
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-w-v005/provenance/v004-manifest.json",
+      "bytes": 1400
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-w-v005/provenance/v004-prompt.json",
+      "bytes": 2701
+    },
+    {
+      "path": "art/source/characters/novice-male-walk-w-v005/provenance/v004-shoulder-prompt.json",
+      "bytes": 3253
+    },
+    {
+      "path": "art/source/fx/fountain-tiered/metadata-v001.json",
+      "bytes": 1531
+    },
+    {
+      "path": "art/source/fx/fountain-tiered/normalization.json",
+      "bytes": 1945
+    },
+    {
+      "path": "art/source/fx/fountain-tiered/prompt-v001.txt",
+      "bytes": 1754
+    },
+    {
+      "path": "art/source/maps/mythraven-town/curved-path-reference.png",
+      "bytes": 2428067
+    },
+    {
+      "path": "art/source/maps/mythraven-town/fountain-plaza-reference.png",
+      "bytes": 1076594
+    },
+    {
+      "path": "art/source/maps/mythraven-town/integration.json",
+      "bytes": 758
+    },
+    {
+      "path": "art/source/maps/mythraven-town/metadata-v004.json",
+      "bytes": 535
+    },
+    {
+      "path": "art/source/maps/mythraven-town/north-court-reference.png",
+      "bytes": 1368927
+    },
+    {
+      "path": "art/source/maps/mythraven-town/prompt-v004.txt",
+      "bytes": 1137
+    },
+    {
+      "path": "art/source/maps/mythraven-town/walkable-ground-reference.png",
+      "bytes": 4027801
+    },
+    {
+      "path": "art/source/previews/ground-v004/camera-measurements.json",
+      "bytes": 386
+    },
+    {
+      "path": "art/source/previews/ground-v004/camera-preview.png",
+      "bytes": 3576169
+    },
+    {
+      "path": "art/source/previews/ground-v004/map-2x3-preview.png",
+      "bytes": 1641608
+    },
+    {
+      "path": "art/source/previews/ground-v004/metadata.json",
+      "bytes": 944
+    },
+    {
+      "path": "art/source/previews/ground-v004/prompt.txt",
+      "bytes": 1873
+    },
+    {
+      "path": "art/source/previews/ground-v004/terrain-style-v001.png",
+      "bytes": 3490225
+    },
+    {
+      "path": "art/source/props/mythraven-fountain/metadata-v001.json",
+      "bytes": 1120
+    },
+    {
+      "path": "art/source/props/mythraven-fountain/prompt-v001.txt",
+      "bytes": 1590
+    },
+    {
+      "path": "art/source/props/mythraven-fountain/round-v003/approved-design.png",
+      "bytes": 1459085
+    },
+    {
+      "path": "art/source/props/mythraven-fountain/round-v003/approved-placement.png",
+      "bytes": 2179096
+    },
+    {
+      "path": "art/source/props/mythraven-fountain/round-v003/metadata.json",
+      "bytes": 676
+    },
+    {
+      "path": "art/source/props/mythraven-fountain/round-v003/prompt.txt",
+      "bytes": 1213
+    },
+    {
+      "path": "art/source/tiles/mythraven-granite/granite-v001.png",
+      "bytes": 526927
+    },
+    {
+      "path": "art/source/tiles/mythraven-granite/metadata-v001.json",
+      "bytes": 558
+    },
+    {
+      "path": "art/source/tiles/mythraven-granite/prompt-v001.txt",
+      "bytes": 1221
+    },
+    {
+      "path": "art/source/tiles/mythraven-granite/repeat-3x3.png",
+      "bytes": 1847610
+    },
+    {
+      "path": "art/source/tiles/mythraven-water/metadata-v001.json",
+      "bytes": 624
+    },
+    {
+      "path": "art/source/tiles/mythraven-water/prompt-v001.txt",
+      "bytes": 1451
+    },
+    {
+      "path": "art/source/tiles/mythraven-water/repeat-3x3.png",
+      "bytes": 1486832
+    },
+    {
+      "path": "art/source/tiles/mythraven-water/water-v001.png",
+      "bytes": 409830
+    },
+    {
+      "path": "art/source/tiles/painted-town-v004/metadata.json",
+      "bytes": 883
+    },
+    {
+      "path": "art/source/tiles/painted-town-v004/prompts.txt",
+      "bytes": 1611
+    },
+    {
+      "path": "art/source/ui/cursors/metadata.json",
+      "bytes": 1134
+    },
+    {
+      "path": "art/source/ui/cursors/PROMPTS.md",
+      "bytes": 3864
+    },
+    {
+      "path": "art/source/ui/favicon/metadata.json",
+      "bytes": 474
+    },
+    {
+      "path": "art/source/ui/favicon/PROMPT.md",
+      "bytes": 1422
+    },
+    {
+      "path": "art/source/ui/login/metadata.json",
+      "bytes": 1523
+    },
+    {
+      "path": "art/source/ui/login/PROMPTS.md",
+      "bytes": 4306
+    },
+    {
+      "path": "scripts/export-novice-walk.mjs",
+      "bytes": 442
+    }
+  ],
+  "runtimeAssetsBefore": [
+    {
+      "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+      "path": "public/assets/.gitkeep"
+    },
+    {
+      "sha256": "1A73266627D3914DECB0F8F3DB7AAC019310545E6A937681B0065C8539AD5160",
+      "path": "public/assets/characters/novice-male-idle.png"
+    },
+    {
+      "sha256": "A7756F4E7C4BDF7E8A690C71C73EC8A98A3BCD97F683690B0D0A94667607A82F",
+      "path": "public/assets/characters/novice-male-walk-sw.png"
+    },
+    {
+      "sha256": "F46AA6B06CC77CA54778383DCADA875E877FADA915F105D6DCE54C175D347406",
+      "path": "public/assets/characters/novice-male-walk-w.png"
+    },
+    {
+      "sha256": "8A26BCEE89A4A7602BF19D0520CC3F6CD9EAB1FB66B6D15D9BB90386F49D8D4E",
+      "path": "public/assets/fx/fountain-tiered-water.png"
+    },
+    {
+      "sha256": "B38B9ABF928DAFFB095C2F0BD9B521BE2C3489A28BB174586BCCA40B1F66FC76",
+      "path": "public/assets/icons/mythraven-16.png"
+    },
+    {
+      "sha256": "AA1D753B81E6636F5080903748A360ED860158C2FAAF7356A8A393D709AEDC78",
+      "path": "public/assets/icons/mythraven-180.png"
+    },
+    {
+      "sha256": "10AD6134FE3AAF841A2DA031B41BD2EBACA461A64EA586AD90BADC4AC53B3C94",
+      "path": "public/assets/icons/mythraven-192.png"
+    },
+    {
+      "sha256": "F5146EB321E03C9CFDB13BF8EC2CFD34FC61DB1C62F50FC31104536458268EAC",
+      "path": "public/assets/icons/mythraven-32.png"
+    },
+    {
+      "sha256": "9E4DA7581E59AE42E5C6A0521D2F4FE46275365D426A79D4C37D5295C33B45C4",
+      "path": "public/assets/icons/mythraven-512.png"
+    },
+    {
+      "sha256": "9722B1C15C176A5074BA1CD036B610EEF64494AE61399EA70454C4A351C31110",
+      "path": "public/assets/maps/mythraven-dirt.png"
+    },
+    {
+      "sha256": "F488842158A7D4925E88A8A74F96AD43D49C127FB03D3A9438F6A80C0740F09D",
+      "path": "public/assets/maps/mythraven-grass-mask.png"
+    },
+    {
+      "sha256": "BA13E6E4D34D28CD20E5AD8543AC764BAEF9888E1C71F3ECB04386B0538D7F46",
+      "path": "public/assets/maps/mythraven-navigation.png"
+    },
+    {
+      "sha256": "FA6CF6E8BB6946D014818E2CC58B687662DA61C6121C51A36E89AB1A097A6BA8",
+      "path": "public/assets/props/fountain/mythraven-fountain.png"
+    },
+    {
+      "sha256": "919694C170BFCE4F651E631C0B1DD33335F6B5C0E9A171563CB6950BEF01A283",
+      "path": "public/assets/tiles/mythraven-granite.png"
+    },
+    {
+      "sha256": "034BBAD28C78D625D6A3F9F4122C83C3A70ADE98E2FABFDEDAFECE251967C3E8",
+      "path": "public/assets/tiles/mythraven-grass.png"
+    },
+    {
+      "sha256": "6BBDE54388D582CE1C626415F389146D3AB5A16950AD95F395B68CCF9AC6C765",
+      "path": "public/assets/tiles/mythraven-paving.png"
+    },
+    {
+      "sha256": "12A077D2C69D016B017D767BEC22197CB4E2412D3A1709E4091D267FADCFAC54",
+      "path": "public/assets/tiles/mythraven-water.png"
+    },
+    {
+      "sha256": "F9F46A0659FE109DC43D627D493CB07E986C1209B692A8931CA5E91DA7C8CF2E",
+      "path": "public/assets/tiles/painted-town.json"
+    },
+    {
+      "sha256": "0AA75DB1C546611150513BD56CB5217F959B4F5D09780401EAF1D14A48837185",
+      "path": "public/assets/ui/login-background.webp"
+    },
+    {
+      "sha256": "177818BA003E3C4E2FB29AF324C1D044906BE0251F5C562FA5FF700390BD2B45",
+      "path": "public/assets/ui/login-frame.webp"
+    },
+    {
+      "sha256": "33DDBDAE2A6F82849C78C19C873CCCC48DF68E08D1275DF58C1F59CE140B9574",
+      "path": "public/assets/ui/mythraven-logo.webp"
+    },
+    {
+      "sha256": "18EF1A3160C41C53C09FEA6BA5C286525351B6C14E2D225690138766270286EF",
+      "path": "public/assets/ui/cursors/cursor-default.png"
+    },
+    {
+      "sha256": "00D39B0BDA6E3CB1DDFD2C5E72D36E6D68A57DE1E2AD54D0AF0FE8316398F5FF",
+      "path": "public/assets/ui/cursors/cursor-pointer.png"
+    }
+  ],
+  "validation": {
+    "runtimeAssetHashesUnchanged": 24,
+    "exportScriptSyntax": "passed",
+    "waterAndGraniteExportByteEquality": true,
+    "build": "passed",
+    "browserTests": [
+      "ground-preview.spec.ts passed",
+      "novice-idle.spec.ts passed",
+      "novice-walk.spec.ts passed"
+    ],
+    "retainedArtFilesAfterTests": 14,
+    "runtimeReferencesReviewed": true,
+    "testOutputsOutsideArt": true
+  }
+}

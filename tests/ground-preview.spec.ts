@@ -1,7 +1,8 @@
 import {test,expect} from '@playwright/test';
 import fs from 'node:fs/promises';
-const out='art/source/previews/ground-v004';
-test('shared multiplayer map stays fixed after resize',async({page,context})=>{
+
+test('shared multiplayer map stays fixed after resize',async({page,context},testInfo)=>{
+ const out=testInfo.outputPath('ground-preview');
  test.setTimeout(60000);await fs.mkdir(out,{recursive:true});
  await page.route('**/src/scenes/WorldScene.ts*',async route=>{
   const response=await route.fetch();await route.fulfill({response,body:await response.text()+'\nconst originalPreviewCreate=WorldScene.prototype.create;WorldScene.prototype.create=function(data){originalPreviewCreate.call(this,data);window.previewScene=this;};'});

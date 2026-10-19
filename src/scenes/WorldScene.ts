@@ -3,7 +3,7 @@ import {t} from '../i18n';
 import {attachFountain,FOUNTAIN_JET} from '../world/fountain';
 import {buildTownGround,TOWN_ASSETS} from '../world/town-ground';
 import {attachMinimap} from '../world/minimap';
-import {createPlayerView,NOVICE_IDLE,NOVICE_WALK} from '../world/player-view';
+import {createPlayerView,NOVICE_IDLE,NOVICE_WALK,NOVICE_WALK_SW} from '../world/player-view';
 import {TownClient} from '../network/town-client';
 import {TILE_WIDTH,TILE_HEIGHT,MAP_WIDTH,MAP_HEIGHT,configureMap,SPAWN,cellAt,centerOf,walkable} from '../world/daflak-grid';
 export class WorldScene extends Phaser.Scene {
@@ -19,6 +19,7 @@ export class WorldScene extends Phaser.Scene {
  preload(){
   this.load.spritesheet(NOVICE_IDLE.key,NOVICE_IDLE.path,{frameWidth:NOVICE_IDLE.frameWidth,frameHeight:NOVICE_IDLE.frameHeight});
   this.load.spritesheet(NOVICE_WALK.key,NOVICE_WALK.path,{frameWidth:NOVICE_WALK.frameWidth,frameHeight:NOVICE_WALK.frameHeight});
+  this.load.spritesheet(NOVICE_WALK_SW.key,NOVICE_WALK_SW.path,{frameWidth:NOVICE_WALK_SW.frameWidth,frameHeight:NOVICE_WALK_SW.frameHeight});
   this.load.spritesheet(FOUNTAIN_JET.key,FOUNTAIN_JET.path,{frameWidth:256,frameHeight:256});
   for(const [key,path] of Object.entries(TOWN_ASSETS))this.load.image(key,path);
  }
