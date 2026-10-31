@@ -1,0 +1,28 @@
+{
+  "date": "2026-10-31",
+  "scope": "Northern court castle and animated flags",
+  "removed": [
+    "art/.scratch/castle-preview-v001/castle-v002.png",
+    "art/.scratch/castle-preview-v001/manifest.json",
+    "art/.scratch/castle-integration-v001/castle-wide-v001.png",
+    "art/.scratch/castle-integration-v001/castle-wide-v002.png",
+    "art/.scratch/castle-integration-v001/export.mjs",
+    "art/.scratch/castle-integration-v001/flag-source.png",
+    "art/.scratch/castle-integration-v001/placement-reference.png",
+    "art/.scratch/castle-integration-v001/prompt.json",
+    "art/.scratch/castle-integration-v001/prompts.json"
+  ],
+  "retained": [
+    "public/assets/props/castle/mythraven-castle.png",
+    "public/assets/props/castle/mythraven-castle-flag.png"
+  ],
+  "permanentReferencePreserved": true,
+  "validation": {
+    "reachableWalkableCells": 28801,
+    "server": "17 passed",
+    "runtimeStatus": "integrated for review; no deployment",
+    "visualEvidence": "test-results/castle",
+    "browser": "3 passed",
+    "build": "passed"
+  }
+}

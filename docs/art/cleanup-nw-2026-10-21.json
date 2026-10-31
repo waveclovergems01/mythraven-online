@@ -1,0 +1,60 @@
+{
+  "date": "2026-10-21",
+  "status": "complete",
+  "reason": "NW/NE runtime integration validated; remove completed sprite drafts, previews, temporary references, prompt records, QA outputs and one-off exporters per owner policy.",
+  "removedFiles": 300,
+  "removedBytes": 52628586.0,
+  "removedRoots": [
+    "art/.scratch/novice-walk-nw",
+    "test-results/novice-idle-integrated.png",
+    "test-results/novice-walk-e.png",
+    "test-results/novice-walk-w.png",
+    "test-results/novice-walk-sw.png",
+    "test-results/novice-walk-se.png",
+    "test-results/novice-walk-nw.png",
+    "test-results/novice-walk-ne.png",
+    "test-results/.last-run.json"
+  ],
+  "runtime": {
+    "path": "public/assets/characters/novice-male-walk-nw.png",
+    "sha256": "ef5a4bf519654264af5db555ee244a6112e83626b0d5575c12d472fff1ba883e",
+    "bytes": 152475,
+    "dimensions": [
+      960,
+      480
+    ],
+    "frames": 8,
+    "frameSize": [
+      240,
+      240
+    ],
+    "fps": 12,
+    "nwFlip": false,
+    "neFlip": true,
+    "alpha": [
+      0,
+      255
+    ],
+    "feetAnchor": [
+      120,
+      216
+    ],
+    "headSource": "Actual NW idle frame 12, y0..109; exact pixels with integer Y translation in all eight frames"
+  },
+  "validation": [
+    "npm run build passed",
+    "Playwright novice-idle.spec.ts and novice-walk.spec.ts: 2 passed",
+    "Both clients animate all eight frames in W/E, SW/SE and NW/NE; mirror and idle restoration passed",
+    "Final atlas hash, alpha, dimensions, distinct frames and exact idle head pixels verified",
+    "In-game NW/NE and idle screenshots inspected",
+    "No active source/test/script references to scratch assets"
+  ],
+  "retained": [
+    "public/assets/characters/novice-male-idle.png",
+    "public/assets/characters/novice-male-walk-w.png",
+    "public/assets/characters/novice-male-walk-sw.png",
+    "public/assets/characters/novice-male-walk-nw.png",
+    "art/references/novice-male-sprite-control-reference.png"
+  ],
+  "permanentReferenceSha256": "25ec80c2bcf094f97220eba78d661695d55824ce151e394ac04cd5b6469652d2"
+}

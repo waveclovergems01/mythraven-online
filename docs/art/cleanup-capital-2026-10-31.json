@@ -1,0 +1,38 @@
+{
+  "date": "2026-10-31",
+  "scope": "Expanded capital integration; local walking review",
+  "removedSupersededFiles": [
+    "scripts/export-painted-town.mjs",
+    "scripts/export-mythraven-town.mjs",
+    "src/world/town-paving.ts",
+    "public/assets/maps/mythraven-dirt.png",
+    "public/assets/tiles/painted-town.json",
+    "art/source/maps/mythraven-town/mythraven-town-sand-v004.png",
+    "art/source/tiles/painted-town-v004/grass-source.png",
+    "art/source/tiles/painted-town-v004/paving-source.png"
+  ],
+  "removedTemporaryFiles": [
+    "art/.scratch/capital-map-4x6-v001/capital-ground-4x6-v001.png",
+    "art/.scratch/capital-map-4x6-v001/manifest.json",
+    "art/.scratch/capital-integration-v001/brick-source.png",
+    "art/.scratch/capital-integration-v001/dirt-source.png",
+    "art/.scratch/capital-integration-v001/export-materials.mjs",
+    "art/.scratch/capital-integration-v001/grass-source.png",
+    "art/.scratch/capital-integration-v001/prompts.json",
+    "art/.scratch/capital-integration-v001/removed.json"
+  ],
+  "preservedSource": "art/source/maps/capital-layout.png is actively consumed by scripts/export-capital-map.mjs",
+  "permanentMotionReferencePreserved": true,
+  "unaffected": "Existing character handoffs and unrelated work preserved",
+  "validation": {
+    "serverTests": "16 passed",
+    "screenshots": "test-results/capital-map",
+    "materialRepeatEdges": "zero opposite-edge pixel difference; 3x3 visual repeat reviewed",
+    "reachableCells": 29357,
+    "build": "passed",
+    "browserTests": "4 passed: capital terrain, multiplayer, idle, walking",
+    "characterVisibleHeight": 79.2,
+    "walkableCells": 29357
+  },
+  "runtimeStatus": "Integrated for owner review; not deployed"
+}

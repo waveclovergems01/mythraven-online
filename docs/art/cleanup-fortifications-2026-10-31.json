@@ -1,0 +1,32 @@
+{
+  "date": "2026-10-31",
+  "scope": "Fortified city perimeter with west, east and south bridges",
+  "removed": [
+    "art/.scratch/fortifications-v001/wall-horizontal-qa.png",
+    "art/.scratch/fortifications-v001/wall-vertical-qa.png",
+    "art/.scratch/fortifications-v001/tower-qa.png",
+    "art/.scratch/fortifications-v001/export.mjs",
+    "art/.scratch/fortifications-v001/export.json"
+  ],
+  "retained": [
+    "public/assets/props/fortifications/mythraven-wall-horizontal.png",
+    "public/assets/props/fortifications/mythraven-wall-vertical.png",
+    "public/assets/props/fortifications/mythraven-watchtower.png"
+  ],
+  "reused": [
+    "public/assets/tiles/mythraven-granite.png",
+    "art/source/maps/capital-layout.png",
+    "scripts/export-capital-map.mjs"
+  ],
+  "supersededRuntimeImages": [],
+  "permanentReferencePreserved": true,
+  "runtimeStatus": "Integrated for review; local only",
+  "validation": {
+    "build": "passed",
+    "server": "19 passed",
+    "browser": "Castle, ground preview, multiplayer and fortifications passed; bridge and multiplayer repeated after reachability update; final fortifications repeated after explicit sprite-frame fix",
+    "reachableWalkableCells": 27628,
+    "visualEvidence": "test-results/fortifications",
+    "tool": "built-in image_gen; model version not exposed"
+  }
+}

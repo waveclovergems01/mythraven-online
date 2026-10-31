@@ -49,13 +49,13 @@ test('two same-browser guests share authoritative movement, resize and leave',as
  // Reject out-of-map and fountain-cell destinations, including malicious payloads.
  await page.waitForTimeout(700);const stable=(await snapshot(page)).players[a.id];
  await page.evaluate(()=>{const n=(window as any).testScene.network;n.room.send('move',{x:-100,y:0});});
- await page.waitForTimeout(100);await page.evaluate(()=>(window as any).testScene.network.room.send('move',{x:60,y:50}));
+ await page.waitForTimeout(100);await page.evaluate(()=>{const s=(window as any).testScene,f=s.children.getByName('town-fountain');s.network.room.send('move',{x:Math.floor(f.x/64),y:Math.floor(f.y/56)});});
  await page.waitForTimeout(400);expect((await snapshot(page)).players[a.id].x).toBeCloseTo(stable.x,1);
  const mapA=await page.evaluate(()=>{const b=(window as any).testScene.cameras.main.getBounds();return [b.width,b.height];});
  await page.setViewportSize({width:1920,height:960});await page.waitForTimeout(400);
  expect((await snapshot(page)).id).toBe(a.id);
  expect(await page.evaluate(()=>{const b=(window as any).testScene.cameras.main.getBounds();return [b.width,b.height];})).toEqual(mapA);
- await expect(page.locator('.minimap-stats')).toContainText('50%');
+ await expect(page.locator('.minimap-stats')).toContainText('25%');
  await page.bringToFront();await page.screenshot({path:'test-results/multiplayer-player-one.png'});
  await other.bringToFront();await other.screenshot({path:'test-results/multiplayer-player-two.png'});
  await other.locator('#logout').click();await expect.poll(async()=>!!(await snapshot(page)).players[b.id]).toBe(false);

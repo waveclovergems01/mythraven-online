@@ -1,0 +1,52 @@
+{
+  "date": "2026-10-21",
+  "status": "complete",
+  "reason": "NW leg/boot proportion correction integrated and validated; remove temporary candidates, comparison, scripts, prompt and QA outputs.",
+  "removedFiles": 22,
+  "removedBytes": 16009839.0,
+  "removedRoots": [
+    "art/.scratch/novice-nw-leg-proportion-v001",
+    "test-results/.last-run.json",
+    "test-results/novice-idle-integrated.png",
+    "test-results/novice-walk-e.png",
+    "test-results/novice-walk-w.png",
+    "test-results/novice-walk-sw.png",
+    "test-results/novice-walk-se.png",
+    "test-results/novice-walk-nw.png",
+    "test-results/novice-walk-ne.png"
+  ],
+  "runtime": {
+    "path": "public/assets/characters/novice-male-walk-nw.png",
+    "sha256": "fc0648725be3ad5f3db0ea848a3792f5fef6014dee3a9f035867aedc762c08be",
+    "bytes": 157194,
+    "dimensions": [
+      960,
+      480
+    ],
+    "frames": 8,
+    "fps": 12,
+    "feetBaseline": 216,
+    "upperBody": "Rows 0-154 pixel-identical; additional original hand/tunic masks preserved"
+  },
+  "lowerBandComparison": {
+    "definition": "Alpha >128 in local rows 185..219; proxy for boot/lower-calf volume, not isolated shoe area",
+    "before": 1430.25,
+    "after": 1106.875,
+    "swReference": 1119.125
+  },
+  "validation": [
+    "npm run build passed",
+    "Playwright novice-idle.spec.ts and novice-walk.spec.ts: 2 passed",
+    "Eight distinct frames, baseline y216, transparent RGBA and original upper-body pixels verified",
+    "NW/NE in-game screenshots and eight-frame before/after/SW comparison inspected",
+    "Idle/W/SW and permanent reference SHA256 unchanged",
+    "No code references to scratch assets"
+  ],
+  "retained": [
+    "public/assets/characters/novice-male-idle.png",
+    "public/assets/characters/novice-male-walk-w.png",
+    "public/assets/characters/novice-male-walk-sw.png",
+    "public/assets/characters/novice-male-walk-nw.png",
+    "art/references/novice-male-sprite-control-reference.png"
+  ]
+}

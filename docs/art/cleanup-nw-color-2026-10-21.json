@@ -1,0 +1,80 @@
+{
+  "date": "2026-10-21",
+  "status": "complete",
+  "reason": "Owner-requested NW boot/tunic RGB correction matched to front/NW idle; completed scratch and QA cleanup.",
+  "removedFiles": 20,
+  "removedBytes": 15064655.0,
+  "removedRoots": [
+    "art/.scratch/novice-nw-color-v001",
+    "test-results/.last-run.json",
+    "test-results/novice-idle-integrated.png",
+    "test-results/novice-walk-e.png",
+    "test-results/novice-walk-w.png",
+    "test-results/novice-walk-sw.png",
+    "test-results/novice-walk-se.png",
+    "test-results/novice-walk-nw.png",
+    "test-results/novice-walk-ne.png"
+  ],
+  "runtimePath": "public/assets/characters/novice-male-walk-nw.png",
+  "assetValidation": {
+    "dimensions": [
+      960,
+      480
+    ],
+    "frames": 8,
+    "alpha": "every pixel identical to prior runtime",
+    "head": "rows 0..114 pixel-identical in all frames",
+    "changedRgbPixels": 18009,
+    "bootLeatherSampleMedianRgb": {
+      "before": [
+        130,
+        67,
+        39
+      ],
+      "after": [
+        153,
+        85,
+        61
+      ],
+      "idle": [
+        157,
+        88,
+        64
+      ]
+    },
+    "sha256": "48366e04cab15afbb5764c13d26279feb0b18395111111cee8c02f9b0db35b65",
+    "bytes": 156938
+  },
+  "tool": "image_gen.imagegen",
+  "validation": [
+    "Build/typecheck passed",
+    "Playwright idle/walk tests: 2 passed, including eight frames on both clients, six walking directions, mirroring and idle restoration",
+    "In-game NW/NE screenshots and before/after/idle comparison visually inspected",
+    "Every original alpha pixel and head row 0-114 unchanged; RGB-only correction across all eight frames",
+    "Idle/W/SW SHA256 unchanged",
+    "No code references to scratch assets"
+  ],
+  "retained": [
+    "public/assets/characters/novice-male-idle.png",
+    "public/assets/characters/novice-male-walk-w.png",
+    "public/assets/characters/novice-male-walk-sw.png",
+    "public/assets/characters/novice-male-walk-nw.png",
+    "art/references/novice-male-sprite-control-reference.png"
+  ],
+  "integrationRecheck": {
+    "date": "2026-10-21",
+    "runtimeUrl": "/assets/characters/novice-male-walk-nw.png?v=48366e04cab1",
+    "servedSha256": "48366e04cab15afbb5764c13d26279feb0b18395111111cee8c02f9b0db35b65",
+    "validation": [
+      "Server response SHA256 matches current runtime file",
+      "Build/typecheck passed",
+      "Walk regression passed: both clients received current file bytes and SHA-based URL; eight frames, mirroring and idle restoration passed"
+    ],
+    "removedEmptyDirectories": [
+      "art/.scratch"
+    ],
+    "additionalRemovedQaFiles": 7,
+    "additionalRemovedQaBytes": 10596871.0,
+    "artAudit": "No character draft files remain. 13 source images feed active exporters and runtime outputs; permanent novice bone reference retained."
+  }
+}

@@ -1,9 +1,11 @@
 import Phaser from 'phaser';
 import {t} from '../i18n';
 import {attachFountain,FOUNTAIN_JET} from '../world/fountain';
+import {attachCastle} from '../world/castle';
+import {attachFortifications} from '../world/fortifications';
 import {buildTownGround,TOWN_ASSETS} from '../world/town-ground';
 import {attachMinimap} from '../world/minimap';
-import {createPlayerView,NOVICE_IDLE,NOVICE_WALK,NOVICE_WALK_SW} from '../world/player-view';
+import {createPlayerView,NOVICE_IDLE,NOVICE_WALK,NOVICE_WALK_SW,NOVICE_WALK_NW} from '../world/player-view';
 import {TownClient} from '../network/town-client';
 import {TILE_WIDTH,TILE_HEIGHT,MAP_WIDTH,MAP_HEIGHT,configureMap,SPAWN,cellAt,centerOf,walkable} from '../world/daflak-grid';
 export class WorldScene extends Phaser.Scene {
@@ -20,13 +22,14 @@ export class WorldScene extends Phaser.Scene {
   this.load.spritesheet(NOVICE_IDLE.key,NOVICE_IDLE.path,{frameWidth:NOVICE_IDLE.frameWidth,frameHeight:NOVICE_IDLE.frameHeight});
   this.load.spritesheet(NOVICE_WALK.key,NOVICE_WALK.path,{frameWidth:NOVICE_WALK.frameWidth,frameHeight:NOVICE_WALK.frameHeight});
   this.load.spritesheet(NOVICE_WALK_SW.key,NOVICE_WALK_SW.path,{frameWidth:NOVICE_WALK_SW.frameWidth,frameHeight:NOVICE_WALK_SW.frameHeight});
+  this.load.spritesheet(NOVICE_WALK_NW.key,NOVICE_WALK_NW.path,{frameWidth:NOVICE_WALK_NW.frameWidth,frameHeight:NOVICE_WALK_NW.frameHeight});
   this.load.spritesheet(FOUNTAIN_JET.key,FOUNTAIN_JET.path,{frameWidth:256,frameHeight:256});
   for(const [key,path] of Object.entries(TOWN_ASSETS))this.load.image(key,path);
  }
  create(){
   configureMap();this.views.clear();this.following=false;this.lastDirection='0,0';this.lastSent=0;
   if(Object.keys(TOWN_ASSETS).some(key=>!this.textures.exists(key))){this.add.text(40,40,t('mapLoadError'));return;}
-  const minimapUrl=buildTownGround(this);attachFountain(this);
+  const minimapUrl=buildTownGround(this);attachFountain(this);attachCastle(this);attachFortifications(this,()=>this.player);
   this.hover=this.add.rectangle(0,0,TILE_WIDTH,TILE_HEIGHT,0x9dedbe,.14).setOrigin(0).setStrokeStyle(2,0xc7ffe1).setDepth(10).setVisible(false);
   this.marker=this.add.rectangle(0,0,TILE_WIDTH,TILE_HEIGHT).setOrigin(0).setStrokeStyle(3,0xf3d48e).setDepth(11).setVisible(false);
   const spawn=centerOf(SPAWN);this.player=this.add.container(spawn.x,spawn.y);

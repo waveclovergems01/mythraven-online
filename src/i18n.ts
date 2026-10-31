@@ -2,7 +2,7 @@ export const messages = {
   th: {
     minimap: 'แผนที่เมืองทั้งหมด', minimapLegend: 'เหลือง = คุณ · เทา = ผู้เล่นอื่น · กรอบ = พื้นที่กล้อง', minimapVisible: 'มองเห็น (กว้าง × สูง)',
     mapLoadError: 'โหลดแผนที่ไม่สำเร็จ กรุณารีเฟรชหน้าเว็บ',
-    city: 'Mythraven · เมืองหลัก', cityControls: 'WASD / ลูกศร หรือคลิกช่องสีเขียวเพื่อเดิน', cityNote: 'พื้นดินและแปลงหญ้า · ข้ามคลองได้ทางเหนือ',
+    city: 'Mythraven · เมืองหลัก', cityControls: 'WASD / ลูกศร หรือคลิกช่องสีเขียวเพื่อเดิน', cityNote: 'เมืองหลวงล้อมแม่น้ำ · ประตูและสะพาน: ซ้าย ขวา ด้านล่าง',
     googleSetup: 'ต้องตั้งค่า Google Client ID ก่อน ดูคู่มือ GOOGLE_AUTH_SETUP.md',
     googleOffline: 'ติดต่อเซิร์ฟเวอร์บัญชีไม่ได้ กรุณาเปิดด้วย npm run dev',
     googleScript: 'โหลด Google ไม่สำเร็จ ตรวจอินเทอร์เน็ตหรือตัวบล็อกเนื้อหา',
@@ -32,7 +32,7 @@ export const messages = {
   en: {
     minimap: 'Full city map', minimapLegend: 'Yellow = you · Gray = other players · Frame = camera view', minimapVisible: 'Visible (width × height)',
     mapLoadError: 'Map could not load. Please refresh the page.',
-    city: 'Mythraven · Main city', cityControls: 'WASD / arrows, or click a green tile to move', cityNote: 'Painted grass over earth · Northern crossing',
+    city: 'Mythraven · Main city', cityControls: 'WASD / arrows, or click a green tile to move', cityNote: 'River-ringed capital · Gates and bridges: west, east, south',
     googleSetup: 'Set your Google Client ID first. See GOOGLE_AUTH_SETUP.md.',
     googleOffline: 'Auth server unavailable. Start the app with npm run dev.',
     googleScript: 'Could not load Google. Check your connection or content blocker.',
