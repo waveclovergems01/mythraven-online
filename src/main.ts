@@ -4,19 +4,24 @@ import { mountGoogle, googleLogin, googleSession, googleLogout, GoogleAuthError 
 import './style.css';
 import './game-viewport.css';
 import { fitAuthViewport } from './auth/fit-viewport';
+import { mountGameSettings } from './game-settings';
 import { restrictInput, usernameCharacters, passwordCharacters, validUsername, validPasswordCharacters, MAX_PASSWORD_LENGTH } from './auth/input-policy';
+import type { CharacterDefinition } from '../shared/character-catalog.mjs';
+import type { PreparedCharacters } from './character-selection';
 
 const app = document.querySelector<HTMLDivElement>('#app')!;
 let mode: 'login' | 'register' = 'login';
 let errorKey: MessageKey | null = null;
-let game: import('phaser').Game | null = null;
+let game: { destroy: (removeCanvas: boolean) => void } | null = null;
 let viewVersion = 0;
 let authenticating = false;
 let stopFittingAuth: (() => void) | undefined;
+let selection: { destroy(): void } | undefined;
 setLocale(locale());
 const brand = '<img class="brand-logo" src="/assets/ui/mythraven-logo.webp" width="640" height="320" alt="Mythraven Online" fetchpriority="high">';
 
 function renderAuth(): void {
+  selection?.destroy(); selection = undefined;
   stopFittingAuth?.();
   viewVersion++;
   app.innerHTML = `<main class="auth-page">
@@ -107,7 +112,7 @@ async function runAuth(action:()=>Promise<Session>): Promise<void> {
   const originallyDisabled=controls.map(c=>c.disabled);
   controls.forEach(c=>c.disabled=true);
   const label=app.querySelector('.primary span'); if(label) label.textContent=t('busy');
-  try { const session=await action(); await showGame(session); }
+  try { const session=await action(); await afterAuthentication(session); }
   catch(error) {
     if(!app.querySelector('#auth-form')) renderAuth();
     showError(error instanceof AuthError || error instanceof GoogleAuthError?error.code:'generic');
@@ -118,26 +123,62 @@ async function runAuth(action:()=>Promise<Session>): Promise<void> {
     if(label) label.textContent=t(mode==='login'?'enter':'create');
   }
 }
-async function showGame(session: Session): Promise<void> {
+async function signOut(session: Session): Promise<void> {
+  if(session.kind==='google') await googleLogout();
+  try { logout(); } catch(error) { if(session.kind!=='google') throw error; }
+  window.dispatchEvent(new Event('mythraven:leave'));
+  game?.destroy(true); game=null; selection?.destroy(); selection=undefined; errorKey=null;
+  if(session.kind==='google') { window.location.reload(); return; }
+  renderAuth();
+}
+async function afterAuthentication(session: Session): Promise<void> {
+  // The explicit legacy comparison keeps its original sprite workflow.
+  if(new URLSearchParams(location.search).get('view')==='2d') return showGame(session);
+  await showCharacterSelection(session);
+}
+async function showCharacterSelection(session: Session, message?: string): Promise<void> {
+  stopFittingAuth?.(); stopFittingAuth=undefined;
+  selection?.destroy(); selection=undefined;
+  game?.destroy(true); game=null;
+  const version=++viewVersion;
+  const {mountCharacterSelection}=await import('./character-selection');
+  if(version!==viewVersion) return;
+  selection=mountCharacterSelection(app,session.username,locale()==='th',async(character,assets)=>{
+    const enteringVersion=viewVersion+1;
+    try { await showGame(session,character,assets); }
+    catch {
+      assets.dispose();
+      if(viewVersion!==enteringVersion) return;
+      await showCharacterSelection(session,locale()==='th'?'เข้าเมืองไม่สำเร็จ กรุณาลองอีกครั้ง':'Could not enter the city. Please try again.');
+    }
+  },()=>signOut(session));
+  if(message) app.querySelector('#character-error')!.textContent=message;
+}
+async function showGame(session: Session, character?: CharacterDefinition, assets?: PreparedCharacters): Promise<void> {
   stopFittingAuth?.();
   stopFittingAuth = undefined;
   const version=++viewVersion;
-  app.innerHTML=`<main class="game-page"><header class="game-header"><div><div class="mini-brand">MYTHRAVEN <span>ONLINE</span></div><p>${t('city')} · <span id="player-name"></span></p></div><button class="leave" id="logout">${t('logout')}</button></header><div id="game" aria-label="${t('city')}"><p class="loading">${t('loading')}</p></div><footer class="game-footer"><span>${t('cityControls')}</span><span>${t('cityNote')}</span></footer><p id="game-error" class="error" role="alert"></p></main>`;
+  app.innerHTML=`<main class="game-page"><header class="game-header"><div><div class="mini-brand">MYTHRAVEN <span>ONLINE</span></div><p>${t('city')} · <span id="player-name"></span></p></div></header><div id="game" aria-label="${t('city')}"><p class="loading">${t('loading')}</p></div><footer class="game-footer"><span>${t('cityControls')}</span><span>${t('cityNote')}</span></footer><button class="leave" id="logout">${t('logout')}</button><p id="game-error" class="error" role="alert"></p></main>`;
   app.querySelector('#player-name')!.textContent=session.username;
+  if(new URLSearchParams(location.search).get('view')!=='2d') mountGameSettings(app.querySelector<HTMLElement>('.game-page')!,locale()==='th');
   app.querySelector('#logout')!.addEventListener('click',async()=>{
     const button=app.querySelector<HTMLButtonElement>('#logout')!; button.disabled=true;
     try {
-      if(session.kind==='google') await googleLogout();
-      try { logout(); } catch(error) { if(session.kind!=='google') throw error; }
-      window.dispatchEvent(new Event('mythraven:leave'));
-      game?.destroy(true); game=null; errorKey=null;
-      if(session.kind==='google') { window.location.reload(); return; }
-      renderAuth();
+      await signOut(session);
     } catch(error) {
       button.disabled=false;
       app.querySelector('#game-error')!.textContent=t(error instanceof GoogleAuthError?error.code:'storage');
     }
   });
+  // The old town remains an explicit comparison route during the terrain migration.
+  if(new URLSearchParams(location.search).get('view')!=='2d') {
+    const {mountTerrainWorld}=await import('./terrain/TerrainWorld');
+    if(version!==viewVersion) { assets?.dispose(); return; }
+    const terrain=await mountTerrainWorld(app.querySelector<HTMLElement>('#game')!,session.username,character?.id,assets);
+    if(version!==viewVersion) { terrain.destroy(); return; }
+    game=terrain;
+    return;
+  }
   const [{default:Phaser},{WorldScene}]=await Promise.all([import('phaser'),import('./scenes/WorldScene')]);
   if(version!==viewVersion) return;
   app.querySelector('.loading')?.remove();
@@ -150,7 +191,7 @@ async function start():Promise<void> {
   let verified:Session|null=null;
   try { verified=await googleSession(); } catch { /* Local demo remains available while server is offline. */ }
   const session=verified ?? getSession();
-  if(session) await showGame(session);
+  if(session) await afterAuthentication(session);
   else renderAuth();
 }
 void start().catch(()=>{renderAuth();showError('generic');});

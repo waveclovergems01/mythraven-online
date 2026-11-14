@@ -1,0 +1,16 @@
+{
+  "date": "2026-11-04",
+  "request": "Thick forests outside walls, at map edges and beside/behind castle; grass on85% of natural land",
+  "treeCount": 1800,
+  "existingTreeImagesReused": 5,
+  "newIllustrationGeneration": false,
+  "changedRaster": "public/assets/maps/mythraven-grass-mask.png",
+  "maintainedExporter": "scripts/export-capital-map.mjs",
+  "naturalGrassFraction": 0.8502295351851115,
+  "roadsAndCourtsPreserved": true,
+  "removedScratchDirectory": "art/.scratch/dense-gardens",
+  "removedHelpers": ["place.mjs", "playwright.config.ts", "test-server.mjs"],
+  "supersededStandaloneGameImages": [],
+  "qaDirectories": ["test-results/exterior-trees", "test-results/fortifications", "test-results/landmark-visibility"],
+  "preserved": ["Five active tree PNGs", "Active terrain source and textures", "Permanent novice motion reference"]
+}

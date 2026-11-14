@@ -19,7 +19,7 @@ Google Auth Platform > Clients > Create client:
 - Name: Mythraven Local
 - Authorized JavaScript origins เพิ่ม:
   - http://localhost
-  - http://localhost:5173
+  - http://localhost:5273
 - ใช้ localhost เป็น URL หลักสำหรับ Google; หากจะใช้ 127.0.0.1 ให้เพิ่ม origin นั้นด้วยถ้า Console อนุญาต
 - Authorized redirect URIs: เว้นว่างสำหรับ GIS popup ที่ส่ง credential เข้า JavaScript callback ชุดนี้
 - กด Create แล้วคัดลอก Client ID ที่ลงท้าย .apps.googleusercontent.com
@@ -35,8 +35,8 @@ Copy-Item .env.example .env
 ใส่ Client ID จริงใน .env:
 ```dotenv
 GOOGLE_CLIENT_ID=YOUR_WEB_CLIENT_ID.apps.googleusercontent.com
-AUTH_PORT=3001
-AUTH_ORIGINS=http://localhost:5173,http://127.0.0.1:5173
+AUTH_PORT=5274
+AUTH_ORIGINS=http://localhost:5273,http://127.0.0.1:5273
 AUTH_SECURE_COOKIES=false
 ```
 ค่า YOUR_WEB_CLIENT_ID เป็นตัวอย่าง ไม่สามารถใช้ล็อกอินจริง
@@ -46,8 +46,8 @@ AUTH_SECURE_COOKIES=false
 ```powershell
 npm.cmd run dev
 ```
-คำสั่งเดียวเปิด Vite :5173 และ auth server :3001 จากนั้นเข้า http://localhost:5173
-แก้ .env แล้วต้อง restart; พอร์ต 5173 ต้องว่าง (strictPort ป้องกัน origin เปลี่ยนเอง)
+คำสั่งเดียวเปิด Vite :5273 และ auth server :5274 จากนั้นเข้า http://localhost:5273
+แก้ .env แล้วต้อง restart; พอร์ต 5273 ต้องว่าง (strictPort ป้องกัน origin เปลี่ยนเอง)
 
 ## 4. ลองเข้าใช้งาน
 1. ปุ่ม Google จริงจะโหลดจาก accounts.google.com หลังตั้งค่า Client ID
@@ -81,8 +81,8 @@ preview ใช้ :4173 หากทดสอบ Google บน preview ต้อ
 
 ## แก้ปัญหา
 - ต้องตั้งค่า Client ID: ใส่ GOOGLE_CLIENT_ID แล้ว restart npm run dev
-- server ติดต่อไม่ได้: ดู terminal ทั้ง Vite และ auth; ตรวจ :3001 ไม่ถูกใช้
-- origin_mismatch: เปิด localhost:5173 และตรวจ Authorized JavaScript origins ให้ตรง protocol/host/port
+- server ติดต่อไม่ได้: ดู terminal ทั้ง Vite และ auth; ตรวจ :5274 ไม่ถูกใช้
+- origin_mismatch: เปิด localhost:5273 และตรวจ Authorized JavaScript origins ให้ตรง protocol/host/port
 - popup ไม่เปิด: อนุญาต popup จาก localhost, ปิด extension ที่บล็อก Google ชั่วคราว
 - หน้าเว็บเปิดทิ้งไว้เกิน 15 นาที/nonce หมดอายุ: refresh หน้าแล้วคลิก Google ใหม่
 - ปิด popup โดยไม่เลือกบัญชี: ยังอยู่หน้า login คลิกปุ่มใหม่ได้

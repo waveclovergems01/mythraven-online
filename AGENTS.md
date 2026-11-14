@@ -1,7 +1,7 @@
 # Mythraven Online — project instructions
 
 ## Scope
-- Phaser + TypeScript game. Keep work within the user's requested scope.
+- TypeScript game: Three.js terrain view is the default after login; Phaser town remains at `?view=2d` during migration. Keep work within the user's requested scope.
 - Local setup is established. Do not infer authorization to publish, push, deploy, or add cloud services.
 - Current procedural WorldScene art is a technical placeholder, not the visual style reference.
 
@@ -13,6 +13,7 @@ Before creating, editing, selecting, or integrating any game image, read:
 4. docs/art/PROMPT_TEMPLATES.md
 
 ART_STYLE.md is authoritative for new art: Soft Painted Fantasy 2D. It supersedes conflicting older MR-ART-v1 visual defaults. Existing images keep their historical metadata; do not relabel them as compliant or approved without review. See docs/art/STYLE_MIGRATION.md.
+Owner request 2026-11-11 adds a scoped exception: the city ground is now a real 3D terrain with river channels, using the old shoreline and a 2.5D camera. See docs/TERRAIN_3D.md. This does not authorize replacing character, prop, or login art.
 Use the shared prompt block plus the relevant asset template, and attach actual available reference images. Never claim a reference was used if it was not attached.
 The user-provided screenshots establish direction, not approved Mythraven character designs. See docs/art/references/README.md.
 Until an approved project master exists, produce a clearly labelled candidate from the documented defaults; do not invent an approval or a completed reference file.

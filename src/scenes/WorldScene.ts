@@ -3,6 +3,10 @@ import {t} from '../i18n';
 import {attachFountain,FOUNTAIN_JET} from '../world/fountain';
 import {attachCastle} from '../world/castle';
 import {attachFortifications} from '../world/fortifications';
+import {attachTrees} from '../world/trees';
+import {attachTownProperties,townActorDepth} from '../world/town-properties';
+import {attachFlowerbeds} from '../world/flowerbeds';
+import {BRIDGE_SURFACE} from '../world/bridges';
 import {buildTownGround,TOWN_ASSETS} from '../world/town-ground';
 import {attachMinimap} from '../world/minimap';
 import {createPlayerView,NOVICE_IDLE,NOVICE_WALK,NOVICE_WALK_SW,NOVICE_WALK_NW} from '../world/player-view';
@@ -10,8 +14,9 @@ import {TownClient} from '../network/town-client';
 import {TILE_WIDTH,TILE_HEIGHT,MAP_WIDTH,MAP_HEIGHT,configureMap,SPAWN,cellAt,centerOf,walkable} from '../world/daflak-grid';
 export class WorldScene extends Phaser.Scene {
  private player!:Phaser.GameObjects.Container;
- private hover!:Phaser.GameObjects.Rectangle;
- private marker!:Phaser.GameObjects.Rectangle;
+ private hover!:Phaser.GameObjects.Graphics;
+ private marker!:Phaser.GameObjects.Graphics;
+ private targetCell?:{x:number;y:number};
  private cursors!:Phaser.Types.Input.Keyboard.CursorKeys;
  private keys!:Record<string,Phaser.Input.Keyboard.Key>;
  private network!:TownClient;
@@ -27,14 +32,17 @@ export class WorldScene extends Phaser.Scene {
   for(const [key,path] of Object.entries(TOWN_ASSETS))this.load.image(key,path);
  }
  create(){
-  configureMap();this.views.clear();this.following=false;this.lastDirection='0,0';this.lastSent=0;
+  configureMap();this.views.clear();this.following=false;this.lastDirection='0,0';this.lastSent=0;this.targetCell=undefined;
   if(Object.keys(TOWN_ASSETS).some(key=>!this.textures.exists(key))){this.add.text(40,40,t('mapLoadError'));return;}
-  const minimapUrl=buildTownGround(this);attachFountain(this);attachCastle(this);attachFortifications(this,()=>this.player);
-  this.hover=this.add.rectangle(0,0,TILE_WIDTH,TILE_HEIGHT,0x9dedbe,.14).setOrigin(0).setStrokeStyle(2,0xc7ffe1).setDepth(10).setVisible(false);
-  this.marker=this.add.rectangle(0,0,TILE_WIDTH,TILE_HEIGHT).setOrigin(0).setStrokeStyle(3,0xf3d48e).setDepth(11).setVisible(false);
+  const minimapUrl=buildTownGround(this);attachFountain(this,()=>this.player);attachCastle(this,()=>this.player);attachFortifications(this,()=>this.player);
+  attachTrees(this,()=>this.player);
+  attachTownProperties(this,()=>this.player);
+  attachFlowerbeds(this,()=>this.player);
+  this.hover=this.add.graphics().setDepth(10).setVisible(false);
+  this.marker=this.add.graphics().setDepth(11).setVisible(false);
   const spawn=centerOf(SPAWN);this.player=this.add.container(spawn.x,spawn.y);
   this.cameras.main.setBounds(0,0,MAP_WIDTH,MAP_HEIGHT).setZoom(.5).startFollow(this.player,true,.12,.12).centerOn(spawn.x,spawn.y);
-  attachMinimap(this,()=>Array.from(this.views,([id,view])=>({id,x:view.container.x,y:view.container.y,mine:id===this.network?.room?.sessionId})),minimapUrl);
+  attachMinimap(this,()=>Array.from(this.views,([id,view])=>({id,...BRIDGE_SURFACE.project(view.container.x,view.container.y),mine:id===this.network?.room?.sessionId})),minimapUrl);
   this.cursors=this.input.keyboard!.createCursorKeys();this.keys=this.input.keyboard!.addKeys('W,A,S,D') as Record<string,Phaser.Input.Keyboard.Key>;
   const panel=document.createElement('div');panel.id='network-status';
   panel.style.cssText='position:absolute;left:16px;top:112px;background:#182b27e8;color:#efe7cf;padding:9px 12px;border-radius:5px;font:12px Tahoma;z-index:20';
@@ -44,8 +52,8 @@ export class WorldScene extends Phaser.Scene {
   void this.network.connect();
   this.input.on('pointerdown',(pointer:Phaser.Input.Pointer)=>{
    if((!pointer.leftButtonDown()&&!pointer.wasTouch)||!this.network.connected)return;
-   const p=this.cameras.main.getWorldPoint(pointer.x,pointer.y),end=cellAt(p.x,p.y);
-   if(walkable(end)){this.network.move(end.x,end.y);this.marker.setPosition(end.x*TILE_WIDTH,end.y*TILE_HEIGHT).setVisible(true);}
+   const p=this.cameras.main.getWorldPoint(pointer.x,pointer.y),ground=BRIDGE_SURFACE.unproject(p.x,p.y),end=cellAt(ground.x,ground.y);
+   if(walkable(end)){this.network.move(end.x,end.y);this.targetCell=end;this.drawCell(this.marker,end,0xf3d48e,false);this.marker.setVisible(true);}
   });
   const blur=()=>{this.network.direction(0,0);this.lastDirection='0,0';};
   window.addEventListener('blur',blur);
@@ -54,14 +62,22 @@ export class WorldScene extends Phaser.Scene {
   window.addEventListener('mythraven:leave',cleanup);window.addEventListener('pagehide',cleanup);
   this.events.once(Phaser.Scenes.Events.SHUTDOWN,cleanup);this.events.once(Phaser.Scenes.Events.DESTROY,cleanup);
  }
+ private drawCell(graphics:Phaser.GameObjects.Graphics,cell:{x:number;y:number},color:number,fill:boolean){
+  const x=cell.x*TILE_WIDTH,y=cell.y*TILE_HEIGHT;
+  const points=[[x,y],[x+TILE_WIDTH,y],[x+TILE_WIDTH,y+TILE_HEIGHT],[x,y+TILE_HEIGHT]].map(([px,py])=>BRIDGE_SURFACE.project(px,py));
+  graphics.clear().lineStyle(fill?2:3,color,1).fillStyle(color,.14).beginPath().moveTo(points[0].x,points[0].y);
+  for(const point of points.slice(1))graphics.lineTo(point.x,point.y);
+  graphics.closePath();if(fill)graphics.fillPath();graphics.strokePath();
+ }
  update(time:number,delta:number){
   if(!this.network)return;
-  const pointer=this.input.activePointer,p=this.cameras.main.getWorldPoint(pointer.x,pointer.y),cell=cellAt(p.x,p.y),allowed=walkable(cell);
-  this.hover.setPosition(cell.x*TILE_WIDTH,cell.y*TILE_HEIGHT).setVisible(this.input.isOver&&this.network.connected).setFillStyle(allowed?0x9dedbe:0xef7878,.14);
+  const pointer=this.input.activePointer,p=this.cameras.main.getWorldPoint(pointer.x,pointer.y),ground=BRIDGE_SURFACE.unproject(p.x,p.y),cell=cellAt(ground.x,ground.y),allowed=walkable(cell);
+  this.hover.setVisible(this.input.isOver&&this.network.connected&&Number.isFinite(cell.x)&&Number.isFinite(cell.y));
+  if(this.hover.visible)this.drawCell(this.hover,cell,allowed?0x9dedbe:0xef7878,true);
   const dx=Number(this.cursors.right.isDown||this.keys.D.isDown)-Number(this.cursors.left.isDown||this.keys.A.isDown);
   const dy=Number(this.cursors.down.isDown||this.keys.S.isDown)-Number(this.cursors.up.isDown||this.keys.W.isDown),key=`${dx},${dy}`;
   if(key!==this.lastDirection||((dx||dy)&&time-this.lastSent>150)){
-   this.network.direction(dx,dy);this.lastDirection=key;this.lastSent=time;if(dx||dy)this.marker.setVisible(false);
+   this.network.direction(dx,dy);this.lastDirection=key;this.lastSent=time;if(dx||dy){this.marker.setVisible(false);this.targetCell=undefined;}
   }
   for(const [id,state] of this.network.players){
    const mine=id===this.network.room?.sessionId;let view=this.views.get(id);
@@ -69,11 +85,13 @@ export class WorldScene extends Phaser.Scene {
    // Smooth received authoritative positions; no browser-owned movement simulation.
    const alpha=1-Math.exp(-Math.min(delta,100)/45);
    view.container.x+= (state.x-view.container.x)*alpha;view.container.y+=(state.y-view.container.y)*alpha;
-   view.container.setDepth(view.container.y);view.updatePose(state.x,state.y,state.moving);
+   view.container.setDepth(townActorDepth(view.container.x,view.container.y));view.updatePose(state.x,state.y,state.moving);
+   const surface=BRIDGE_SURFACE.project(view.container.x,view.container.y);
+   view.surface.setPosition(surface.x-view.container.x,surface.y-view.container.y);
    if(mine){
-    this.player.setPosition(view.container.x,view.container.y);
+    this.player.setPosition(surface.x,surface.y);
     if(!this.following){this.cameras.main.centerOn(state.x,state.y);this.following=true;}
-    if(!state.moving&&Math.hypot(state.x-(this.marker.x+TILE_WIDTH/2),state.y-(this.marker.y+TILE_HEIGHT/2))<4)this.marker.setVisible(false);
+    if(!state.moving&&this.targetCell){const target=centerOf(this.targetCell);if(Math.hypot(state.x-target.x,state.y-target.y)<4){this.marker.setVisible(false);this.targetCell=undefined;}}
    }
   }
   for(const [id,view] of this.views)if(!this.network.players.has(id)){view.container.destroy();this.views.delete(id);}

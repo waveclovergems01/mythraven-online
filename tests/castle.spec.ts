@@ -8,7 +8,7 @@ test('castle fits northern court, blocks walls and animates only cloth with fixe
   const response=await route.fetch();await route.fulfill({response,body:await response.text()+
    '\nimport {CASTLE as testCastle} from "/shared/town-layout.mjs";import {walkable as testWalkable,cellAt as testCellAt} from "/shared/town-grid.mjs";const castleCreate=WorldScene.prototype.create;WorldScene.prototype.create=function(...args){castleCreate.apply(this,args);window.castleTest={scene:this,layout:testCastle,walkable:testWalkable,cellAt:testCellAt};};'});
  });
- await page.setViewportSize({width:1920,height:1200});await page.goto('/');await page.locator('#guest').click();
+ await page.setViewportSize({width:1920,height:1200});await page.goto('/?view=2d');await page.locator('#guest').click();
  await expect(page.locator('#network-status')).toHaveAttribute('data-connected','true',{timeout:25000});
  await page.waitForFunction(()=>{const s=(window as any).castleTest?.scene;return s?.views.has(s.network.room?.sessionId);});
  const layout=await page.evaluate(()=>{

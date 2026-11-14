@@ -6,5 +6,6 @@ export function getFortifications(width:number,height:number):{
  towers:{x:number;y:number;gate:boolean}[];
  bridges:({id:string;axis:string}&Rect)[];
  rails:({axis:string}&Rect)[];
+ supports:Rect[];
  solids:Rect[];
 };

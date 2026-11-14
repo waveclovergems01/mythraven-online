@@ -1,0 +1,69 @@
+.terrain-status, .terrain-move-hint {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 12px 16px;
+  border-radius: 6px;
+  background: #20332ff2;
+  color: #efe2b9;
+  pointer-events: none;
+}
+.terrain-status { top: 45%; }
+.terrain-move-hint { bottom: 60px; font-size: 12px; }
+#game[data-renderer="three"] canvas { cursor: default; touch-action: none; outline: none; user-select: none; -webkit-user-select: none; }
+#game[data-renderer="three"] canvas[data-player-hover="true"] { cursor: pointer; }
+.terrain-network {
+  position: absolute; left: 16px; top: 112px; z-index: 2;
+  padding: 8px 12px; border-radius: 4px; background: #20332fe8; color: #d9e5ce; font-size: 12px;
+}
+.terrain-network[data-connected="false"] { color: #e9c28d; }
+.terrain-network { max-width: calc(100vw - var(--terrain-minimap-size, 140px) - 40px); }
+.terrain-speed { display: block; width: 196px; max-width: 100%; margin-top: 9px; color: #e5dec2; }
+.terrain-speed-heading { display: flex; justify-content: space-between; gap: 8px; font-size: 11px; }
+.terrain-speed output { white-space: nowrap; font-variant-numeric: tabular-nums; }
+.terrain-speed input { display: block; width: 100%; height: 24px; margin: 3px 0 0; padding: 0; accent-color: #d6ba71; cursor: pointer; }
+.terrain-speed input:disabled { cursor: default; opacity: .45; }
+@media (max-width: 600px) {
+  .terrain-speed { width: 150px; }
+  .terrain-speed-heading { flex-wrap: wrap; gap: 2px 6px; font-size: 10px; }
+}
+.terrain-network button { margin-left: 10px; padding: 5px 8px; border: 1px solid #ae9d6a; border-radius: 3px; background: #30443c; color: #eee3c8; }
+.world-player-name {
+  position: absolute; transform: translate(-50%, -100%); pointer-events: none;
+  white-space: nowrap; font-size: 11px; color: #e5edf1; text-shadow: 0 1px 3px #102719;
+  padding: 3px 6px; background: #243a3080; border-radius: 3px;
+}
+.world-player-name[data-mine="true"] { color: #ffe5a0; }
+@media (max-width: 600px) { .terrain-network { top: 78px; left: 8px; font-size: 11px; } }
+.game-page:has(.terrain-minimap) { --terrain-minimap-size: clamp(140px, 17vw, 224px); }
+.terrain-minimap {
+  position: absolute; z-index: 2; top: 16px; right: 16px;
+  width: var(--terrain-minimap-size); padding: 3px;
+  border: 1px solid #ae9a67; border-radius: 6px;
+  background: #172c29ee; color: #e6dcc0; box-shadow: 0 4px 16px #162e2826;
+  user-select: none; cursor: default;
+}
+.terrain-minimap > svg { display: block; width: 100%; aspect-ratio: 1; overflow: hidden; border-radius: 2px; }
+.terrain-minimap-city { position: absolute; top: 8px; left: 8px; max-width: calc(100% - 65px); padding: 3px 7px; border: 1px solid #ac996966; border-radius: 4px; background: #172c29d9; font-size: 11px; }
+.terrain-minimap-compass { position: absolute; top: 7px; right: 7px; width: 44px; height: 44px; pointer-events: none; }
+.terrain-minimap-compass svg { width: 100%; height: 100%; }
+.terrain-minimap-compass circle { fill: #172c29dd; stroke: #ac996999; stroke-width: .7; }
+.terrain-minimap-compass path { fill: #8fa79b; }
+.terrain-minimap-compass .north { fill: #efcf82; }
+.terrain-minimap-compass text { fill: #eee3c6; font: 8px sans-serif; text-anchor: middle; }
+.game-page:has(.terrain-minimap) .game-header { right: calc(var(--terrain-minimap-size) + 32px); }
+@media (max-width: 600px) {
+  .game-page:has(.terrain-minimap) { --terrain-minimap-size: clamp(120px, 36vw, 140px); }
+  .terrain-minimap { top: 8px; right: 8px; }
+  .terrain-minimap-city { top: 6px; left: 6px; max-width: calc(100% - 48px); padding: 2px 4px; font-size: 9px; }
+  .terrain-minimap-compass { top: 5px; right: 5px; width: 34px; height: 34px; }
+  .game-page:has(.terrain-minimap) .game-header { right: calc(var(--terrain-minimap-size) + 16px); }
+  .game-page:has(.terrain-minimap) .mini-brand { font-size: clamp(12px, 3.8vw, 18px); letter-spacing: 1.5px; }
+  .game-page:has(.terrain-minimap) .mini-brand span { display: block; font-size: 10px; }
+  .game-page:has(.terrain-minimap) .game-header p { overflow-wrap: anywhere; }
+  .terrain-network { top: 112px; }
+}
+
+.terrain-asset-status { position: absolute; top: 12px; left: 50%; transform: translateX(-50%); max-width: 45%; padding: 8px 12px; border-radius: 5px; background: #18332ee8; color: #eee2c2; font-size: 12px; z-index: 5; }
+.terrain-asset-status[hidden] { display: none; }
+.terrain-asset-status button { margin-left: 10px; padding: 4px 8px; background: #d2b477; color: #1c2d24; border: 0; border-radius: 3px; }

@@ -1,15 +1,16 @@
 import Phaser from 'phaser';
 import {CASTLE} from './town-layout';
 import {MAP_WIDTH,MAP_HEIGHT} from './daflak-grid';
+import {attachOcclusionFade} from './occlusion-fade';
 
 /** Stationary masonry with independent, slowly waving raster cloth. */
-export function attachCastle(scene:Phaser.Scene):void {
+export function attachCastle(scene:Phaser.Scene,getPlayer:()=>{x:number;y:number}|undefined):void {
  const scale=CASTLE.width/CASTLE.sourceWidth,x=MAP_WIDTH*CASTLE.x,y=MAP_HEIGHT*CASTLE.y;
  const texture=scene.textures.get('town-castle');
- CASTLE.sections.forEach(([left,right,foot],i)=>{
+ const sections=CASTLE.sections.map(([left,right,foot],i)=>{
   const frame=`castle-section-${i}`;
   if(!texture.has(frame))texture.add(frame,0,left,0,right-left,CASTLE.sourceHeight);
-  scene.add.image(x+(left-CASTLE.anchorX)*scale,y-CASTLE.anchorY*scale,'town-castle',frame)
+  return scene.add.image(x+(left-CASTLE.anchorX)*scale,y-CASTLE.anchorY*scale,'town-castle',frame)
    .setOrigin(0).setScale(scale).setDepth(y+(foot-CASTLE.anchorY)*scale).setName(`castle-section-${i}`);
  });
  const flag=scene.textures.get('town-castle-flag'),image=flag.getSourceImage() as HTMLImageElement;
@@ -22,6 +23,7 @@ export function attachCastle(scene:Phaser.Scene):void {
   return scene.add.image(root.x+i*stripWidth*clothScale,root.y,'town-castle-flag',frame)
    .setOrigin(0).setScale(clothScale).setDepth(y+3).setName(`castle-flag-${flagIndex}-${i}`);
  }));
+ attachOcclusionFade(scene,sections,[...sections,...strips.flat()],getPlayer);
  let elapsed=0;
  const tick=(_time:number,delta:number)=>{
   elapsed+=Math.min(delta,100)/1000;

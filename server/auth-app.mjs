@@ -2,6 +2,7 @@ import express from 'express';
 import rateLimit from 'express-rate-limit';
 import { randomBytes } from 'node:crypto';
 import { OAuth2Client } from 'google-auth-library';
+import {localPorts, localWebOrigins} from './local-ports.mjs';
 
 const SESSION_COOKIE = 'mr_google_session';
 const BINDING_COOKIE = 'mr_google_browser';
@@ -15,7 +16,7 @@ function cookie(req, name) {
 /** The verifier injection is only for isolated tests; the executable always uses Google's verifier. */
 export function createAuthApp({
   clientId = '',
-  origins = ['http://localhost:5173','http://127.0.0.1:5173'],
+  origins = localWebOrigins(localPorts(process.env).web),
   secureCookies = false,
   now = Date.now,
   verifyToken,

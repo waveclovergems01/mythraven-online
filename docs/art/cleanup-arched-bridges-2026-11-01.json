@@ -1,0 +1,35 @@
+{
+  "date": "2026-11-01",
+  "scope": "Replace three flat crossings with painted arched stone bridges",
+  "removed": [
+    "art/.scratch/arched-bridges-v001/edit-prompt.json",
+    "art/.scratch/arched-bridges-v001/ew-v001-qa.png",
+    "art/.scratch/arched-bridges-v001/ew-v001.png",
+    "art/.scratch/arched-bridges-v001/ew-v002-qa.png",
+    "art/.scratch/arched-bridges-v001/ew-v002.png",
+    "art/.scratch/arched-bridges-v001/export.json",
+    "art/.scratch/arched-bridges-v001/export.mjs",
+    "art/.scratch/arched-bridges-v001/ns-v001-qa.png",
+    "art/.scratch/arched-bridges-v001/ns-v001.png",
+    "art/.scratch/arched-bridges-v001/prompts.json"
+  ],
+  "retained": [
+    "public/assets/props/bridges/mythraven-bridge-ew.png",
+    "public/assets/props/bridges/mythraven-bridge-ew-front.png",
+    "public/assets/props/bridges/mythraven-bridge-ns.png",
+    "public/assets/props/bridges/mythraven-bridge-ns-front.png"
+  ],
+  "supersededRuntimeImages": [],
+  "supersededCode": "Granite tileSprite decks and low wall-texture bridge parapets removed",
+  "intentionalExistingAssets": "Granite remains used on courts; wall sprites remain used on city perimeter",
+  "permanentReferencePreserved": true,
+  "validation": {
+    "build": "passed",
+    "server": "20 passed",
+    "browser": "5 passed: arched bridges, multiplayer, ground preview, castle, novice idle",
+    "art": "Real alpha and source-derived foregrounds; lossless PNG optimization preserves every visible RGBA pixel",
+    "evidence": "test-results/fortifications",
+    "tool": "built-in image_gen; model version not exposed"
+  },
+  "runtimeStatus": "Integrated locally for review; no deployment"
+}

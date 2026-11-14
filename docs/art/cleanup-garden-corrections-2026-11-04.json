@@ -1,0 +1,12 @@
+{
+  "date": "2026-11-04",
+  "task": "Whole crowns above walls, front-edge flowerbed opacity, symmetric enlarged gardens and larger blossoms",
+  "rasterChanges": "None; existing five tree PNGs and two flowerbed materials reused",
+  "removedScratchDirectory": "art/.scratch/garden-corrections",
+  "removedHelpers": ["playwright.config.ts", "test-server.mjs"],
+  "supersededStandaloneGameImages": [],
+  "retainedPermanentReference": "art/references/novice-male-sprite-control-reference.png",
+  "validation": ["production build", "23 server tests", "883 tree-wall overlaps without wall clipping", "18 front-edge probes at alpha 1 across six beds", "6 covered-body probes at alpha 0.48", "real movement, collision rejection, minimap and reentry", "fountain and castle visibility regression", "screenshot review"],
+  "qaDirectories": ["test-results/flowerbeds", "test-results/exterior-trees", "test-results/landmark-visibility"],
+  "temporaryServicesStopped": [5183, 3101, 2667]
+}

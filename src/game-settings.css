@@ -1,0 +1,35 @@
+.game-settings { --settings-gold: #d7bd80; --settings-edge: #88784e; --settings-surface: #192c29; }
+.settings-gear {
+  position: absolute; z-index: 4; right: 16px; bottom: 12px; width: 48px; height: 48px;
+  display: grid; place-items: center; padding: 10px; border: 1px solid var(--settings-edge); border-radius: 50%;
+  background: var(--settings-surface); color: var(--settings-gold); box-shadow: 0 3px 14px #0e211d55;
+}
+.settings-gear svg { width: 26px; height: 26px; }
+.settings-gear:hover { background: #30463b; border-color: var(--settings-gold); }
+.settings-menu { position: fixed; inset: auto 16px 70px auto; margin: 0; padding: 5px; width: 180px;
+  color: #eee3c9; border: 1px solid var(--settings-edge); border-radius: 7px; background: var(--settings-surface); box-shadow: 0 8px 24px #0005; }
+.settings-menu button { display: flex; justify-content: space-between; width: 100%; padding: 11px 13px; border: 0; border-radius: 3px; color: inherit; background: transparent; text-align: left; font: inherit; }
+.settings-menu button:hover { background: #31483b; }
+.settings-dialog { box-sizing: border-box; width: min(380px, calc(100vw - 32px)); max-height: calc(100dvh - 32px); padding: 0;
+  color: #e9e1c9; background: var(--settings-surface); border: 1px solid var(--settings-edge); border-radius: 10px; box-shadow: 0 20px 80px #0008; }
+.settings-dialog::backdrop { background: #08151299; }
+.settings-dialog header { display: flex; justify-content: space-between; align-items: center; padding: 18px 22px; border-bottom: 1px solid #8e81523d; }
+.settings-dialog h2 { margin: 0; font-size: 19px; font-weight: 500; color: var(--settings-gold); }
+.settings-close { width: 34px; height: 34px; border: 0; border-radius: 4px; background: transparent; color: #c9d1be; font-size: 26px; }
+.settings-close:hover { background: #ffffff10; }
+.settings-controls { min-height: 130px; padding: 24px 22px; }
+.settings-dialog .settings-range { display: block; width: 100%; margin: 0; color: #e5dec2; }
+.settings-dialog .settings-range + .settings-range { margin-top: 24px; padding-top: 22px; border-top: 1px solid #8e81523d; }
+.settings-dialog .terrain-speed-heading, .settings-range-heading { display: flex; justify-content: space-between; gap: 8px; font-size: 13px; }
+.settings-range output { white-space: nowrap; font-variant-numeric: tabular-nums; }
+.settings-dialog .settings-range input { display: block; width: 100%; height: 34px; padding: 0; margin: 16px 0 0; accent-color: #d6ba71; cursor: pointer; }
+.settings-range-ends { display: flex; justify-content: space-between; align-items: center; gap: 8px; font-size: 11px; color: #b8c5b8; }
+.settings-reset { padding: 5px 8px; border: 1px solid #88784e80; border-radius: 4px; background: transparent; color: var(--settings-gold); font: inherit; }
+.settings-reset:hover { background: #ffffff10; }
+.settings-footer { padding: 18px 22px; border-top: 1px solid #8e81523d; }
+.settings-footer .leave { width: 100%; padding: 12px; color: #e9c0a3; background: #392d26; border: 1px solid #987258; border-radius: 5px; }
+.settings-footer .leave:hover { background: #50372c; }
+.settings-dialog #game-error:not(:empty) { position: static; padding: 8px; margin-bottom: 10px; }
+.game-page:has(.game-settings) .game-footer { right: 80px; }
+.game-settings button:focus-visible, .settings-dialog input:focus-visible { outline: 2px solid var(--settings-gold); outline-offset: 3px; }
+@media(max-width:600px) { .settings-gear { right: 8px; bottom: 8px; width: 44px; height: 44px; } .settings-menu { right: 8px; bottom: 62px; } .game-page:has(.game-settings) .game-footer { right: 66px; } }

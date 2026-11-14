@@ -1,6 +1,10 @@
 import {shortestPath,canStep as legalStep} from './pathfinding.mjs';
 import { FOUNTAIN, CASTLE } from './town-layout.mjs';
 import {getFortifications} from './fortifications.mjs';
+import {getExteriorTrees} from './exterior-trees.mjs';
+import {getFlowerbeds} from './flowerbeds.mjs';
+import {touchesCell} from './ground-polygon.mjs';
+import {getTownProperties} from './town-properties.mjs';
 export const TILE_WIDTH=64, TILE_HEIGHT=56;
 // Four by six camera spans at the reference 1920x960 viewport and zoom 0.5.
 // Fixed for every multiplayer client; viewport resizing never changes the world.
@@ -8,7 +12,29 @@ export const MAP_COLUMNS=240, MAP_ROWS=206;
 export const MAP_WIDTH=TILE_WIDTH*MAP_COLUMNS, MAP_HEIGHT=TILE_HEIGHT*MAP_ROWS;
 export const SPAWN={x:122,y:112};
 const citySolids=getFortifications(MAP_WIDTH,MAP_HEIGHT).solids;
+const trees=getExteriorTrees(MAP_WIDTH,MAP_HEIGHT);
+// Static forest contacts are rasterized once; A* need not scan every tree.
+const treeBlocked=new Uint8Array(MAP_COLUMNS*MAP_ROWS);
+for(const tree of trees){
+ const l=Math.max(0,Math.floor((tree.x-tree.radiusX)/TILE_WIDTH)-1),r=Math.min(MAP_COLUMNS-1,Math.floor((tree.x+tree.radiusX)/TILE_WIDTH));
+ const t=Math.max(0,Math.floor((tree.y-tree.radiusY)/TILE_HEIGHT)-1),b=Math.min(MAP_ROWS-1,Math.floor((tree.y+tree.radiusY)/TILE_HEIGHT));
+ for(let y=t;y<=b;y++)for(let x=l;x<=r;x++){
+  const dx=Math.max(x*TILE_WIDTH,Math.min(tree.x,(x+1)*TILE_WIDTH))-tree.x;
+  const dy=Math.max(y*TILE_HEIGHT,Math.min(tree.y,(y+1)*TILE_HEIGHT))-tree.y;
+  if((dx/tree.radiusX)**2+(dy/tree.radiusY)**2<=1)treeBlocked[y*MAP_COLUMNS+x]=1;
+ }
+}
 const castleScale=CASTLE.width/CASTLE.sourceWidth;
+const propBlocked=new Uint8Array(MAP_COLUMNS*MAP_ROWS);
+const outlines=[...getFlowerbeds(MAP_WIDTH,MAP_HEIGHT),...getTownProperties(MAP_WIDTH,MAP_HEIGHT)];
+for(const {points,rim=0} of outlines){
+ const margin=rim/2;
+ const l=Math.max(0,Math.floor((Math.min(...points.map(p=>p[0]))-margin)/TILE_WIDTH)-1);
+ const r=Math.min(MAP_COLUMNS-1,Math.ceil((Math.max(...points.map(p=>p[0]))+margin)/TILE_WIDTH));
+ const t=Math.max(0,Math.floor((Math.min(...points.map(p=>p[1]))-margin)/TILE_HEIGHT)-1);
+ const b=Math.min(MAP_ROWS-1,Math.ceil((Math.max(...points.map(p=>p[1]))+margin)/TILE_HEIGHT));
+ for(let y=t;y<=b;y++)for(let x=l;x<=r;x++)if(touchesCell(points,x*TILE_WIDTH,y*TILE_HEIGHT,TILE_WIDTH,TILE_HEIGHT,margin))propBlocked[y*MAP_COLUMNS+x]=1;
+}
 const castleFootprints=CASTLE.footprints.map(([left,top,right,bottom])=>({
  left:MAP_WIDTH*CASTLE.x+(left-CASTLE.anchorX)*castleScale,
  right:MAP_WIDTH*CASTLE.x+(right-CASTLE.anchorX)*castleScale,
@@ -51,6 +77,9 @@ export function configureNavigation(image) {
 export function walkable(c) {
   if(!Number.isInteger(c.x)||!Number.isInteger(c.y)||c.x<0||c.y<0||c.x>=MAP_COLUMNS||c.y>=MAP_ROWS)return false;
   const left=c.x*TILE_WIDTH,top=c.y*TILE_HEIGHT;
+  // Only the trunk/root contact blocks walking; the canopy can overhang players.
+  if(treeBlocked[c.y*MAP_COLUMNS+c.x])return false;
+  if(propBlocked[c.y*MAP_COLUMNS+c.x])return false;
   if(citySolids.some(r=>left<r.right&&left+TILE_WIDTH>r.left&&top<r.bottom&&top+TILE_HEIGHT>r.top))return false;
   if(castleFootprints.some(r=>left<r.right&&left+TILE_WIDTH>r.left&&top<r.bottom&&top+TILE_HEIGHT>r.top))return false;
   // Closest point of a movement cell to the ellipse makes the entire footprint solid.

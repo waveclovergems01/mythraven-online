@@ -1,7 +1,7 @@
 import {test,expect,type Page} from '@playwright/test';
 async function enter(page:Page){
  await page.route('**/src/scenes/WorldScene.ts*',async route=>{const response=await route.fetch();await route.fulfill({response,body:await response.text()+'\nconst oldCreate=WorldScene.prototype.create;WorldScene.prototype.create=function(...args){oldCreate.apply(this,args);window.testScene=this;};'});});
- await page.goto('/');await page.locator('#guest').click();
+ await page.goto('/?view=2d');await page.locator('#guest').click();
  await expect(page.locator('#network-status')).toHaveAttribute('data-connected','true',{timeout:20000});
  await page.waitForFunction(()=>!!(window as any).testScene?.network.room?.sessionId);
 }

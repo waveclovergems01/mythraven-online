@@ -1,0 +1,15 @@
+{
+  "date": "2026-11-04",
+  "task": "Six raised flowerbeds and tree infill in circled bridge-bank pockets",
+  "tool": "Built-in image_gen.imagegen; model version not exposed",
+  "runtimeMaterials": ["public/assets/props/flowerbeds/mythraven-flowers-v001.png", "public/assets/props/flowerbeds/mythraven-stone-v001.png"],
+  "runtimeMaterialSize": [512,512],
+  "treeCount": 1914,
+  "removedScratchDirectory": "art/.scratch/flowerbeds",
+  "removedHelpers": ["export-materials.mjs", "infill-trees.mjs", "playwright.config.ts", "test-server.mjs"],
+  "supersededStandaloneGameImages": [],
+  "retained": ["Existing tree, fountain and castle assets", "Permanent novice motion reference", "Two active flowerbed material PNGs"],
+  "validation": ["build", "23 server tests", "flowerbed browser test", "bridge return trips", "landmark visibility", "repeat and screenshot review"],
+  "qaDirectory": "test-results/flowerbeds",
+  "temporaryServicesStopped": [5183,3101,2667]
+}

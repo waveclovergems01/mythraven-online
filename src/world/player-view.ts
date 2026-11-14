@@ -19,7 +19,7 @@ export function createPlayerView(scene:Phaser.Scene,name:string,mine:boolean){
  // About 80 screen pixels tall at camera zoom 0.5; preserve proportions and feet anchor.
  const body=scene.add.sprite(0,0,NOVICE_IDLE.key).setOrigin(.5,.9).setScale(NOVICE_IDLE.worldScale);
  const label=scene.add.text(0,-180,name,{fontFamily:'Tahoma',fontSize:'18px',color:'#f4ecd0',stroke:'#20332e',strokeThickness:4}).setOrigin(.5);
- container.add([shadow,ring,body,label]);
+ const surface=scene.add.container(0,0,[shadow,ring,body,label]);container.add(surface);
  let direction=0;let previous:{x:number;y:number}|undefined;
  function updatePose(x:number,y:number,moving:boolean){
   if(previous){const dx=x-previous.x,dy=y-previous.y;
@@ -39,6 +39,6 @@ export function createPlayerView(scene:Phaser.Scene,name:string,mine:boolean){
   }
  }
  body.play('novice-idle-s');
- return {container,body,label,updatePose};
+ return {container,surface,body,label,updatePose};
 }
 

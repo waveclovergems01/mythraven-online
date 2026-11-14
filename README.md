@@ -1,8 +1,8 @@
 # Mythraven Online
 
-ล่าสุด: เข้าสู่เมือง Daflak หลังล็อกอิน/Guest มีกริด 40×40, hover เลือกช่อง, เดินตามถนนหลักและกล้องติดตาม พร้อม favicon ที่โหลดจริง ดู [รายละเอียดและข้อจำกัดของต้นแบบ](docs/DAFLAK_PREVIEW.md)
+ล่าสุด 2026-11-12: ฉากเมือง 3D เชื่อม Multiplayer ผ่าน Colyseus แล้ว เปิดสองหน้าต่างเข้า Guest เพื่อเห็นกันและเดินร่วมกัน คลิกซ้ายเดิน กล้องมุมเฉียงคงที่ตามตัวเอง เซิร์ฟเวอร์คุมตำแหน่ง ความเร็ว และร่องน้ำ มีป้ายชื่อ จำนวนคนออนไลน์ และเชื่อมต่อใหม่ เมืองหนึ่งตั้งเพดาน 64 คน (ทดสอบการเชื่อมต่อครบ 64 คนแล้ว); เมื่อเต็มจะเปิดอีก instance ยังรันบนเครื่องและยังไม่มีตัวละครถาวร ดู [วิธีทดสอบออนไลน์](docs/MULTIPLAYER_LOCAL.md) และ [สเกล terrain](docs/TERRAIN_3D.md) เมือง Phaser เดิมยังเปิดเทียบได้ที่ `/?view=2d`
 
-ต้นแบบเกมเว็บ Phaser + TypeScript + Vite สำหรับรันบนเครื่อง หน้า login ใช้ภาพแฟนตาซีที่สร้างด้วย AI ส่วนฉากเกมยังใช้ภาพ placeholder ที่วาดจากโค้ด
+ต้นแบบเกมเว็บ TypeScript + Vite สำหรับรันบนเครื่อง ใช้ Three.js สำหรับพื้นเมือง 3D และเก็บเมือง Phaser เป็นฉากเทียบระหว่างย้ายระบบ หน้าล็อกอินยังใช้ภาพแฟนตาซีเดิม
 
 ## เริ่มเล่นบน local
 
@@ -14,7 +14,7 @@ npm.cmd install
 npm.cmd run dev
 ```
 
-เปิด http://localhost:5173 สำหรับ Google sign-in พอร์ต 5173 เป็น strictPort เพื่อให้ตรงกับ OAuth origins หากไม่ว่างต้องปิด dev server เดิมก่อน เปิด terminal ค้างไว้ระหว่างเล่น หยุดด้วย Ctrl+C ครั้งต่อไปใช้ npm.cmd run dev ได้เลย
+เปิด http://localhost:5273 สำหรับ Google sign-in พอร์ต 5273 เป็น strictPort เพื่อให้ตรงกับ OAuth origins หากไม่ว่างต้องปิด dev server เดิมก่อน เปิด terminal ค้างไว้ระหว่างเล่น หยุดด้วย Ctrl+C ครั้งต่อไปใช้ npm.cmd run dev ได้เลย
 
 ใช้ npm.cmd เพื่อหลีกเลี่ยงปัญหา PowerShell บล็อก npm.ps1 โดยไม่ต้องเปลี่ยน execution policy
 
@@ -77,7 +77,7 @@ Google เชื่อมผ่าน GIS และ server verification แล�
 ## Google sign-in จริง
 
 อ่าน [คู่มือตั้งค่า Google](docs/GOOGLE_AUTH_SETUP.md) เพื่อสร้าง Web Client ID และใส่ใน .env
-`npm.cmd run dev` เปิดทั้งเว็บ :5173 และ auth server :3001 ให้ใช้ http://localhost:5173 สำหรับ Google
+`npm.cmd run dev` เปิดทั้งเว็บ :5273 และ auth server :5274 ให้ใช้ http://localhost:5273 สำหรับ Google
 ตั้งค่าพอร์ตแบบ strict เพื่อให้ตรง Google Authorized JavaScript origins
 `npm.cmd run test:server` ทดสอบ token/session contract; `npm.cmd run test:e2e` ทดสอบหน้าเว็บ
 ยังไม่ได้ทดสอบบัญชี Google จริงจนกว่าจะมี Client ID และผู้ใช้เลือกบัญชีผ่าน Google สำเร็จ

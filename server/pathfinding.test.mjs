@@ -37,7 +37,9 @@ test('A* gives minimum world-distance cost around obstacles',()=>{
 test('server movement consumes the same distance budget in straight and diagonal directions',()=>{
  configureNavigation({width:1,height:1,data:new Uint8Array([255,255,255,255])});
  for(const direction of [{x:1,y:0},{x:1,y:1}]){
-  const cell={x:10,y:10},start=centerOf(cell),p={...start},m={cell,path:[],target:null,direction,directionUntil:Infinity};
+  // The southern court has a full 420-unit run in both directions. The spawn
+  // approach now borders enlarged gardens, so it cannot isolate movement speed.
+  const cell={x:122,y:132},start=centerOf(cell),p={...start},m={cell,path:[],target:null,direction,directionUntil:Infinity};
   const room={movers:new Map([['p',m]]),state:{players:new Map([['p',p]])}};
   for(let i=0;i<20;i++)TownRoom.prototype.tick.call(room,50);
   assert.ok(Math.abs(Math.hypot(p.x-start.x,p.y-start.y)-420)<1e-5);

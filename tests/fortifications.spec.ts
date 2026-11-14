@@ -9,9 +9,9 @@ test('all three fortified bridges support server-authoritative return trips and 
   page.on('pageerror',e=>errors.push(e.message));
   await page.route('**/src/scenes/WorldScene.ts*',async route=>{
    const response=await route.fetch();await route.fulfill({response,body:await response.text()+
-    '\nimport {walkable as testWalkable,cellAt as testCellAt} from "/shared/town-grid.mjs";import {CITY_DEFENSES as testDefenses} from "/src/world/fortifications.ts";const fortCreate=WorldScene.prototype.create;WorldScene.prototype.create=function(...args){fortCreate.apply(this,args);window.fortTest={scene:this,walkable:testWalkable,cellAt:testCellAt,layout:testDefenses};};'});
+    '\nimport {walkable as testWalkable,cellAt as testCellAt} from "/shared/town-grid.mjs";import {CITY_DEFENSES as testDefenses} from "/src/world/fortifications.ts";import {BRIDGE_SURFACE as testSurface} from "/src/world/bridges.ts";const fortCreate=WorldScene.prototype.create;WorldScene.prototype.create=function(...args){fortCreate.apply(this,args);window.fortTest={scene:this,walkable:testWalkable,cellAt:testCellAt,layout:testDefenses,surface:testSurface};};'});
   });
-  await page.goto('/');await page.locator('#guest').click();
+  await page.goto('/?view=2d');await page.locator('#guest').click();
   await expect(page.locator('#network-status')).toHaveAttribute('data-connected','true',{timeout:30000});
   await page.waitForFunction(()=>{const s=(window as any).fortTest?.scene;return s?.views.has(s.network.room?.sessionId);});
   // Adding a cap frame changes Phaser's default frame; ordinary wall/rail
@@ -33,12 +33,26 @@ test('all three fortified bridges support server-authoritative return trips and 
    const bridge=t.layout.bridges.find((b:any)=>b.id===id);
    const rail=t.layout.rails.find((r:any)=>r.axis===bridge.axis&&r.left>=bridge.left-20&&r.right<=bridge.right+20&&r.top>=bridge.top-20&&r.bottom<=bridge.bottom+20);
    const blocked=t.cellAt((rail.left+rail.right)/2,(rail.top+rail.bottom)/2);
-   return {position:{x:p.x,y:p.y},blocked,allowed:t.walkable(blocked),deckDepth:deck.depth,playerDepth:s.views.get(s.network.room.sessionId).container.depth};
+   const view=s.views.get(s.network.room.sessionId),expected=t.surface.project(view.container.x,view.container.y);
+   return {position:{x:p.x,y:p.y},blocked,allowed:t.walkable(blocked),deckDepth:deck.depth,playerDepth:view.container.depth,
+    deckType:deck.type,offset:{x:view.surface.x,y:view.surface.y},projectionError:Math.hypot(view.container.x+view.surface.x-expected.x,view.container.y+view.surface.y-expected.y),frontDepth:s.children.getByName(`bridge-front-${id}`).depth};
   },gate.id);
   expect(bridgeState.allowed).toBe(false);expect(bridgeState.playerDepth).toBeGreaterThan(bridgeState.deckDepth);
+  expect(bridgeState.deckType).toBe('Image');expect(bridgeState.offset.y).toBeLessThan(-60);expect(bridgeState.projectionError).toBeLessThan(.1);
+  expect(bridgeState.frontDepth).toBeGreaterThan(bridgeState.playerDepth);
   await page.evaluate(c=>(window as any).fortTest.scene.network.room.send('move',c),bridgeState.blocked);
   await page.waitForTimeout(350);
   expect(await page.evaluate(()=>{const s=(window as any).fortTest.scene,p=s.network.players.get(s.network.room.sessionId);return {x:p.x,y:p.y};})).toEqual(bridgeState.position);
+  await page.evaluate(id=>{const t=(window as any).fortTest,b=t.surface.bridges.find((b:any)=>b.id===id);t.scene.cameras.main.stopFollow().centerOn((b.left+b.right)/2,(b.top+b.bottom)/2);},gate.id);
+  await page.waitForTimeout(250);await page.screenshot({path:`${out}/${gate.id}-arched-bridge.png`});
+  // An actual pointer click on raised paving must target its physical grid cell.
+  const click=await page.evaluate(axis=>{
+   const t=(window as any).fortTest,s=t.scene,p=s.network.players.get(s.network.room.sessionId),c=t.cellAt(p.x,p.y);
+   c[axis==='x'?'x':'y']+=2;const projected=t.surface.project((c.x+.5)*64,(c.y+.5)*56),camera=s.cameras.main;
+   return {cell:c,allowed:t.walkable(c),screen:{x:(projected.x-camera.worldView.x)*camera.zoom,y:(projected.y-camera.worldView.y)*camera.zoom}};
+  },gate.axis);
+  expect(click.allowed).toBe(true);await page.mouse.click(click.screen.x,click.screen.y);
+  await expect.poll(()=>page.evaluate(c=>{const s=(window as any).fortTest.scene,p=s.network.players.get(s.network.room.sessionId);return Math.hypot(p.x-(c.x+.5)*64,p.y-(c.y+.5)*56);},click.cell),{timeout:10000}).toBeLessThan(1);
   await move([gate.x,gate.y]);
   if(gate.axis==='x')await expect.poll(()=>page.evaluate(()=>(window as any).fortTest.scene.children.list.some((o:any)=>o.name.startsWith('city-gate-')&&o.alpha<.7))).toBe(true);
   await page.evaluate(g=>{const s=(window as any).fortTest.scene;s.cameras.main.stopFollow().centerOn(g.x/1448*15360,g.y/1086*11536-300);},gate);

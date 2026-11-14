@@ -7,7 +7,7 @@ test('capital uses fixed 4x6 camera extent, streamed detailed ground and matchin
  await page.route('**/src/scenes/WorldScene.ts*',async route=>{
   const response=await route.fetch();await route.fulfill({response,body:await response.text()+'\nconst originalPreviewCreate=WorldScene.prototype.create;WorldScene.prototype.create=function(data){originalPreviewCreate.call(this,data);window.previewScene=this;};'});
  });
- await page.setViewportSize({width:1920,height:960});await page.goto('/');await page.locator('#guest').click();
+ await page.setViewportSize({width:1920,height:960});await page.goto('/?view=2d');await page.locator('#guest').click();
  await expect(page.locator('#network-status')).toHaveAttribute('data-connected','true',{timeout:30000});
  await page.waitForFunction(()=>{const s=(window as any).previewScene;return s?.views.has(s.network.room?.sessionId)&&s.textures.getTextureKeys().filter((k:string)=>k.startsWith('town-ground-')).length>6;});
  const measure=()=>page.evaluate(()=>{

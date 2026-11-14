@@ -9,14 +9,14 @@ export const PERIMETER = [
  [225,335],[285,335],
 ];
 export const GATES = [
- {id:'west',x:180,y:490,axis:'x',bridge:[35,467,240,513],inside:[250,490],outside:[45,490]},
- {id:'east',x:1300,y:490,axis:'x',bridge:[1250,467,1435,513],inside:[1230,490],outside:[1420,490]},
- {id:'south',x:740,y:905,axis:'y',bridge:[717,870,763,1055],inside:[740,850],outside:[740,1040]},
+ {id:'west',x:180,y:490,axis:'x',bridge:[35,478,175,502],inside:[250,490],outside:[45,490]},
+ {id:'east',x:1300,y:490,axis:'x',bridge:[1315,478,1435,502],inside:[1230,490],outside:[1420,490]},
+ {id:'south',x:740,y:905,axis:'y',bridge:[726,935,754,1055],inside:[740,850],outside:[740,1040]},
 ];
 /** One geometry contract for rendering, minimap, navigation and server collision. */
 export function getFortifications(width,height){
  const sx=width/1448,sy=height/1086;
- const walls=[],towers=[],bridges=[],rails=[];
+ const walls=[],towers=[],bridges=[],rails=[],supports=[];
  const rectangle=(l,t,r,b)=>({left:l*sx,top:t*sy,right:r*sx,bottom:b*sy});
  const wall=(x1,y1,x2,y2)=>walls.push({x1:x1*sx,y1:y1*sy,x2:x2*sx,y2:y2*sy,
   axis:x1===x2?'y':'x',footprint:rectangle(Math.min(x1,x2)-5,Math.min(y1,y2)-5,Math.max(x1,x2)+5,Math.max(y1,y2)+5)});
@@ -36,7 +36,22 @@ export function getFortifications(width,height){
   // Low parapets run along the river span only, leaving both approaches open.
   if(g.axis==='x')for(const y of [t+1,b-1])rails.push({axis:'x',...rectangle(l,y-1.5,r,y+1.5)});
   else for(const x of [l+1,r-1])rails.push({axis:'y',...rectangle(x-1.5,t,x+1.5,b)});
+  // Footprints of the painted piers and abutments, including those standing
+  // on either bank outside the walkable deck. These are not sprite silhouettes.
+  if(g.axis==='x'){
+   const scaleX=(r-l)*sx/1685,scaleY=(b-t)*sy/290,centerY=(t+b)*sy/2;
+   for(const [px,py] of [[55,665],[310,760],[625,795],[1170,795],[1490,760],[1740,665]]){
+    const x=l*sx+(px-55)*scaleX,y=centerY+(py-475)*scaleY;
+    supports.push({left:x-47*scaleX,right:x+47*scaleX,top:y-52*scaleY,bottom:y+3*scaleY});
+   }
+  }else{
+   const scaleX=(r-l)*sx/264,scaleY=(b-t)*sy/1305,cx=(l+r)*sx/2;
+   for(const [x1,y1,x2,y2] of [[170,1230,310,1296],[318,1430,378,1488],[300,1340,400,1400]])for(const mirror of [false,true]){
+    const a=mirror?1024-x2:x1,c=mirror?1024-x1:x2;
+    supports.push({left:cx+(a-512)*scaleX,right:cx+(c-512)*scaleX,top:t*sy+(y1-145)*scaleY,bottom:t*sy+(y2-145)*scaleY});
+   }
+  }
  }
- const solids=[...walls.map(w=>w.footprint),...towers.map(t=>({left:t.x-(t.gate?220:190),top:t.y-90,right:t.x+(t.gate?220:190),bottom:t.y+90})),...rails];
- return {walls,towers,bridges,rails,solids};
+ const solids=[...walls.map(w=>w.footprint),...towers.map(t=>({left:t.x-(t.gate?220:190),top:t.y-90,right:t.x+(t.gate?220:190),bottom:t.y+90})),...rails,...supports];
+ return {walls,towers,bridges,rails,supports,solids};
 }

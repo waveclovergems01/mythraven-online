@@ -1,0 +1,15 @@
+{
+  "date": "2026-11-04",
+  "task": "Five exterior tree variants and 74 outer-mainland placements",
+  "tool": "Built-in image_gen.imagegen; model version not exposed",
+  "runtimeDirectory": "public/assets/props/trees",
+  "runtimeImages": 5,
+  "removedScratchDirectory": "art/.scratch/exterior-trees-v001",
+  "removedFiles": ["prepare.mjs", "export-record.json", "playwright.config.ts", "test-server.mjs"],
+  "supersededGameImages": [],
+  "retained": ["Five active tree PNGs", "Existing castle/grass reference assets", "Permanent novice motion reference"],
+  "validation": ["build", "21 server tests", "exterior tree browser playtest", "three-bridge return-trip playtest", "alpha and image review"],
+  "qaDirectory": "test-results/exterior-trees",
+  "temporaryServicesStopped": [5183, 3101, 2667],
+  "approvalStatus": "Integrated for local review; no final visual approval inferred"
+}

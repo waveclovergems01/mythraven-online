@@ -1,9 +1,11 @@
 import Phaser from 'phaser';
 import {getFortifications} from '../../shared/fortifications.mjs';
 import {MAP_WIDTH,MAP_HEIGHT} from './daflak-grid';
+import {BRIDGE_ASSETS,attachBridges,drawBridgesOnMinimap} from './bridges';
 
 export const CITY_DEFENSES=getFortifications(MAP_WIDTH,MAP_HEIGHT);
 export const FORTIFICATION_ASSETS={
+ ...BRIDGE_ASSETS,
  'city-wall-horizontal':'/assets/props/fortifications/mythraven-wall-horizontal.png?v=20261031',
  'city-wall-vertical':'/assets/props/fortifications/mythraven-wall-vertical.png?v=20261031',
  'city-watchtower':'/assets/props/fortifications/mythraven-watchtower.png?v=20261031',
@@ -31,10 +33,6 @@ function pieces():Piece[]{
    result.push({key:'city-wall-horizontal',x:w.x1-75,y:end+35-390,width:150,height:390,depth:end+47,name:`city-wall-cap-${index++}`,cap:true});
   }
  }
- for(const r of CITY_DEFENSES.rails){
-  if(r.axis==='x')horizontal(r.left,r.right,(r.top+r.bottom)/2+12,85,'bridge-rail');
-  else vertical((r.left+r.right)/2,r.top,r.bottom,38,45,'bridge-rail');
- }
  for(const t of CITY_DEFENSES.towers){
   const width=t.gate?470:410,height=width*814/424;
   result.push({key:'city-watchtower',x:t.x-width/2,y:t.y+90-height,width,height,depth:t.y+90,name:`city-${t.gate?'gate':'tower'}-${index++}`});
@@ -42,14 +40,20 @@ function pieces():Piece[]{
  return result;
 }
 const CITY_PIECES=pieces();
+/** Crowns that intersect the raised wall-walk must stay whole. Sorting only by
+ * roots lets successive vertical wall slices cut horizontal holes in a tree. */
+export function treeWallDepth(left:number,top:number,right:number,bottom:number,rootY:number):number {
+ let depth=rootY;
+ for(const p of CITY_PIECES){
+  if(p.key==='city-watchtower')continue;
+  if(left<p.x+p.width&&right>p.x&&top<p.y+p.height&&bottom>p.y)depth=Math.max(depth,p.depth+.25);
+ }
+ return depth;
+}
 export function attachFortifications(scene:Phaser.Scene,getPlayer:()=>{x:number;y:number}|undefined){
  const wallTexture=scene.textures.get('city-wall-horizontal');
  if(!wallTexture.has('end-cap'))wallTexture.add('end-cap',0,128,0,128,388);
- // Decks are deliberately below actors; rails and towers occlude by ground Y.
- for(const b of CITY_DEFENSES.bridges){
-  scene.add.tileSprite(b.left,b.top,b.right-b.left,b.bottom-b.top,'town-granite')
-   .setOrigin(0).setTileScale(.5,.4375).setDepth(2).setName(`bridge-deck-${b.id}`);
- }
+ attachBridges(scene);
  const raised=CITY_PIECES.map(p=>({p,image:scene.add.image(p.x,p.y,p.key,p.cap?'end-cap':'__BASE').setOrigin(0)
   .setDisplaySize(p.width,p.height).setDepth(p.depth).setName(p.name)}));
  // Tall foreground masonry becomes translucent only while it hides the local
@@ -65,12 +69,11 @@ export function attachFortifications(scene:Phaser.Scene,getPlayer:()=>{x:number;
  scene.events.once(Phaser.Scenes.Events.SHUTDOWN,()=>scene.events.off(Phaser.Scenes.Events.UPDATE,update));
 }
 /** Same placements and painter order as the world, scaled only at draw time. */
-export function drawFortificationsOnMinimap(ctx:CanvasRenderingContext2D,source:(key:string)=>HTMLImageElement,scale:number){
- const stone=source('town-granite'),pattern=ctx.createPattern(stone,'repeat')!;
- pattern.setTransform(new DOMMatrix().scale(.5*scale,.4375*scale));ctx.fillStyle=pattern;
- for(const b of CITY_DEFENSES.bridges)ctx.fillRect(b.left*scale,b.top*scale,(b.right-b.left)*scale,(b.bottom-b.top)*scale);
- for(const p of [...CITY_PIECES].sort((a,b)=>a.depth-b.depth)){
+export function drawFortificationsOnMinimap(ctx:CanvasRenderingContext2D,source:(key:string)=>HTMLImageElement,scale:number,landmarks:{depth:number;draw:()=>void}[]=[]){
+ drawBridgesOnMinimap(ctx,source,scale);
+ const layers=CITY_PIECES.map(p=>({depth:p.depth,draw:()=>{
   if(p.cap)ctx.drawImage(source(p.key),128,0,128,388,p.x*scale,p.y*scale,p.width*scale,p.height*scale);
   else ctx.drawImage(source(p.key),p.x*scale,p.y*scale,p.width*scale,p.height*scale);
- }
+ }}));
+ for(const layer of [...layers,...landmarks].sort((a,b)=>a.depth-b.depth))layer.draw();
 }

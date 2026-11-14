@@ -1,5 +1,21 @@
 # Mythraven Art Bible
 
+> 2026-11-14 grass follow-up: authorized replacement fine-blade grass reduces the repeated dark/light clumps visible as a checkerboard. Keep the painted green palette, low ground contrast, fixed orientation and 32-unit repetition span. This is a scoped ground candidate integration, not a new project-wide master.
+
+> 2026-11-14 ground correction: the owner requests ordinary straight texture tiling instead of randomly rotated overlapping patches. Preserve the supplied paintings and soft grass/soil region transitions; use one fixed orientation across the terrain. No new artwork or image edits.
+
+> 2026-11-13 Warrior extension: two owner-supplied male Warrior variants join the pre-entry character picker. Preserve their original armor/materials and Warrior-specific Idle/Run. Share verified compatible hair within Warrior; no Novice retargeting or general style replacement. See ART_STYLE.md, CHAR-WARRIOR-3D.
+
+> 2026-11-13 hairstyle extension: owner `m1-novice2.glb` supplies a second hairstyle for the same novice. Preserve that hair's supplied geometry/material, attach it to the existing avatar skin, and keep the original body and animations. Selection now takes place on a separate post-login screen with a live preview and gender categories, before city entry. This extends the scoped character exception to selectable hair, not a new general character style.
+
+> 2026-11-13 scoped character exception: the owner-supplied `m1-novice.glb` now replaces capsules in the 3D city with its own materials and Idle/Run clips. Its supplied appearance is the authority for this import. Preserve active 2D characters and their historical style status. This explicit request supersedes the earlier terrain-only scope for this one character; see ART_STYLE.md, CHAR-NOVICE-3D.
+
+> 2026-11-13 scoped terrain update: the four supplied green grass, dry grass, earth and grass/earth PNGs now define the 3D ground's painted surface direction. Preserve their source pixels; blend irregularly in-world without checker tiling or circular repeated patches. This supersedes reuse of the old grass/dirt tiles for the 3D surface only. See ART_STYLE.md, BG-TERRAIN-PAINTED.
+
+> Owner extension 2026-11-12: one green 3D oak candidate is authorized beside the canal. Preserve the existing painted oak's palette and foliage language while modeling roots, trunk, branching and spatial leaf sprays. This is a scoped prop exception for review, not a replacement or approval of the existing 2D tree library. See the current ART_STYLE.md entry and ASSET_SPEC.md.
+
+> Owner exception, 2026-11-11: the city ground/water now uses real 3D geometry with a 2.5D orthographic camera. Retain the warm muted palette and soft lighting. This terrain-only transition supersedes 2D-only requirements for that surface, not for existing characters, props or login art. See [terrain contract](../TERRAIN_3D.md) and the current ART_STYLE.md entry.
+
 > Current guide (2026-10-12): [ART_STYLE.md](../../ART_STYLE.md) is authoritative for new images. Its visual tokens, palette, ground/object rules, registry, naming and variant workflow override conflicting defaults below. This document retains legacy guidance and technical contracts; see [STYLE_MIGRATION.md](STYLE_MIGRATION.md). Existing assets are not automatically approved under the new guide.
 
 Style ID: **MR-ART-v1**  

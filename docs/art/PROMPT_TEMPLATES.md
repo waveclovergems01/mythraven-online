@@ -1,5 +1,15 @@
 # Image generation templates — MR-ART-v1
 
+> 2026-11-14 grass replacement: built-in image_gen edits the actual former `painted-grass-v001.png` reference. Adapt shared painted-fantasy block and terrain/top-down override: opaque square albedo, low-contrast fine grass strokes with irregular placement, uniform diffuse lighting, palette from source, no prominent clumps, rows, diamonds, checkerboard, swirls, vignette or text. Seamless edges requested; verify in game before integration. No model name is exposed by the tool.
+
+> Warrior import, 2026-11-13: owner supplies both GLBs directly. No generation prompt or reference-image attachment applies. Preserve source appearance and animation; extract the second hair losslessly after validating Warrior bindings and clips.
+
+> Second novice hairstyle, 2026-11-13: import supplied 3D hair from `m1-novice2.glb` using lossless geometry/texture extraction and existing skeleton binding. No generation prompt applies. The owner source defines the hair appearance; unrelated sprite templates remain unchanged.
+
+> Owner GLB import, 2026-11-13: `m1-novice.glb` is supplied directly for the default 3D city. No raster generation prompt is used; preserve its appearance/materials and authored Idle/Run. The scoped character exception in ART_STYLE.md applies to this import only, without changing the legacy sprite templates below.
+
+> Terrain exception, 2026-11-11: the current city-ground task uses code-native Three.js heightfield geometry and the existing shoreline data. It does not generate a raster image and therefore does not invoke an image prompt. If terrain textures or 3D asset concepts are requested later, use a scoped 3D-ground brief while preserving the shared palette; do not silently reuse the 2D-only camera/rendering restrictions. Existing sprite templates remain unchanged. See [terrain contract](../TERRAIN_3D.md).
+
 > Current guide (2026-10-12): [ART_STYLE.md](../../ART_STYLE.md) is authoritative for new images. Its visual tokens, palette, ground/object rules, registry, naming and variant workflow override conflicting defaults below. This document retains legacy guidance and technical contracts; see [STYLE_MIGRATION.md](STYLE_MIGRATION.md). Existing assets are not automatically approved under the new guide.
 
 ใช้ shared block + template ประเภทภาพ + reference จริง + asset brief เสมอ

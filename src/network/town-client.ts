@@ -10,7 +10,7 @@ export class TownClient {
   async connect(){
     this.status('กำลังเชื่อมต่อเมือง…',false);
     try {
-      const endpoint=(import.meta as any).env.VITE_GAME_SERVER_URL||`${location.protocol==='https:'?'wss':'ws'}://${location.hostname}:2567`;
+      const endpoint=(import.meta as any).env.VITE_GAME_SERVER_URL||`${location.protocol==='https:'?'wss':'ws'}://${location.hostname}:${(import.meta as any).env.VITE_LOCAL_GAME_PORT}`;
       const room=await new Client(endpoint).joinOrCreate<TownState>('mythraven-town');
       if(this.disposed){void room.leave();return;}
       this.room=room;room.reconnection.enabled=false;this.connected=true;

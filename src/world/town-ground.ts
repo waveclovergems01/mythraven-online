@@ -1,14 +1,20 @@
 import Phaser from 'phaser';
 import {TERRAIN_MATERIALS} from './terrain-materials';
 import {attachWater} from './water';
-import {CASTLE} from './town-layout';
+import {CASTLE,FOUNTAIN} from './town-layout';
 import {FORTIFICATION_ASSETS,drawFortificationsOnMinimap} from './fortifications';
+import {TREE_ASSETS,treeMinimapLayers} from './trees';
+import {PROPERTY_ASSETS,propertyMinimapLayers} from './town-properties';
+import {FLOWERBED_ASSETS,flowerbedMinimapLayers} from './flowerbeds';
 import {MAP_WIDTH,MAP_HEIGHT,configureNavigation} from './daflak-grid';
 
-const revision='?v=fortified-capital-20261031';
+const revision='?v=arched-capital-20261101';
 export const TOWN_ASSETS = {
  ...FORTIFICATION_ASSETS,
- 'town-castle':'/assets/props/castle/mythraven-castle.png?v=wide-20261031',
+ ...TREE_ASSETS,
+ ...PROPERTY_ASSETS,
+ ...FLOWERBED_ASSETS,
+ 'town-castle':'/assets/props/castle/mythraven-castle-v002.png',
  'town-castle-flag':'/assets/props/castle/mythraven-castle-flag.png?v=20261031',
  'town-granite':'/assets/tiles/mythraven-granite.png',
  'town-fountain':'/assets/props/fountain/mythraven-fountain.png',
@@ -16,12 +22,12 @@ export const TOWN_ASSETS = {
  'town-paving':'/assets/tiles/mythraven-paving.png'+revision,
  'town-dirt':'/assets/tiles/mythraven-dirt.png'+revision,
  'town-grass':'/assets/tiles/mythraven-grass.png'+revision,
- 'town-coverage':'/assets/maps/mythraven-grass-mask.png'+revision,
+ 'town-coverage':'/assets/maps/mythraven-grass-mask.png?v=oval-court',
  'town-navigation':'/assets/maps/mythraven-navigation.png'+revision,
  'town-land':'/assets/maps/mythraven-land.png'+revision,
  'town-banks':'/assets/maps/mythraven-banks.png'+revision,
  'town-roads':'/assets/maps/mythraven-roads.png'+revision,
- 'town-courts':'/assets/maps/mythraven-courts.png'+revision,
+ 'town-courts':'/assets/maps/mythraven-courts.png?v=oval-court',
 } as const;
 
 /** Fixed-scale materials with layout masks; bounded ground chunks around the
@@ -61,12 +67,20 @@ export function buildTownGround(scene:Phaser.Scene):string {
  const mc=mini.getContext('2d')!,water=mc.createPattern(source('town-water'),'repeat')!;
  water.setTransform(new DOMMatrix().scale(.5*miniScale,.4375*miniScale));
  mc.globalCompositeOperation='destination-over';mc.fillStyle=water;mc.fillRect(0,0,mini.width,mini.height);
- // Include the same placed building in the minimap; the cloth alone animates in-world.
- const castleScale=CASTLE.width/CASTLE.sourceWidth/2*miniScale;
+ // Landmarks use their real world scale and ground anchor. The static minimap
+ // always keeps them opaque, independently of local-player occlusion fading.
  mc.globalCompositeOperation='source-over';
- drawFortificationsOnMinimap(mc,source,miniScale/2);
- mc.drawImage(source('town-castle'),width*CASTLE.x*miniScale-CASTLE.anchorX*castleScale,
-  height*CASTLE.y*miniScale-CASTLE.anchorY*castleScale,CASTLE.sourceWidth*castleScale,CASTLE.sourceHeight*castleScale);
+ const landmarks=[...treeMinimapLayers(mc,source,miniScale/2),...flowerbedMinimapLayers(scene,mc,miniScale/2),
+  ...propertyMinimapLayers(mc,source,miniScale/2)];
+ for(const [key,prop] of [['town-castle',CASTLE],['town-fountain',FOUNTAIN]] as const){
+  const scale=prop.width/prop.sourceWidth/2*miniScale;
+  const sections=key==='town-castle'?CASTLE.sections:[[0,prop.sourceWidth,prop.anchorY]];
+  for(const [left,right,foot] of sections)landmarks.push({depth:MAP_HEIGHT*prop.y+(foot-prop.anchorY)*prop.width/prop.sourceWidth,draw:()=>{
+   mc.drawImage(source(key),left,0,right-left,prop.sourceHeight,width*prop.x*miniScale+(left-prop.anchorX)*scale,
+    height*prop.y*miniScale-prop.anchorY*scale,(right-left)*scale,prop.sourceHeight*scale);
+  }});
+ }
+ drawFortificationsOnMinimap(mc,source,miniScale/2,landmarks);
  attachWater(scene);
  const chunks=new Map<string,Phaser.GameObjects.Image>();let region='';
  const sync=()=>{

@@ -1,6 +1,7 @@
 import sharp from 'sharp';
 import {mkdir} from 'node:fs/promises';
 import {GATES} from '../shared/fortifications.mjs';
+import {FOUNTAIN_COURT} from '../shared/town-layout.mjs';
 
 // Maintained layout exporter: concept colors supply coverage, never surface detail.
 const source='art/source/maps/capital-layout.png',out='public/assets/maps';
@@ -52,7 +53,6 @@ const contour=await sharp(Buffer.from(land.map(v=>v*255)),{raw:{width:w,height:h
 const smoothLand=await sharp(contour,{raw:{width:w*2,height:h*2,channels:1}}).threshold(128).blur(.55).greyscale().raw().toBuffer();
 const inner=await sharp(smoothLand,{raw:{width:w*2,height:h*2,channels:1}}).erode(4).greyscale().raw().toBuffer();
 await writeAlpha('mythraven-land',smoothLand,0,w*2,h*2);
-await writeAlpha('mythraven-grass-mask',grass,1.1);
 await writeAlpha('mythraven-banks',smoothLand.map((v,i)=>Math.round(Math.max(0,v-inner[i])*.55)),.55,w*2,h*2);
 await sharp(Buffer.from(safeIsland.map(v=>v*255)),{raw:{width:w,height:h,channels:1}}).png().toFile(`${out}/mythraven-navigation.png`);
 
@@ -93,7 +93,6 @@ const roads=[
 ];
 const courts=[
  'M580 103 L649 103 L649 82 L848 82 L848 102 L943 102 L943 157 Q943 180 921 180 L832 180 L832 237 L654 237 L654 177 L598 177 Q577 177 577 157 Z',
- 'M700 417 L798 417 L798 448 L836 448 L853 467 L853 527 L819 545 L798 545 L798 574 L700 574 L700 547 L664 547 L649 528 L649 465 L670 448 L700 448 Z',
  'M358 468 L420 468 L447 489 L447 518 L421 537 L361 537 L336 520 L336 490 Z',
  'M1085 444 L1139 444 L1155 462 L1155 478 L1180 478 L1180 520 L1154 520 L1154 539 L1084 539 L1060 519 L1060 465 Z',
  'M682 704 L787 704 L810 728 L829 741 L829 766 L790 798 L686 798 L649 768 L649 734 Z',
@@ -106,5 +105,42 @@ const courts=[
 ];
 const svg=(content)=>Buffer.from(`<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="0 0 1448 1086">${content}</svg>`);
 await sharp(svg(roads.map(([width,d])=>`<path d="${d}" fill="none" stroke="white" stroke-width="${width}" stroke-linecap="butt" stroke-linejoin="round"/>`).join(''))).png().toFile(`${out}/mythraven-roads.png`);
-await sharp(svg(courts.map(d=>`<path d="${d}" fill="white"/>`).join(''))).png().toFile(`${out}/mythraven-courts.png`);
+// Run granite under the raised coping to cover the full circular opening, even
+// at its projected back edge. The four landings meet the existing brick roads.
+const court=FOUNTAIN_COURT;
+const armLength=court.outerRadius+16;
+const courtRadius=court.outerRadius+7;
+const armHalfWidth=court.passageHalfWidth+2;
+const fountainPaving=`<g fill="white" transform="translate(${court.x} ${court.y})">
+ <ellipse rx="${courtRadius}" ry="${courtRadius*court.depthRatio}"/>
+ <rect x="${-armHalfWidth}" y="${-armLength}" width="${2*armHalfWidth}" height="${2*armLength}"/>
+ <rect x="${-armLength}" y="${-armHalfWidth}" width="${2*armLength}" height="${2*armHalfWidth}"/>
+</g>`;
+const courtShapes=courts.map(d=>`<path d="${d}" fill="white"/>`).join('');
+await sharp(svg(courtShapes+fountainPaving)).png().toFile(`${out}/mythraven-courts.png`);
+// Owner target: grass covers85% of natural land, excluding existing paving.
+// Keep organic openings rather than applying a uniform translucent green wash.
+const roadPixels=await sharp(`${out}/mythraven-roads.png`).ensureAlpha().raw().toBuffer();
+const courtPixels=await sharp(`${out}/mythraven-courts.png`).ensureAlpha().raw().toBuffer();
+const hash=(x,y)=>{let v=Math.imul(x,374761393)^Math.imul(y,668265263)^41017;v=Math.imul(v^(v>>>13),1274126177);return ((v^(v>>>16))>>>0)/4294967295;};
+const smooth=t=>t*t*(3-2*t);
+const noise=(x,y,size)=>{
+ const gx=Math.floor(x/size),gy=Math.floor(y/size),u=smooth(x/size-gx),v=smooth(y/size-gy);
+ return (hash(gx,gy)*(1-u)+hash(gx+1,gy)*u)*(1-v)+(hash(gx,gy+1)*(1-u)+hash(gx+1,gy+1)*u)*v;
+};
+const scores=new Float32Array(n),weights=new Float32Array(n);let naturalArea=0;
+for(let y=0;y<h;y++)for(let x=0;x<w;x++){
+ const i=y*w+x;
+ scores[i]=grass[i]/255*.55+noise(x,y,65)*.32+noise(x,y,19)*.13;
+ weights[i]=land[i]*(1-Math.max(roadPixels[i*4+3],courtPixels[i*4+3])/255);naturalArea+=weights[i];
+}
+const coverage=(value,threshold)=>smooth(Math.max(0,Math.min(1,(value-threshold)/.055+.5)));
+let low=0,high=1;
+for(let step=0;step<24;step++){
+ const threshold=(low+high)/2;let covered=0;
+ for(let i=0;i<n;i++)covered+=weights[i]*coverage(scores[i],threshold);
+ if(covered/naturalArea>.85)low=threshold;else high=threshold;
+}
+for(let i=0;i<n;i++)grass[i]=Math.round(coverage(scores[i],(low+high)/2)*255);
+await writeAlpha('mythraven-grass-mask',grass,1.1);
 console.log(`Capital masks exported ${w}x${h}; safe land and bridges ${safeIsland.reduce((a,b)=>a+b,0)} pixels.`);

@@ -1,4 +1,7 @@
 import { test, expect } from '@playwright/test';
+import { chooseCharacter } from './helpers/character-selection';
+import { openSettings } from './helpers/game-settings';
+test.setTimeout(90000);
 
 test('ASCII account fields reject Thai, paste and IME without silently changing passwords', async ({page}) => {
   await page.goto('/');
@@ -31,6 +34,7 @@ test('ASCII account fields reject Thai, paste and IME without silently changing 
   await password.fill('ไทย');
   await expect(password).toHaveValue('Good!Pass123');
   await page.getByRole('button',{name:'สมัครและเข้าเกม',exact:true}).click();
+  await chooseCharacter(page);
   await expect(page.locator('#game canvas')).toBeVisible();
 });
 
@@ -69,12 +73,15 @@ test('registration, validation, logout, login and saved session', async ({ page 
   await expect(page.getByRole('alert')).toHaveText('Passwords do not match');
   await page.getByLabel('Confirm password',{exact:true}).fill('test-only-pass');
   await page.getByRole('button',{name:'Create account & play'}).click();
+  await chooseCharacter(page);
   await expect(page.locator('#game canvas')).toBeVisible();
   await expect(page.locator('#player-name')).toHaveText('test_adventurer');
   const saved = await page.evaluate(()=>localStorage.getItem('mr.demo.accounts.v1'));
   expect(saved).not.toContain('test-only-pass');
   await page.reload();
+  await chooseCharacter(page);
   await expect(page.locator('#game canvas')).toBeVisible();
+  await openSettings(page);
   await page.getByRole('button',{name:'Leave game'}).click();
   await page.getByRole('button',{name:'Sign in',exact:true}).click();
   await page.getByLabel('Username',{exact:true}).fill('test_adventurer');
@@ -83,7 +90,9 @@ test('registration, validation, logout, login and saved session', async ({ page 
   await expect(page.getByRole('alert')).toHaveText('Incorrect username or password');
   await page.getByLabel('Password',{exact:true}).fill('test-only-pass');
   await page.getByRole('button',{name:'Enter the world'}).click();
+  await chooseCharacter(page);
   await expect(page.locator('#game canvas')).toBeVisible();
+  await openSettings(page);
   await page.getByRole('button',{name:'Leave game'}).click();
   await page.getByRole('button',{name:'Create account',exact:true}).click();
   await page.getByLabel('Username',{exact:true}).fill('test_adventurer');
@@ -98,13 +107,18 @@ test('guest identity survives tab refresh; new login creates a new guest', async
   await page.goto('/');
   await page.selectOption('#language','en');
   await page.getByRole('button',{name:'Play as Guest'}).click();
+  await chooseCharacter(page);
   await expect(page.locator('#game canvas')).toBeVisible();
   const name=await page.locator('#player-name').textContent();
   await page.reload();
+  await chooseCharacter(page);
   await expect(page.locator('#player-name')).toHaveText(name!);
+  await openSettings(page);
   await page.getByRole('button',{name:'Leave game'}).click();
   await page.getByRole('button',{name:'Play as Guest'}).click();
+  await chooseCharacter(page);
   await expect(page.locator('#player-name')).not.toHaveText(name!);
+  await openSettings(page);
   await page.getByRole('button',{name:'Leave game'}).click();
   await page.selectOption('#language','th');
   await page.reload();
@@ -158,11 +172,14 @@ test('configured Google button forwards a credential and uses the server identit
   await page.goto('/');
   await page.selectOption('#language','en');
   await page.getByRole('button',{name:'Test Google chooser'}).click();
+  await chooseCharacter(page);
   await expect(page.locator('#game canvas')).toBeVisible();
   await expect(page.locator('#player-name')).toHaveText('Verified <player>');
   expect(await page.evaluate(()=>JSON.stringify(localStorage))).not.toContain('signed-test-credential');
   await page.reload();
+  await chooseCharacter(page);
   await expect(page.locator('#player-name')).toHaveText('Verified <player>');
+  await openSettings(page);
   await page.getByRole('button',{name:'Leave game'}).click();
   await expect(page.locator('#auth-form')).toBeVisible();
   expect(signedIn).toBe(false);
