@@ -1,6 +1,8 @@
 import * as THREE from 'three';
 import { TERRAIN, type TerrainData } from './terrain-data';
 import { createGroundMaterial, createRiverMaterial, terrainGrassCoverage, type TerrainTiles } from './terrain-materials';
+import {createCityLayout,roadDistance} from '../../shared/city-layout.mjs';
+import {trailZ} from '../../shared/west-march.mjs';
 
 export function createTerrain(data: TerrainData, tiles: TerrainTiles): THREE.Group {
   const group = new THREE.Group();
@@ -13,10 +15,25 @@ export function createTerrain(data: TerrainData, tiles: TerrainTiles): THREE.Gro
   const grass = terrainGrassCoverage(data);
   geometry.setAttribute('grassWeight', new THREE.BufferAttribute(grass.weights, 1));
   geometry.setAttribute('shoreDistance', new THREE.BufferAttribute(data.shoreDistance, 1));
+  const city=createCityLayout(data),paving=new Float32Array(positions.count*2);
+  for(let i=0;i<positions.count;i++){
+    const x=positions.getX(i),z=positions.getZ(i);
+    if (data.area === 'west-march') {
+      grass.weights[i] *= THREE.MathUtils.smoothstep(Math.abs(z-trailZ(x)), 2, 5);
+      paving[i*2] = 10;
+      continue;
+    }
+    const gap=Math.min((Math.abs(x)+Math.abs(z)-city.plaza.radius)/Math.SQRT2,...city.roads.map(r=>roadDistance(r,x,z)));
+    // Interpolate signed distance, not already-clamped coverage; otherwise the
+    // 1.3m terrain grid leaves saw teeth along diagonal streets and plaza edges.
+    paving[i*2]=data.shoreDistance[i]>3?gap:10;
+  }
+  geometry.setAttribute('cityPaving',new THREE.BufferAttribute(paving,2));
   geometry.computeVertexNormals();
   geometry.computeBoundingSphere();
   const material = createGroundMaterial(tiles);
   const land = new THREE.Mesh(geometry, material);
+  land.castShadow = true; land.receiveShadow = true;
   land.name = 'continuous-terrain';
   land.userData.grassCoverage = grass.coverage;
   group.add(land);
@@ -52,5 +69,6 @@ export function createWater(data: TerrainData): { mesh: THREE.Mesh; update: (tim
   const water = createRiverMaterial(data);
   const mesh = new THREE.Mesh(geometry, water.material);
   mesh.name = 'river-water'; mesh.position.y = TERRAIN.waterLevel;
+  mesh.receiveShadow = true;
   return { mesh, update: water.update };
 }

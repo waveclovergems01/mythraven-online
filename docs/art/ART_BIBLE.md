@@ -1,5 +1,23 @@
 # Mythraven Art Bible
 
+Current plaza fountain revision: place the 9-unit source model at 2.5 uniform scale (22.5 high, about 38.4 across). Its circular collision and plaza inlay follow the enlarged footprint. Clear sea-blue water shows the stone beneath. Shallow traveling waves and ripples from the urn impact deform the surface, replacing the earlier bright caustic spots and separate ripple rings.
+
+> Owner angel-fountain follow-up, 2026-11-15: the supplied winged-statue fountain fills the former central reserve. Preserve its proportions, painted PBR and exact paired emissive texture. Add subdued blue-green water confined to the modeled basin, one curved urn-to-basin stream and gentle impact ripples. Respect scene day/night light and reduced motion. This supersedes the earlier empty-center instruction below.
+
+> Owner city-building placement, 2026-11-15: the stored red-spired castle belongs on the north plot behind the river; a fourth bridge connects it to the city. Retain supplied models/maps and uniform proportions, arrange houses and market shops in neighbourhoods, and reserve the diamond plaza center for a later fountain. A new soft painted cobblestone albedo covers streets and bridge approaches; no stretched bridge-atlas pavement. Original emissive pairs are bound to their own material and remain restrained by day, stronger at night. See ASSET_SPEC.md for mappings.
+
+> Owner follow-up, 2026-11-15: soft toon-like runtime shading for 3D trees, architecture and terrain, preserving supplied painted maps and day/night shadows. Use broad soft light bands and restrained specular/normal detail. Foliage moves gently in intermittent wind; roots and collision remain static. Gate scale increases uniformly to 1.85 XYZ; recompute adjoining wall placement. This supersedes static foliage and the earlier 1.35 gate size, not the supplied source proportions.
+
+> Owner architectural proportion correction, 2026-11-15: use uniform XYZ scale on complete gates, walls, towers and bridge arches. Fit spans with repeated whole modules and align/overlap masonry joints. Do not stretch length, flatten height or thin depth to fit the terrain. Source model proportions remain authoritative.
+
+> Owner architecture, 2026-11-14: five supplied PBR models authorize the 3D city's enclosing walls, open gates, roofed towers and three arched bridges. Preserve original maps/material colors; scale for the 2.8-unit player, retain physically open doorways and stone bridge decks. See ART_STYLE.md and ASSET_SPEC.md. No raster generation or legacy 2D replacement.
+
+> Owner PBR replacement, 2026-11-14: matching supplied PBR GLBs replace the overbright shaded tree models. Preserve their original color/normal/metallic-roughness maps and let world lighting shade them without emission. Remove the generated riverside prototype oak. Denser woodland is concentrated outside the river, with a closer inner-city belt. This supersedes the shaded-tree material contract below.
+
+> Owner trees, 2026-11-14: integrate the supplied broadleaf oak, conifer and coconut palm in the marked inner city perimeter and outer river land. Original baked materials define their appearance. Fixed seeded yaw and modest scale variation avoid a grid; static shared placements, trunk collision, shadows and player-occlusion fading apply. See ART_STYLE.md and ASSET_SPEC.md. This is a scoped 3D prop exception, not a change to legacy 2D art.
+
+> 2026-11-14 city lighting exception: the owner requests centered front/screen-side sunlight and rear/screen-up shadows. Use moving geometry shadows for current 3D characters/props/terrain, retaining source painted colors. This supersedes the former static oak-area shadow and upper-left light for this 3D view only.
+
 > 2026-11-14 grass follow-up: authorized replacement fine-blade grass reduces the repeated dark/light clumps visible as a checkerboard. Keep the painted green palette, low ground contrast, fixed orientation and 32-unit repetition span. This is a scoped ground candidate integration, not a new project-wide master.
 
 > 2026-11-14 ground correction: the owner requests ordinary straight texture tiling instead of randomly rotated overlapping patches. Preserve the supplied paintings and soft grass/soil region transitions; use one fixed orientation across the terrain. No new artwork or image edits.

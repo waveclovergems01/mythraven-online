@@ -1,0 +1,10 @@
+import type { TerrainData } from './terrain-data.mjs';
+import type { GroundPoint } from './terrain-movement.mjs';
+export type Area = 'city' | 'west-march';
+export const FIELD_PORTAL: GroundPoint, FIELD_ARRIVAL: GroundPoint, PORTAL_RADIUS: number;
+export const FIELD_LIMIT: number;
+export const FIELD_CROSSINGS: (GroundPoint & {id:string;axis:'x'|'z'})[];
+export function trailZ(x: number): number;
+export function mapPortal(data: TerrainData): GroundPoint;
+export function cityArrival(data: TerrainData): GroundPoint;
+export function buildWestMarch(): TerrainData;

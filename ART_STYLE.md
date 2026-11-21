@@ -1,5 +1,54 @@
 # ART_STYLE.md — Asset Style Guide & Generation Template
 
+## Modular male character kit · 2026-11-21
+
+The owner-supplied hairless Novice, Warrior and Archer bodies now use the same two male hairstyles. Runtime GLBs are grouped under `public/assets/models/characters/{bodies,hair,weapons}`. The preview supports Novice with a dagger, Warrior with a longsword or dagger, and Archer with a bow. Bodies retain their own animation clips. Hair and weapons carry only their weighted joint palette and no duplicate clips. The slow-stride preview plays the authored run at 55% cadence. Equipment and attacks are preview controls. This replaces the four previous class-specific body/hair files and their two extraction scripts.
+
+West March uses the owner's supplied meadow rabbit and wolf cub GLBs in `public/assets/models/monsters`. The peaceful field reuses the city's painted terrain, trees and daylight. Rabbits hop, stand and nibble. Wolves idle and run.
+
+Owner-supplied merchant NPC: Elra (เอลรา), provisioner at the southeast market stall. The supplied npc1-female1.glb defines her appearance and is stored as public/assets/models/npcs/elra-provisions.glb. Use n_idle for standing, n_idle_call sparingly, and n_idle_welcome for greeting an arriving customer.
+
+
+Plaza paving uses continuous cobblestone up to the fountain base and through road junctions. The circle and diamond line overlays are retired. Local cloth masks in flag-panels.json identify free pennants and hanging banners on the city architecture. Their moving vertices and shadow pass share one wind phase per world location. Poles and attachment edges stay fixed.
+
+Current plaza fountain revision: place the 9-unit source model at 2.5 uniform scale (22.5 high, about 38.4 across). Its circular collision and plaza inlay follow the enlarged footprint. Clear sea-blue water shows the stone beneath. Shallow traveling waves and ripples from the urn impact deform the surface, replacing the earlier bright caustic spots and separate ripple rings.
+
+## Owner angel fountain and water — 2026-11-15
+
+The owner supplies model c4c8b10a-2411-46b7-9b6d-07671fa66356 with its matching emissive PNG and authorizes it in the previously reserved plaza center. Runtime name: plaza-angel-fountain.glb, uniform normalized height 9. This supersedes the earlier no-fountain stage below. Add water only inside the real basin, leaving the central statue pedestal dry; a single curved stream falls from the tilted urn mouth into the basin, with gentle moving surface highlights and impact ripples. Use code-native geometry/material animation, preserve the owner's model and texture bytes. No new raster generation or broader style approval.
+
+## Owner city buildings and streets — 2026-11-15
+
+Owner now authorizes placement of the stored nine models: the red-spired castle occupies the northern river-separated plot, with a northern bridge; houses and market buildings form neighbourhoods inside the city. A diamond stone plaza reserves its center for a future fountain. Preserve uniform XYZ proportions and the owner's PBR maps; pair each separately supplied emissive texture with its own model. This supersedes the storage-only instruction below. Active importer inputs remain in `assets/pending/buildings`; runtime exports and measured roles are in `shared/building-assets.json`.
+
+New road candidate `painted-city-stone-v001.png` is soft painted warm-grey cobblestone, generated using the available built-in image tool with an actual rendered contact sheet of the nine owner models as palette/style reference. Use it for terrain roads/plaza and bridge approaches, replacing reuse of bridge deck geometry/UVs on streets. Keep the complete bridges' original textures. No fountain model or interior scene is authorized/created in this pass.
+
+## Owner building intake — 2026-11-15 (historical storage stage)
+
+Original storage-only stage: byte-identical GLBs and paired emissive PNGs were retained under `assets/pending/buildings/`, outside public runtime assets. Its provisional names and manifest preserve source identity. The newer placement request above activates these assets; the maintained importer consumes these originals for uniform normalized exports. See the intake README for the current inventory.
+
+## Owner soft toon lighting and living foliage — 2026-11-15
+
+The owner requests softer toon-like runtime shading to unify bright/dark PBR assets and subtle intermittent leaf motion. Apply broad softly blended light bands to city trees, architecture and painted terrain; retain original texture colors, actual day/night lighting and shadows. Reduce specular glare and normal-map harshness. Original GLBs/images are unchanged; this is a scoped 3D runtime treatment, not a new 2D art master. Tree roots/placements remain fixed, crown motion is gentle with differing wind phases, and shadow deformation matches the visible foliage. Enlarge all three gates uniformly again (1.85 XYZ) and refit adjoining walls, tree clearances and shared collision.
+
+## Owner city fortifications — 2026-11-14
+
+Owner correction 2026-11-15: preserve each supplied model's aspect ratio with equal X/Y/Z scale. Fit the enclosure by positioning/repeating complete wall and bridge modules, never by stretching one axis. Join wall masonry to the gate's actual side wings with overlap; no open seams between modules.
+
+Owner supplies five PBR GLBs for a large city enclosure: an open gate, two wall styles, a roofed watchtower and an arched stone bridge. Preserve their supplied geometry/textures as the scoped 3D architectural appearance authority. Use a river-following inner wall, large walk-through gates and river crossings west/east/south; shared collision must block solid masonry while leaving actual door openings and bridge decks walkable. Keep gate/bridge approaches clear of trees. No generated artwork or project-wide style approval is implied. Asset mappings and measured dimensions are in ASSET_SPEC.md.
+
+## Owner city tree models — 2026-11-14
+
+Owner size follow-up: enlarge all three species relative to the character, especially coconut palms, with fixed randomized smaller/larger trees mixed throughout the existing groves. Preserve each model's proportions with uniform scaling. Runtime height ranges and shared collision scaling are recorded in ASSET_SPEC.md.
+
+Owner follow-up supersedes the shaded import below: replace all three runtime tree files with the matching `base_basic_pbr(4).glb`, `base_basic_pbr.glb`, `base_basic_pbr(1).glb` sources. Preserve their base-color, normal and metallic/roughness maps; use real scene lighting with no added emission. Remove the earlier generated riverside review oak, its exporter and leaf source. Increase planting density, mainly on outer land, and bring the inner belt nearer the bank. The original shaded export details below are historical, not active appearance instructions.
+
+The owner supplies three static GLBs and requests planting along the marked city-ring and outer-river areas. Their actual modeled appearance and baked color textures are the authority for this scoped 3D prop import. Map `base_basic_shaded(4).glb` to `tree-oak-green.glb`, `base_basic_shaded.glb` to `tree-pine-green.glb`, and `base_basic_shaded(1).glb` to `tree-coconut-palm.glb`. Rename internal nodes/materials consistently, normalize root pivot and metre scale, preserve embedded texture bytes. Use irregular seeded placement with fixed randomized yaw, never continuous spinning. These extend the prior one-oak exception; existing active 2D props and the original single riverside review oak retain their status. No generated art or broader art-master approval is implied.
+
+## City sunlight and moving shadows — 2026-11-14
+
+Owner requests centered sunlight from the screen/camera side, with shadows extending behind characters. The default 3D city uses a +Z-side directional light, offset (0, 80, 160) from its target, casting toward world -Z / screen-up. This overrides the earlier upper-left/oak-only light for the current city. Novice, Warrior, both hairstyles, the oak, standing grass and terrain participate in real moving shadows; ground and water receive them. Preserve painted source textures and the existing fixed camera. No new raster asset or legacy 2D lighting change.
+
 ## CHAR-WARRIOR-3D — owner models, 2026-11-13
 
 Owner supplies `m1-warrior1.glb` and `m1-warrior2.glb` to extend the character picker with two male Warrior hairstyles. Their modeled appearance, original embedded materials and `n_war_idle` / `n_war_run` clips are the authority for this scoped import. Preserve the first full model byte-for-byte, extract the second hair without repainting, and reuse the verified matching Warrior rig/clips. Do not substitute Novice animation or assume cross-class retargeting. Both classes coexist in the 3D city; active 2D art remains unchanged. Runtime files: `public/assets/models/characters/m1-warrior1.glb` and `warrior-hair-02.glb`. No generated art or broader class/style approval is implied.
@@ -11,6 +60,8 @@ Owner extension: add the second hairstyle supplied in `m1-novice2.glb`. Its hair
 Owner explicitly supplies `m1-novice.glb` and requests it replace the temporary capsules in the default 3D city, for both local and remote players. This scoped character exception authorizes the supplied modeled appearance, embedded materials and `n_idle` / `n_run` animations. Preserve the original GLB bytes at `public/assets/models/characters/m1-novice.glb`; no generated/repainted character art or universal rig compatibility is claimed. Display at the prior 2.8-unit standing height, with independent player poses, shared immutable assets, skinned hover/selection outlines and existing click-to-approach behavior. Legacy 2D atlases stay active and unchanged. This is an owner-requested integration for review, not approval of every future 3D class or a project-wide style change. See ASSET_SPEC.md and docs/TERRAIN_3D.md.
 
 ## BG-TERRAIN-PAINTED — owner textures, 2026-11-13
+
+Owner scale correction 2026-11-14: grass is accepted at its current size. Earth brushwork and pebbles look oversized beside the avatar; sample only the earth texture at an 8-unit span instead of 32 (one quarter the linear feature size). Grass and worn-grass remain at 32; preserve land coverage, colors and clearing shape. This supersedes the shared 32-unit scale for soil.
 
 2026-11-14 follow-up: the owner reports visible checker-like repetition and authorizes a larger scale or replacement texture. Replace the repeated leaf-clump green/dry grass with the low-contrast fine-blade candidate `painted-grass-v002.png`. Keep fixed orientation; full images repeat every 32 world units (twice the former span). Dry regions tint the same fine-blade grass, rather than sampling the old repeated clump image. Confine the existing grass/earth painting to worn margins. No random rotation or overlapping tile copies.
 

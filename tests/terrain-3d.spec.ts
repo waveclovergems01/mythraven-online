@@ -2,7 +2,7 @@ import { chooseCharacter } from './helpers/character-selection';
 import { openSettings, closeSettings } from './helpers/game-settings';
 import { test, expect } from '@playwright/test';
 
-test('novice appears at login, walks on left click and keeps a fixed follow camera', async ({ page }) => {
+test('novice appears at login, walks on left click and follows with a resettable orbit camera', async ({ page }) => {
   test.setTimeout(90000);
   const errors: string[] = [];
   page.on('pageerror', error => errors.push(error.message));
@@ -43,14 +43,18 @@ test('novice appears at login, walks on left click and keeps a fixed follow came
   expect(arrived.camera[0] - start.camera[0]).toBeCloseTo(arrived.player.x - start.player.x, 5);
   await page.screenshot({ path: 'test-results/terrain-3d/player-walk.png' });
 
-  // Right-click, right drags, wheel and arrows do not pan or rotate the view.
+  // Right drag orbits without issuing movement. Reset restores the walking view.
   await page.mouse.click(900, 420, { button: 'right' });
   for (const button of ['right'] as const) {
     await page.mouse.move(650, 500); await page.mouse.down({ button });
     await page.mouse.move(900, 650, { steps: 10 }); await page.mouse.up({ button });
   }
   await page.mouse.wheel(0, -500); await page.keyboard.press('ArrowLeft'); await page.waitForTimeout(250);
-  expect(await inspect()).toEqual(arrived);
+  const orbited = await inspect();
+  expect(orbited.player).toEqual(arrived.player); expect(orbited.moving).toBe(false);
+  expect(orbited.orbit.yaw).not.toBe(arrived.orbit.yaw);
+  expect(orbited.orbit.clearance).toBeGreaterThanOrEqual(2);
+  await openSettings(page); await page.locator('#reset-camera').click(); await closeSettings(page);
 
   // A fresh click replaces a route that is still in progress.
   await page.mouse.click(1000, 500); await expect.poll(async () => (await inspect()).moving).toBe(true);

@@ -13,6 +13,13 @@
 .character-filters button[aria-pressed="true"] { color: #f2d69b; background: #405140; }
 .character-availability { font-size: 12px; color: #9bac9e; margin: 14px 2px 20px; }
 .character-cards { border: 0; margin: 0; padding: 0; display: grid; gap: 14px; }
+.class-hairstyles { border:0; padding:0; margin:0; display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+.class-hairstyles[hidden] {display:none}
+.class-hairstyles legend { padding:0 0 6px; color:#dfc68d; }
+.class-hairstyles .character-card {padding:12px;gap:6px}
+.preview-controls {max-width:1120px;margin:14px auto;display:flex;justify-content:flex-end;flex-wrap:wrap;gap:12px}
+.preview-controls label {display:flex;align-items:center;gap:8px;font-size:14px;color:#c8d1c3}
+.preview-controls select {padding:6px 10px;border:1px solid #738267;background:#243a31;color:#f1e4c2;border-radius:5px;font:inherit}
 .character-card { position: relative; display: flex; align-items: center; gap: 18px; padding: 22px 18px; border: 1px solid #73826770; border-radius: 9px; background: #152823c9; cursor: pointer; }
 .character-card[hidden] { display: none; }
 .character-card:hover { border-color: #cbb47e; background: #263b2f; }

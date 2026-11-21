@@ -16,6 +16,7 @@ const shoreline=await sharp(fileURLToPath(new URL('../public/assets/maps/mythrav
 const terrainData=buildTerrainData({data:shoreline.data,width:shoreline.info.width,height:shoreline.info.height});
 configureTerrainWorld(terrainData);
 server.define('mythraven-world',TerrainRoom);
+server.define('mythraven-west-march',TerrainRoom);
 const port=localPorts(process.env).game;
 await server.listen(port,'127.0.0.1');
 console.log(`Colyseus local game server: ws://127.0.0.1:${port}`);

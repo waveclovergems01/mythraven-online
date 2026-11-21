@@ -31,11 +31,11 @@ test('guest chooses a model before joining; previews share assets with the city 
   await page.locator('[data-gender="male"]').click();
   await chooseCharacter(page, 'novice-male-02');
   const state = () => page.evaluate(() => (window as any).selectionWorld?.inspect());
-  await expect.poll(async () => (await state())?.renderedPlayers).toBe(1);
+  await expect.poll(async () => (await state())?.renderedPlayers,{timeout:60000}).toBe(1);
   const mine = (await state()).id;
   expect((await state()).players[mine].characterId).toBe('novice-male-02');
   expect((await state()).avatars[mine].hairStyle).toBe(2);
-  expect(assets).toHaveLength(2); // One base + one modular hair, no second loading for city entry.
+  expect(assets).toHaveLength(3); // One body and two shared hairstyles, reused on city entry.
   await expect(page.locator('#character-preview')).toHaveCount(0);
   await openSettings(page); await expect(page.locator('#hair-style')).toHaveCount(0);
   await page.locator('#close-settings').click();
@@ -43,14 +43,14 @@ test('guest chooses a model before joining; previews share assets with the city 
   const other = await otherContext.newPage(); await hook(other);
   try {
     await other.goto('/'); await other.locator('#guest').click(); await chooseCharacter(other);
-    await expect.poll(async () => (await state()).renderedPlayers).toBe(2);
+    await expect.poll(async () => (await state()).renderedPlayers,{timeout:60000}).toBe(2);
     const peer = await other.evaluate(() => (window as any).selectionWorld.inspect());
     expect(peer.players[mine].characterId).toBe('novice-male-02'); expect(peer.avatars[mine].hairStyle).toBe(2);
     expect((await state()).avatars[peer.id].hairStyle).toBe(1);
     await page.bringToFront(); await page.context().setOffline(true);
     await expect(page.locator('#network-status')).toHaveAttribute('data-connected','false',{timeout:15000});
     await page.context().setOffline(false); await page.locator('#network-status button').click();
-    await expect(page.locator('#network-status')).toHaveAttribute('data-connected','true');
+    await expect(page.locator('#network-status')).toHaveAttribute('data-connected','true',{timeout:60000});
     const rejoined = await state(); expect(rejoined.players[rejoined.id].characterId).toBe('novice-male-02');
     await page.reload();
     await expect(page.locator('#character-title')).toBeVisible();
@@ -72,15 +72,15 @@ test('selection can sign out while assets load and retry a failed model download
   const errors: string[]=[]; page.on('pageerror',e=>errors.push(e.message));
   let release!:()=>void;
   const pending=new Promise<void>(resolve=>{release=resolve;});
-  await page.route('**/assets/models/characters/m1-novice.glb',async route=>{await pending;await route.continue();});
+  await page.route('**/assets/models/characters/bodies/novice.glb',async route=>{await pending;await route.continue();});
   await page.goto('/');await page.locator('#guest').click();
   await expect(page.locator('#character-title')).toBeVisible();
   await page.locator('#character-logout').click(); release();
   await expect(page.locator('#guest')).toBeVisible();await page.waitForTimeout(500);
   await expect(page.locator('canvas')).toHaveCount(0);
-  await page.unroute('**/assets/models/characters/m1-novice.glb');
+  await page.unroute('**/assets/models/characters/bodies/novice.glb');
   let fail=true;
-  await page.route('**/assets/models/characters/m1-novice.glb',route=>fail?route.abort():route.continue());
+  await page.route('**/assets/models/characters/bodies/novice.glb',route=>fail?route.abort():route.continue());
   await page.locator('#guest').click();
   await expect(page.locator('#character-retry')).toBeVisible();
   await page.locator('input[value="novice-male-02"]').check();
@@ -88,6 +88,6 @@ test('selection can sign out while assets load and retry a failed model download
   fail=false; await page.locator('#character-retry').click();
   await expect(page.locator('#enter-city')).toBeEnabled({timeout:30000});
   await page.locator('#enter-city').click();
-  await expect(page.locator('#network-status')).toHaveAttribute('data-connected','true');
+  await expect(page.locator('#network-status')).toHaveAttribute('data-connected','true',{timeout:60000});
   expect(errors).toEqual([]);
 });

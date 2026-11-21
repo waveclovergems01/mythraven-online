@@ -1,21 +1,21 @@
 import { chooseCharacter } from './helpers/character-selection';
 import { test, expect } from '@playwright/test';
 import { Client } from '@colyseus/sdk';
-import { openSettings, closeSettings } from './helpers/game-settings';
+import { openSettings, setWheelZoom } from './helpers/game-settings';
 
 test('owner novice plays independent idle/run poses, picks skinned silhouettes and survives reentry', async ({ page }) => {
   test.setTimeout(120000);
   const errors: string[] = [], requests: string[] = [];
   page.on('pageerror', e => errors.push(e.message));
   page.on('console', m => { if (/error|warning/.test(m.type()) && /THREE|WebGL|shader|PropertyBinding/i.test(m.text())) errors.push(m.text()); });
-  page.on('request', r => { if (r.url().includes('/characters/m1-novice.glb')) requests.push(r.url()); });
+  page.on('request', r => { if (r.url().includes('/characters/bodies/novice.glb')) requests.push(r.url()); });
   await page.route('**/src/terrain/TerrainWorld.ts*', async route => {
     const response = await route.fetch();
     await route.fulfill({ response, body: await response.text() + '\nconst mountNoviceTest=mountTerrainWorld;mountTerrainWorld=async(...args)=>{const w=await mountNoviceTest(...args);window.noviceWorld=w;return w;};' });
   });
-  await page.route('**/src/terrain/novice-player.ts*', async route => {
+  await page.route('**/src/terrain/skinned-player.ts*', async route => {
     const response = await route.fetch();
-    await route.fulfill({ response, body: await response.text() + '\nconst loadNoviceTest=loadNovicePlayers;loadNovicePlayers=async()=>{const factory=await loadNoviceTest();window.noviceInstances=[];const create=factory.create;factory.create=(...args)=>{const avatar=create(...args);window.noviceInstances.push(avatar);return avatar;};return factory;};' });
+    await route.fulfill({ response, body: await response.text() + '\nconst loadNoviceTest=loadSkinnedPlayers;loadSkinnedPlayers=async(...args)=>{const factory=await loadNoviceTest(...args);window.noviceInstances=[];const create=factory.create;factory.create=(...args)=>{const avatar=create(...args);window.noviceInstances.push(avatar);return avatar;};return factory;};' });
   });
   await page.setViewportSize({ width: 1440, height: 960 });
   await page.goto('/'); await page.locator('#guest').click(); await chooseCharacter(page);
@@ -30,7 +30,7 @@ test('owner novice plays independent idle/run poses, picks skinned silhouettes a
   });
   const initialPose = await pose();
   await page.waitForTimeout(300); expect(await pose()).not.toEqual(initialPose);
-  await openSettings(page); await page.locator('#camera-zoom').fill('200'); await closeSettings(page);
+  await setWheelZoom(page,200);
   await page.screenshot({ path: 'test-results/terrain-novice/idle.png' });
   const label = (await page.locator(`.world-player-name[data-player-id="${own}"]`).boundingBox())!;
   await page.mouse.move(label.x + label.width / 2, label.y + label.height + 45);
@@ -50,7 +50,7 @@ test('owner novice plays independent idle/run poses, picks skinned silhouettes a
         palettesPerAvatar: meshes.map((parts: any[]) => new Set(parts.map(p => p.skeleton)).size),
         independentBones: meshes[0][0].skeleton.bones[0] !== meshes[1][0].skeleton.bones[0] };
     });
-    expect(ownership).toEqual({ sharedGeometry: true, sharedMaterial: true, palettesPerAvatar: [1, 1], independentBones: true });
+    expect(ownership).toEqual({ sharedGeometry: true, sharedMaterial: true, palettesPerAvatar: [3, 3], independentBones: true });
     await page.mouse.click(1150, 280);
     await expect.poll(async () => (await state()).avatars[own].clip).toBe('n_run');
     expect((await state()).avatars[remote.sessionId].clip).toBe('n_idle');

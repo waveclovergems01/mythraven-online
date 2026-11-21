@@ -1,10 +1,11 @@
 import * as THREE from 'three';
 import { TERRAIN, smoothstep, type TerrainData } from './terrain-data';
+import { softenPaintedLighting } from './painted-lighting';
 
 /** Painted ground assets; sampling scales are world metres. */
 export async function loadTerrainTiles() {
   const loader = new THREE.TextureLoader();
-  const loaded = await Promise.allSettled(['painted-grass-v002', 'painted-earth-v001', 'painted-grass-earth-v001'].map(name =>
+  const loaded = await Promise.allSettled(['painted-grass-v002', 'painted-earth-v001', 'painted-grass-earth-v001','painted-city-stone-v001'].map(name =>
     loader.loadAsync(`/assets/tiles/terrain/${name}.png`)));
   if (loaded.some(result => result.status === 'rejected')) {
     loaded.forEach(result => { if (result.status === 'fulfilled') result.value.dispose(); });
@@ -16,7 +17,7 @@ export async function loadTerrainTiles() {
     texture.colorSpace = THREE.SRGBColorSpace;
     texture.anisotropy = 4;
   }
-  return { grass: textures[0], dirt: textures[1], grassEarth: textures[2],
+  return { grass: textures[0], dirt: textures[1], grassEarth: textures[2], cityStone:textures[3],
     dispose: () => textures.forEach(t => t.dispose()) };
 }
 export type TerrainTiles = Awaited<ReturnType<typeof loadTerrainTiles>>;
@@ -78,11 +79,16 @@ vec3 surfaceRelief(vec3 p, vec3 n, float height) {
 
 export function createGroundMaterial(tiles: TerrainTiles) {
   const material = new THREE.MeshStandardMaterial({ roughness: .95 });
-  material.customProgramCacheKey = () => 'terrain-painted-lawn-v4';
+  material.customProgramCacheKey = () => 'terrain-painted-city-paving-v7';
   material.onBeforeCompile = shader => {
+    softenPaintedLighting(shader);
     shader.uniforms.grassTile = { value: tiles.grass };
     shader.uniforms.dirtTile = { value: tiles.dirt };
     shader.uniforms.grassEarthTile = { value: tiles.grassEarth };
+    shader.uniforms.cityStoneTile = {value:tiles.cityStone};
+    shader.vertexShader='attribute vec2 cityPaving; varying vec2 paved;\n'+shader.vertexShader;
+    shader.vertexShader=shader.vertexShader.replace('#include <begin_vertex>','#include <begin_vertex>\npaved=cityPaving;');
+    shader.fragmentShader='uniform sampler2D cityStoneTile; varying vec2 paved;\n'+shader.fragmentShader;
     shader.vertexShader = 'attribute float grassWeight; attribute float shoreDistance; varying vec3 groundPoint; varying vec2 groundBlend;\n' + shader.vertexShader;
     shader.vertexShader = shader.vertexShader.replace('#include <begin_vertex>',
       '#include <begin_vertex>\ngroundPoint=position; groundBlend=vec2(grassWeight,shoreDistance);');
@@ -92,14 +98,15 @@ export function createGroundMaterial(tiles: TerrainTiles) {
       vec2 p=groundPoint.xz;
       float fringe=terrainNoise(p*1.6)-.5;
       float grass=clamp(groundBlend.x+fringe*.18*4.0*groundBlend.x*(1.0-groundBlend.x),0.0,1.0);
-      // One complete painted tile every 32 world units, with a fixed orientation.
+      // Grass keeps its accepted 32-unit span; soil detail uses a separate scale.
       // Blend material regions only; never rotate or overlap copies of a tile.
       vec2 tileUv=p/32.0;
       vec3 green=texture2D(grassTile,tileUv).rgb;
       // Dry grass uses the same fine blades, so the old clump grid cannot return.
       vec3 dryGrass=green*vec3(1.55,1.06,.72);
       vec3 wornGrass=texture2D(grassEarthTile,tileUv).rgb;
-      vec3 earth=texture2D(dirtTile,tileUv).rgb;
+      // Pebbles and soil brushwork are one quarter of their former linear size.
+      vec3 earth=texture2D(dirtTile,p/8.0).rgb;
       vec2 climate=p+vec2(terrainNoise(p*.017+21.0),terrainNoise(p*.017-13.0))*18.0;
       float dryPatch=smoothstep(.50,.83,terrainNoise(climate*.037+29.0))*.65;
       float wornPatch=smoothstep(.52,.80,terrainNoise(climate*.051-17.0))*.08;
@@ -112,6 +119,8 @@ export function createGroundMaterial(tiles: TerrainTiles) {
       vec3 bankSoil=earth*mix(.25,.56,smoothstep(-1.5,3.8,groundPoint.y));
       soil=mix(soil,bankSoil,bank);
       diffuseColor.rgb=mix(soil,lawn,grass);
+      vec3 cityStone=texture2D(cityStoneTile,p/8.0).rgb*.78;
+      diffuseColor.rgb=mix(diffuseColor.rgb,cityStone,1.-smoothstep(-.18,.22,paved.x));
       // Keep the supplied brushwork readable without the former noisy raised rings.
       float relief=dot(mix(earth,green,grass),vec3(.3,.6,.1))*.008;
     `);

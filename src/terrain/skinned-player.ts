@@ -1,146 +1,108 @@
 import * as THREE from 'three';
-import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
-import { clone } from 'three/addons/utils/SkeletonUtils.js';
-import { speedMultiplier, DEFAULT_SPEED_LEVEL } from '../../shared/terrain-movement.mjs';
+import type {GLTF} from 'three/addons/loaders/GLTFLoader.js';
+import {clone} from 'three/addons/utils/SkeletonUtils.js';
+import {speedMultiplier, DEFAULT_SPEED_LEVEL} from '../../shared/terrain-movement.mjs';
+import type {PlayerLibrary} from './player-library';
 
-export interface PlayerAssetDefinition {
-  model: string; url: string; hairUrl: string; hairNode: string; hairMaterial: string;
-  idle: string; run: string;
-}
-const HEIGHT = 2.8;
+export const equipment = {
+  novice: ['dagger'], warrior: ['longsword','dagger'], archer: ['bow'],
+} as const;
+export type PlayerClass = keyof typeof equipment;
+export type Weapon = typeof equipment[PlayerClass][number];
+export type PreviewMotion = 'idle'|'slow'|'run'|'attack';
+const attacks:Record<Weapon,string>={dagger:'n_dagger_attack1',longsword:'n_sword_attack1',bow:'n_bow_attack'};
 
-/** One asset per world; geometry, materials and clips are shared, poses never are. */
-export async function loadSkinnedPlayers(definition: PlayerAssetDefinition) {
-  const gltf = await new GLTFLoader().loadAsync(definition.url);
-  const geometries = new Set<THREE.BufferGeometry>();
-  const materials = new Set<THREE.Material>();
-  const textures = new Set<THREE.Texture>();
-  const sourceSkeletons = new Set<THREE.Skeleton>();
-  const collectResources = (scene: THREE.Object3D) => scene.traverse(object => {
-    if (!(object instanceof THREE.Mesh)) return;
-    geometries.add(object.geometry);
-    for (const material of Array.isArray(object.material) ? object.material : [object.material]) {
-      materials.add(material);
-      for (const value of Object.values(material)) if (value instanceof THREE.Texture) textures.add(value);
-    }
-    object.userData.playerSurface = true;
-    if (object instanceof THREE.SkinnedMesh) sourceSkeletons.add(object.skeleton);
-  });
-  collectResources(gltf.scene);
-  let disposed = false;
-  const dispose = () => {
-    if (disposed) return; disposed = true;
-    geometries.forEach(g => g.dispose()); materials.forEach(m => m.dispose());
-    textures.forEach(t => { t.dispose(); if (typeof ImageBitmap !== 'undefined' && t.image instanceof ImageBitmap) t.image.close(); });
-    sourceSkeletons.forEach(s => s.dispose());
-  };
-  let hairAsset;
-  try { hairAsset = await new GLTFLoader().loadAsync(definition.hairUrl); }
-  catch (error) { dispose(); throw error; }
-  collectResources(hairAsset.scene);
-  const newHair = hairAsset.scene.getObjectByName(definition.hairNode);
-  let oldHair: THREE.SkinnedMesh | undefined;
-  gltf.scene.traverse(object => {
-    if (object instanceof THREE.SkinnedMesh && !Array.isArray(object.material) && object.material.name === definition.hairMaterial) {
-      oldHair = object; object.userData.hairStyle = 1;
-    }
-  });
-  if (!(newHair instanceof THREE.SkinnedMesh) || !oldHair
-    || newHair.skeleton.bones.length !== oldHair.skeleton.bones.length
-    || !newHair.skeleton.bones.every((bone, i) => bone.name === oldHair!.skeleton.bones[i].name
-      && newHair.skeleton.boneInverses[i].equals(oldHair!.skeleton.boneInverses[i]))) {
-    dispose(); throw new Error(`${definition.model} hairstyle has an incompatible skin binding`);
-  }
-  const idle = gltf.animations.find(clip => clip.name === definition.idle);
-  const run = gltf.animations.find(clip => clip.name === definition.run);
-  if (!idle || !run) { dispose(); throw new Error(`${definition.model} GLB requires ${definition.idle} and ${definition.run}`); }
-  // Measure the standing pose, not the exported rest pose with outstretched arms.
-  const referenceMixer = new THREE.AnimationMixer(gltf.scene);
-  referenceMixer.clipAction(idle).play(); referenceMixer.update(0);
-  gltf.scene.updateMatrixWorld(true);
-  const bounds = new THREE.Box3().setFromObject(gltf.scene, true);
-  const scale = HEIGHT / (bounds.max.y - bounds.min.y);
-  const center = bounds.getCenter(new THREE.Vector3());
-  referenceMixer.stopAllAction(); referenceMixer.uncacheRoot(gltf.scene);
-  const shadowGeometry = new THREE.CircleGeometry(.85, 32);
-  const ringGeometry = new THREE.RingGeometry(.85, .93, 40);
-  geometries.add(shadowGeometry); geometries.add(ringGeometry);
-  const shadowMaterial = new THREE.MeshBasicMaterial({ color: '#263b2e', transparent: true, opacity: .2, depthWrite: false });
-  const ringMaterials = [true, false].map(mine => new THREE.MeshBasicMaterial({
-    color: mine ? '#e9d392' : '#bcd3dd', transparent: true, opacity: .85, depthWrite: false, side: THREE.DoubleSide,
+export async function loadSkinnedPlayers(modelId:PlayerClass, library:PlayerLibrary) {
+  const [body,...hairAssets]=await Promise.all([
+    library.load('bodies/'+modelId),library.load('hair/male-01'),library.load('hair/male-02'),
+  ]);
+  const clips=new Map(body.animations.map(clip=>[clip.name,clip]));
+  const idle=clips.get('n_idle');
+  if(!idle || !clips.has('n_run')) throw new Error('Missing locomotion for '+modelId);
+  const referenceMixer=new THREE.AnimationMixer(body.scene);
+  referenceMixer.clipAction(idle).play();referenceMixer.update(0);body.scene.updateMatrixWorld(true);
+  const bounds=new THREE.Box3().setFromObject(body.scene,true),scale=2.8/(bounds.max.y-bounds.min.y);
+  const center=bounds.getCenter(new THREE.Vector3());
+  referenceMixer.stopAllAction();referenceMixer.uncacheRoot(body.scene);
+  const ringGeometry=new THREE.RingGeometry(.85,.93,40);
+  const ringMaterials=[0xe9d392,0xbcd3dd].map(color=>new THREE.MeshBasicMaterial({
+    color,transparent:true,opacity:.85,depthWrite:false,side:THREE.DoubleSide,
   }));
-  materials.add(shadowMaterial); ringMaterials.forEach(m => materials.add(m));
   return {
-    dispose,
-    create(mine: boolean, initialHairStyle = 1) {
-      const group = new THREE.Group(); group.name = `${definition.model}-player`;
-      const model = clone(gltf.scene);
-      const visual = new THREE.Group(); visual.name = `${definition.model}-visual`;
-      visual.scale.setScalar(scale);
-      visual.position.set(-center.x * scale, -bounds.min.y * scale, -center.z * scale);
-      visual.add(model); group.add(visual);
-      const skeletons = new Set<THREE.Skeleton>();
-      model.traverse(object => {
-        if (object instanceof THREE.SkinnedMesh) {
-          // GLTF primitives can clone the same skin separately. Within one
-          // avatar, use one palette for meshes with the identical bone binding.
-          const existing = [...skeletons].find(s => s.bones.length === object.skeleton.bones.length
-            && s.bones.every((bone, i) => bone === object.skeleton.bones[i]
-              && s.boneInverses[i].equals(object.skeleton.boneInverses[i])));
-          if (existing) object.skeleton = existing;
+    dispose(){ringGeometry.dispose();ringMaterials.forEach(m=>m.dispose());},
+    create(mine:boolean,initialHairStyle=1){
+      const group=new THREE.Group(),visual=new THREE.Group(),model=clone(body.scene);
+      group.name=modelId+'-player';visual.name=modelId+'-visual';
+      visual.scale.setScalar(scale);visual.position.set(-center.x*scale,-bounds.min.y*scale,-center.z*scale);
+      visual.add(model);group.add(visual);
+      const bones=new Map<string,THREE.Bone>(), skeletons=new Set<THREE.Skeleton>();
+      let bodyMesh:THREE.SkinnedMesh|undefined;
+      model.traverse(object=>{
+        if(object instanceof THREE.Bone) bones.set(object.name,object);
+        if(object instanceof THREE.SkinnedMesh){
+          bodyMesh=object;
+          const shared=[...skeletons].find(s=>s.bones.length===object.skeleton.bones.length &&
+            s.bones.every((bone,i)=>bone===object.skeleton.bones[i] && s.boneInverses[i].equals(object.skeleton.boneInverses[i])));
+          if(shared) object.skeleton=shared;
           skeletons.add(object.skeleton);
-          // Conservative local bounds cover both authored poses without per-frame
-          // full-mesh bounds scans or stale rest-pose raycast rejection.
-          object.boundingSphere = new THREE.Sphere(new THREE.Vector3(0, 1, 0), 4);
-          object.boundingBox = new THREE.Box3(new THREE.Vector3(-4, -3, -4), new THREE.Vector3(4, 5, 4));
-          object.frustumCulled = false;
+          object.frustumCulled=false;
+          object.boundingSphere=new THREE.Sphere(new THREE.Vector3(0,1,0),4);
+          object.boundingBox=new THREE.Box3(new THREE.Vector3(-4,-3,-4),new THREE.Vector3(4,5,4));
         }
       });
-      // Keep both lightweight hair meshes on the same animated skeleton, toggling
-      // visibility without recreating the avatar, its mixer, or its current pose.
-      let hairOne!: THREE.SkinnedMesh;
-      model.traverse(object => { if (object instanceof THREE.SkinnedMesh && object.userData.hairStyle === 1) hairOne = object; });
-      const hairTwo = new THREE.SkinnedMesh(newHair.geometry, newHair.material);
-      hairTwo.name = `${definition.model}-hair-02`; hairTwo.userData.playerSurface = true; hairTwo.userData.hairStyle = 2;
-      hairTwo.position.copy(hairOne.position); hairTwo.quaternion.copy(hairOne.quaternion); hairTwo.scale.copy(hairOne.scale);
-      hairTwo.bindMode = hairOne.bindMode; hairTwo.bindMatrix.copy(newHair.bindMatrix);
-      hairTwo.bindMatrixInverse.copy(newHair.bindMatrixInverse); hairTwo.skeleton = hairOne.skeleton;
-      hairTwo.frustumCulled = false; hairTwo.boundingSphere = hairOne.boundingSphere.clone(); hairTwo.boundingBox = hairOne.boundingBox.clone();
-      hairOne.parent!.add(hairTwo);
-      let hairStyle = 1;
-      const setHairStyle = (value: number) => {
-        hairStyle = value === 2 ? 2 : 1;
-        hairOne.visible = hairStyle === 1; hairTwo.visible = hairStyle === 2;
-      };
+      if(!bodyMesh) throw new Error('Missing body mesh for '+modelId);
+      const parent=bodyMesh.parent!;
+      function attach(asset:GLTF) {
+        const meshes:THREE.SkinnedMesh[]=[];
+        asset.scene.traverse(source=>{
+          if(!(source instanceof THREE.SkinnedMesh)) return;
+          const palette=source.skeleton.bones.map(b=>{
+            const target=bones.get(b.name);
+            if(!target) throw new Error(modelId+' missing attachment bone '+b.name);
+            return target;
+          });
+          const mesh=source.clone(false);
+          mesh.skeleton=new THREE.Skeleton(palette,source.skeleton.boneInverses);
+          mesh.boundingSphere=bodyMesh!.boundingSphere!.clone();mesh.boundingBox=bodyMesh!.boundingBox!.clone();
+          mesh.frustumCulled=false;parent.add(mesh);meshes.push(mesh);
+        });
+        return meshes;
+      }
+      const hair=hairAssets.map(attach);
+      let hairStyle=initialHairStyle;
+      function setHairStyle(style:number) {
+        hairStyle=style===2?2:1;
+        hair.forEach((meshes,i)=>meshes.forEach(mesh=>{mesh.visible=i+1===hairStyle;mesh.userData.hairStyle=i+1;}));
+      }
       setHairStyle(initialHairStyle);
-      const shadow = new THREE.Mesh(shadowGeometry, shadowMaterial);
-      shadow.rotation.x = -Math.PI / 2; shadow.position.y = .035; group.add(shadow);
-      const ring = new THREE.Mesh(ringGeometry, ringMaterials[mine ? 0 : 1]);
-      ring.rotation.x = -Math.PI / 2; ring.position.y = .06; group.add(ring);
-      const mixer = new THREE.AnimationMixer(model);
-      const actions = { idle: mixer.clipAction(idle), run: mixer.clipAction(run) };
-      let state: 'idle' | 'run' = 'idle';
-      actions.idle.play(); mixer.update(0);
-      return {
-        group,
-        setHairStyle,
-        update(delta: number, moving: boolean, speedLevel: number) {
-          const next = moving ? 'run' : 'idle';
-          if (next !== state) {
-            const previous = actions[state];
-            actions[next].reset().setEffectiveWeight(1).play();
-            previous.crossFadeTo(actions[next], .15, false); state = next;
-          }
-          // Exploration speed is deliberately exaggerated; cap cadence to keep
-          // the supplied run readable rather than playing it five times faster.
-          actions.run.setEffectiveTimeScale(THREE.MathUtils.clamp(speedMultiplier(speedLevel) / speedMultiplier(DEFAULT_SPEED_LEVEL), .65, 1.6));
-          mixer.update(Math.min(delta, .1));
+      const ring=new THREE.Mesh(ringGeometry,ringMaterials[mine?0:1]);
+      ring.rotation.x=-Math.PI/2;ring.position.y=.06;group.add(ring);
+      const mixer=new THREE.AnimationMixer(model);
+      let active=mixer.clipAction(idle!).play(),state:PreviewMotion='idle',weapon:Weapon|undefined;
+      let gear:THREE.SkinnedMesh[]=[];
+      mixer.update(0);
+      function detach(meshes:THREE.SkinnedMesh[]){for(const mesh of meshes){mesh.removeFromParent();mesh.skeleton.dispose();}}
+      function play(delta:number,motion:PreviewMotion,rate:number){
+        state=motion;
+        const base=motion==='run'||motion==='slow'?'n_run':'n_idle';
+        const clip=motion==='attack' && weapon ? clips.get(attacks[weapon]) : undefined;
+        const next=mixer.clipAction(clip ?? (weapon && clips.get(base+'_hold')) ?? clips.get(base)!);
+        if(next!==active){next.reset().play().crossFadeFrom(active,.15,false);active=next;}
+        active.setEffectiveTimeScale(rate);mixer.update(Math.min(delta,.1));
+      }
+      return {group,setHairStyle,
+        setWeapon(next:Weapon|undefined,asset?:GLTF){
+          if(next && (!asset || !(equipment[modelId] as readonly Weapon[]).includes(next))) throw new Error('Invalid equipment');
+          detach(gear);gear=asset?attach(asset):[];weapon=next;
         },
-        inspect: () => ({ state, clip: actions[state].getClip().name, hairStyle, model: definition.model }),
-        dispose() {
-          mixer.stopAllAction(); mixer.uncacheRoot(model);
-          skeletons.forEach(s => s.dispose()); group.removeFromParent();
+        canPreviewAttack:(item:Weapon)=>clips.has(attacks[item]),
+        preview(delta:number,motion:PreviewMotion){play(delta,motion,motion==='slow'?.55:1);},
+        setLighting(value:number){library.brightness.value=value;},
+        update(delta:number,moving:boolean,speedLevel:number){
+          play(delta,moving?'run':'idle',moving?THREE.MathUtils.clamp(speedMultiplier(speedLevel)/speedMultiplier(DEFAULT_SPEED_LEVEL),.65,1.6):1);
         },
+        inspect:()=>({state,clip:active.getClip().name,hairStyle,model:modelId}),
+        dispose(){mixer.stopAllAction();mixer.uncacheRoot(model);hair.forEach(detach);detach(gear);skeletons.forEach(s=>s.dispose());group.removeFromParent();},
       };
     },
   };

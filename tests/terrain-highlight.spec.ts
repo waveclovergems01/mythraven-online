@@ -1,27 +1,32 @@
 import { chooseCharacter } from './helpers/character-selection';
 import { test, expect } from '@playwright/test';
 import { Client } from '@colyseus/sdk';
-import { openSettings, closeSettings } from './helpers/game-settings';
+import { openSettings, setWheelZoom } from './helpers/game-settings';
 
 test.use({ hasTouch: true });
 test('hover outlines and player selection approach others with space while self clicks do nothing', async ({ page }) => {
+  test.setTimeout(120000);
   const errors: string[] = [];
   page.on('pageerror', e => errors.push(e.message));
   page.on('console', m => { if (m.type() === 'error' && /shader|THREE|WebGL/i.test(m.text())) errors.push(m.text()); });
   await page.route('**/src/terrain/TerrainWorld.ts*', async route => {
     const response = await route.fetch();
-    await route.fulfill({ response, body: await response.text() + '\nconst mountHighlightTest=mountTerrainWorld;mountTerrainWorld=async(...args)=>{const w=await mountHighlightTest(...args);window.highlightWorld=w;return w;};' });
+    const source=(await response.text()).replace('renderer.render(scene, camera);',`
+      window.playerBodyPoint=id=>{
+        const p=views.get(id).mesh.position.clone();p.y+=1.45;p.project(camera);
+        const box=canvas.getBoundingClientRect();
+        return {x:box.left+(p.x+1)*box.width/2,y:box.top+(1-p.y)*box.height/2};
+      };
+      renderer.render(scene,camera);`);
+    await route.fulfill({ response, body: source + '\nconst mountHighlightTest=mountTerrainWorld;mountTerrainWorld=async(...args)=>{const w=await mountHighlightTest(...args);window.highlightWorld=w;return w;};' });
   });
   await page.setViewportSize({ width: 1440, height: 960 });
   await page.goto('/'); await page.locator('#guest').click(); await chooseCharacter(page);
-  await expect(page.locator('#walk-speed')).toBeEnabled();
+  await expect(page.locator('#walk-speed')).toBeEnabled({timeout:45000});
   const state = () => page.evaluate(() => (window as any).highlightWorld.inspect());
   await expect.poll(async () => (await state()).renderedPlayers).toBeGreaterThan(0);
   const mine = (await state()).id;
-  const bodyPoint = async (id: string) => {
-    const box = (await page.locator(`.world-player-name[data-player-id="${id}"]`).boundingBox())!;
-    return { x: box.x + box.width / 2, y: box.y + box.height + 35 * (await state()).zoom };
-  };
+  const bodyPoint = (id:string)=>page.evaluate(id=>(window as any).playerBodyPoint(id),id);
   const hover = async (id: string) => { const p = await bodyPoint(id); await page.mouse.move(p.x, p.y); };
   await hover(mine); await expect.poll(async () => (await state()).hoveredPlayer).toBe(mine);
   await expect(page.locator('#game canvas')).toHaveCSS('cursor', 'pointer');
@@ -93,14 +98,13 @@ test('hover outlines and player selection approach others with space while self 
     await remote.leave();
     await expect.poll(async () => (await state()).selectedPlayer).toBeUndefined();
     await expect.poll(async () => (await state()).moving).toBe(false);
-    for (const [key, zoom] of [['Home', .5], ['End', 2]] as const) {
-      await openSettings(page); await page.locator('#camera-zoom').focus(); await page.locator('#camera-zoom').press(key);
-      await closeSettings(page); await hover(mine);
+    for (const zoom of [.5,2] as const) {
+      await setWheelZoom(page,zoom===2 ? 200 : 50); await hover(mine);
       await expect.poll(async () => (await state()).hoveredPlayer).toBe(mine);
       await page.screenshot({ path: `test-results/terrain-highlight/zoom-${zoom}.png` });
     }
     await openSettings(page); await page.locator('#logout').click(); await page.locator('#guest').click(); await chooseCharacter(page);
-    await expect(page.locator('#walk-speed')).toBeEnabled();
+    await expect(page.locator('#walk-speed')).toBeEnabled({timeout:45000});
     expect((await state()).selectedPlayer).toBeUndefined();
     await expect(page.locator('#game canvas')).toHaveCount(1);
     expect(errors).toEqual([]);

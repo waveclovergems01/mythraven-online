@@ -1,7 +1,7 @@
 import { chooseCharacter } from './helpers/character-selection';
 import { test, expect } from '@playwright/test';
 import sharp from 'sharp';
-import { openSettings, closeSettings } from './helpers/game-settings';
+import { setWheelZoom } from './helpers/game-settings';
 
 test('layered ground, clear animated river and reduced-motion surface render without shader errors', async ({ page }) => {
   const errors: string[] = [];
@@ -56,12 +56,11 @@ test('layered ground, clear animated river and reduced-motion surface render wit
   expect(coverage.fraction).toBeCloseTo(.8, 3); expect(coverage.wetGrass).toBe(false);
   expect([...loadedTiles].sort()).toEqual(['painted-grass-v002','painted-earth-v001','painted-grass-earth-v001'].map(name=>`/assets/tiles/terrain/${name}.png`).sort());
   await page.screenshot({ path:'test-results/terrain-materials/ground.png' });
-  for (const [key, percentage] of [['Home', 50], ['End', 200]] as const) {
-    await openSettings(page); await page.locator('#camera-zoom').focus(); await page.locator('#camera-zoom').press(key);
-    await closeSettings(page);
+  for (const percentage of [50,200] as const) {
+    await setWheelZoom(page,percentage);
     await page.screenshot({ path:`test-results/terrain-materials/ground-${percentage}.png` });
   }
-  await openSettings(page); await page.locator('.settings-reset').click(); await closeSettings(page);
+  await setWheelZoom(page,100);
   // Inspect actual painted clearings/transitions as well as the grassy spawn area.
   const samples = await page.evaluate(async () => {
     const dataPath='/src/terrain/terrain-data.ts', materialPath='/src/terrain/terrain-materials.ts';

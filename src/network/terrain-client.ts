@@ -1,9 +1,10 @@
 import { Client, type Room } from '@colyseus/sdk';
 import { MAX_SPEED_LEVEL, DEFAULT_SPEED_LEVEL } from '../../shared/terrain-movement.mjs';
 import { DEFAULT_CHARACTER_ID } from '../../shared/character-catalog.mjs';
+import type {Area} from '../../shared/west-march.mjs';
 
 export interface TerrainPlayer { name: string; x: number; y: number; z: number; heading: number;
-  moving: boolean; turning: boolean; targetX: number; targetZ: number; speedLevel: number; inputSeq: number; hairStyle: number; characterId: string }
+  moving: boolean; turning: boolean; path: string; pathIndex: number; targetX: number; targetZ: number; speedLevel: number; inputSeq: number; hairStyle: number; characterId: string }
 interface TerrainState { players: Map<string, TerrainPlayer> }
 
 export class TerrainClient {
@@ -17,7 +18,7 @@ export class TerrainClient {
   get nextInputSeq() { return this.inputSeq + 1; }
   constructor(private displayName: string, private status: (state: 'connecting' | 'online' | 'offline') => void,
     private rejected: () => void, private snapshot?: (player: TerrainPlayer) => void,
-    private characterId = DEFAULT_CHARACTER_ID) {}
+    private characterId = DEFAULT_CHARACTER_ID, private area: Area = 'city', private fromWest = false) {}
   async connect(): Promise<void> {
     if (this.disposed) return;
     const generation = ++this.generation;
@@ -28,7 +29,9 @@ export class TerrainClient {
     try {
       const env = (import.meta as any).env;
       const endpoint = env.VITE_GAME_SERVER_URL || ((location.protocol === 'https:' ? 'wss' : 'ws') + '://' + location.hostname + ':' + env.VITE_LOCAL_GAME_PORT);
-      const room = await new Client(endpoint).joinOrCreate<TerrainState>('mythraven-world', { displayName: this.displayName, characterId: this.characterId });
+      const roomName = this.area === 'city' ? 'mythraven-world' : 'mythraven-west-march';
+      const room = await new Client(endpoint).joinOrCreate<TerrainState>(roomName, { displayName: this.displayName,
+        characterId: this.characterId, fromWest: this.fromWest });
       if (this.disposed || generation !== this.generation) { void room.leave().catch(() => {}); return; }
       this.room = room; room.reconnection.enabled = false;
       if (this.speedLevel !== DEFAULT_SPEED_LEVEL) room.send('speed-level', { level: this.speedLevel });
@@ -37,7 +40,7 @@ export class TerrainClient {
         if (!current()) return;
         this.players.clear();
         state.players?.forEach((p, id) => this.players.set(id, { name: p.name, x: p.x, y: p.y, z: p.z,
-          heading: p.heading, moving: p.moving, turning: p.turning, targetX: p.targetX, targetZ: p.targetZ, speedLevel: p.speedLevel, inputSeq: p.inputSeq, hairStyle: p.hairStyle, characterId: p.characterId }));
+          heading: p.heading, moving: p.moving, turning: p.turning, path: p.path, pathIndex: p.pathIndex, targetX: p.targetX, targetZ: p.targetZ, speedLevel: p.speedLevel, inputSeq: p.inputSeq, hairStyle: p.hairStyle, characterId: p.characterId }));
         this.connected = this.players.has(room.sessionId);
         if (this.connected) {
           const mine = this.players.get(room.sessionId)!;

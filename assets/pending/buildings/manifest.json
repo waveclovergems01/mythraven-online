@@ -1,0 +1,348 @@
+{
+  "status": "Owner authorized city placement 2026-11-15. Originals retained as active importer inputs; see scripts/import-city-buildings.mjs.",
+  "entries": [
+    {
+      "id": "building-01-2dca8b3d",
+      "sourceId": "2dca8b3d-f3f8-4e25-9777-709a67400077",
+      "status": "integrated-city-2026-11-15",
+      "category": "house-red-gable",
+      "files": [
+        {
+          "file": "building-01-2dca8b3d.glb",
+          "source": "E:/Blender/Environment/asset2/2dca8b3d-f3f8-4e25-9777-709a67400077/base_basic_pbr.glb",
+          "bytes": 13356844,
+          "sha256": "edb31c465b1047b6146d6eb46883ee13d97632c4e43b444e310f52b28a0293b2"
+        }
+      ],
+      "meshes": 1,
+      "animations": 0,
+      "nodes": [
+        "model"
+      ],
+      "materials": [
+        {
+          "name": "model",
+          "emissiveFactor": [
+            0,
+            0,
+            0
+          ],
+          "embeddedEmissiveTexture": null
+        }
+      ],
+      "externalResources": [],
+      "emissivePairing": "No external emissive supplied in this batch.",
+      "runtime": "house-red-gable"
+    },
+    {
+      "id": "building-02-43d57859",
+      "sourceId": "43d57859-6d85-4bb3-97d5-3dca4ff45c5a",
+      "status": "integrated-city-2026-11-15",
+      "category": "house-banner",
+      "files": [
+        {
+          "file": "building-02-43d57859.glb",
+          "source": "E:/Blender/Environment/asset2/43d57859-6d85-4bb3-97d5-3dca4ff45c5a/base_basic_pbr.glb",
+          "bytes": 13555968,
+          "sha256": "a69b4b2558d8a72efbc288fb3bd00513afa1e4475c403447152bdf8d840c516d"
+        }
+      ],
+      "meshes": 1,
+      "animations": 0,
+      "nodes": [
+        "model"
+      ],
+      "materials": [
+        {
+          "name": "model",
+          "emissiveFactor": [
+            0,
+            0,
+            0
+          ],
+          "embeddedEmissiveTexture": null
+        }
+      ],
+      "externalResources": [],
+      "emissivePairing": "No external emissive supplied in this batch.",
+      "runtime": "house-banner"
+    },
+    {
+      "id": "building-03-053bd146",
+      "sourceId": "053bd146-5a25-48e1-b49a-4f08e4b58fd8",
+      "status": "integrated-city-2026-11-15",
+      "category": "house-blue-awning",
+      "files": [
+        {
+          "file": "building-03-053bd146.glb",
+          "source": "E:/Blender/Environment/asset2/053bd146-5a25-48e1-b49a-4f08e4b58fd8/base_basic_pbr.glb",
+          "bytes": 13578284,
+          "sha256": "13188b04c7a20ce022fa33ba7588c2edd504327e3fa3f1e5c493168b0216246b"
+        }
+      ],
+      "meshes": 1,
+      "animations": 0,
+      "nodes": [
+        "model"
+      ],
+      "materials": [
+        {
+          "name": "model",
+          "emissiveFactor": [
+            0,
+            0,
+            0
+          ],
+          "embeddedEmissiveTexture": null
+        }
+      ],
+      "externalResources": [],
+      "emissivePairing": "No external emissive supplied in this batch.",
+      "runtime": "house-blue-awning"
+    },
+    {
+      "id": "building-04-5512881d",
+      "sourceId": "5512881d-0fe6-4c22-b77b-aeeec0672561",
+      "status": "integrated-city-2026-11-15",
+      "category": "house-red-cottage",
+      "files": [
+        {
+          "file": "building-04-5512881d.glb",
+          "source": "E:/Blender/Environment/asset2/5512881d-0fe6-4c22-b77b-aeeec0672561/base_basic_pbr.glb",
+          "bytes": 12624008,
+          "sha256": "9bfca8a1f64a2e1fc97560c67da89864816e1fca6968e5a82b8be0427a7e3724"
+        }
+      ],
+      "meshes": 1,
+      "animations": 0,
+      "nodes": [
+        "model"
+      ],
+      "materials": [
+        {
+          "name": "model",
+          "emissiveFactor": [
+            0,
+            0,
+            0
+          ],
+          "embeddedEmissiveTexture": null
+        }
+      ],
+      "externalResources": [],
+      "emissivePairing": "No external emissive supplied in this batch.",
+      "runtime": "house-red-cottage"
+    },
+    {
+      "id": "building-05-a8a40f5e",
+      "sourceId": "a8a40f5e-558d-4529-91ae-88680ac5f6c9",
+      "status": "integrated-city-2026-11-15",
+      "category": "castle-red-spires",
+      "files": [
+        {
+          "file": "building-05-a8a40f5e.glb",
+          "source": "E:/Blender/Environment/asset2/a8a40f5e-558d-4529-91ae-88680ac5f6c9/base_basic_pbr.glb",
+          "bytes": 15035532,
+          "sha256": "060936d0a77feb901c6103fc89034e4016e54f643da2eca0530b677b3832597b"
+        }
+      ],
+      "meshes": 1,
+      "animations": 0,
+      "nodes": [
+        "model"
+      ],
+      "materials": [
+        {
+          "name": "model",
+          "emissiveFactor": [
+            0,
+            0,
+            0
+          ],
+          "embeddedEmissiveTexture": null
+        }
+      ],
+      "externalResources": [],
+      "emissivePairing": "No external emissive supplied in this batch.",
+      "runtime": "castle-red-spires"
+    },
+    {
+      "id": "building-06-9fcf9c85",
+      "sourceId": "9fcf9c85-e326-4ac4-a9b4-c727eae27ca7",
+      "status": "integrated-city-2026-11-15",
+      "category": "market-produce-cart",
+      "files": [
+        {
+          "file": "building-06-9fcf9c85.glb",
+          "source": "E:/Blender/Environment/asset2/9fcf9c85-e326-4ac4-a9b4-c727eae27ca7/base_basic_pbr.glb",
+          "bytes": 11224292,
+          "sha256": "d5d82c4fc80b60a31bbf77a52d3b89d221c35724b13956cab85f664e69d44c28"
+        },
+        {
+          "file": "building-06-9fcf9c85-emissive.png",
+          "source": "E:/Blender/Environment/asset2/9fcf9c85-e326-4ac4-a9b4-c727eae27ca7/texture_emissive.png",
+          "bytes": 61956,
+          "sha256": "5bf9680af446200a7d7e453f1ff60fb169fcfd8e5c469756c678b8f0cd3ae41c"
+        }
+      ],
+      "meshes": 1,
+      "animations": 0,
+      "nodes": [
+        "model"
+      ],
+      "materials": [
+        {
+          "name": "model",
+          "emissiveFactor": [
+            0,
+            0,
+            0
+          ],
+          "embeddedEmissiveTexture": null
+        }
+      ],
+      "externalResources": [],
+      "emissivePairing": "Owner supplied together in the same source directory; stored separately without modifying GLB.",
+      "runtime": "market-produce-cart"
+    },
+    {
+      "id": "building-07-44a71b11",
+      "sourceId": "44a71b11-c739-49b2-94b3-cf1302d64453",
+      "status": "integrated-city-2026-11-15",
+      "category": "tavern-red-awning",
+      "files": [
+        {
+          "file": "building-07-44a71b11.glb",
+          "source": "E:/Blender/Environment/asset2/44a71b11-c739-49b2-94b3-cf1302d64453/base_basic_pbr.glb",
+          "bytes": 14429036,
+          "sha256": "1bcf0483c29023454110cdecb581e60fc7b3e17718f9116a72e27073f10dae19"
+        },
+        {
+          "file": "building-07-44a71b11-emissive.png",
+          "source": "E:/Blender/Environment/asset2/44a71b11-c739-49b2-94b3-cf1302d64453/texture_emissive.png",
+          "bytes": 66784,
+          "sha256": "ae44c045e13618a6f7b7fa35c6e4b533674695cafb73291b815ce119a2e7a153"
+        }
+      ],
+      "meshes": 1,
+      "animations": 0,
+      "nodes": [
+        "model"
+      ],
+      "materials": [
+        {
+          "name": "model",
+          "emissiveFactor": [
+            0,
+            0,
+            0
+          ],
+          "embeddedEmissiveTexture": null
+        }
+      ],
+      "externalResources": [],
+      "emissivePairing": "Owner supplied together in the same source directory; stored separately without modifying GLB.",
+      "runtime": "tavern-red-awning"
+    },
+    {
+      "id": "building-08-e0fc4f01",
+      "sourceId": "e0fc4f01-f63a-4c72-930b-8fb084bfd793",
+      "status": "integrated-city-2026-11-15",
+      "category": "market-produce-stall",
+      "files": [
+        {
+          "file": "building-08-e0fc4f01.glb",
+          "source": "E:/Blender/Environment/asset2/e0fc4f01-f63a-4c72-930b-8fb084bfd793/base_basic_pbr.glb",
+          "bytes": 11583088,
+          "sha256": "48e5b509a337296d9bc34d93025d82ff142cdf909f4b5e95a5495bbcd68b9b95"
+        },
+        {
+          "file": "building-08-e0fc4f01-emissive.png",
+          "source": "E:/Blender/Environment/asset2/e0fc4f01-f63a-4c72-930b-8fb084bfd793/texture_emissive.png",
+          "bytes": 642243,
+          "sha256": "4ec31b82b40db6aa6ab1f781301c25aa5f6e8de353f4d1c1088fc3b8bf54bf55"
+        }
+      ],
+      "meshes": 1,
+      "animations": 0,
+      "nodes": [
+        "model"
+      ],
+      "materials": [
+        {
+          "name": "model",
+          "emissiveFactor": [
+            0,
+            0,
+            0
+          ],
+          "embeddedEmissiveTexture": null
+        }
+      ],
+      "externalResources": [],
+      "emissivePairing": "Owner supplied together in the same source directory; stored separately without modifying GLB.",
+      "runtime": "market-produce-stall"
+    },
+    {
+      "id": "building-09-efd3e0a4",
+      "sourceId": "efd3e0a4-d0e3-4545-a52a-2ee558042f68",
+      "status": "integrated-city-2026-11-15",
+      "category": "shop-red-awning",
+      "files": [
+        {
+          "file": "building-09-efd3e0a4.glb",
+          "source": "E:/Blender/Environment/asset2/efd3e0a4-d0e3-4545-a52a-2ee558042f68/base_basic_pbr.glb",
+          "bytes": 12781740,
+          "sha256": "a4da8009aef398dd3706128ff74b8d6a8effe6c596caa6e24ac38ee7e29ec5f8"
+        },
+        {
+          "file": "building-09-efd3e0a4-emissive.png",
+          "source": "E:/Blender/Environment/asset2/efd3e0a4-d0e3-4545-a52a-2ee558042f68/texture_emissive.png",
+          "bytes": 26067,
+          "sha256": "74292bd04f017dcb87525fb45ab6aa4227bd840c2c8cff131427dd46ad2735e7"
+        }
+      ],
+      "meshes": 1,
+      "animations": 0,
+      "nodes": [
+        "model"
+      ],
+      "materials": [
+        {
+          "name": "model",
+          "emissiveFactor": [
+            0,
+            0,
+            0
+          ],
+          "embeddedEmissiveTexture": null
+        }
+      ],
+      "externalResources": [],
+      "emissivePairing": "Owner supplied together in the same source directory; stored separately without modifying GLB.",
+      "runtime": "shop-red-awning"
+    },
+    {
+      "id": "building-10-c4c8b10a",
+      "sourceId": "c4c8b10a-2411-46b7-9b6d-07671fa66356",
+      "status": "integrated-city-2026-11-15",
+      "files": [
+        {
+          "file": "building-10-c4c8b10a.glb",
+          "source": "E:/Blender/Environment/asset2/c4c8b10a-2411-46b7-9b6d-07671fa66356/base_basic_pbr.glb",
+          "bytes": 12404976,
+          "sha256": "12211de25cb14cac61ac296be6ec05cbc6bac5d5999f7fcadde52981328dc1c4"
+        },
+        {
+          "file": "building-10-c4c8b10a-emissive.png",
+          "source": "E:/Blender/Environment/asset2/c4c8b10a-2411-46b7-9b6d-07671fa66356/texture_emissive.png",
+          "bytes": 92385,
+          "sha256": "c03cca75499388ef675fc2eba3a644246431d2aa031c8d03b7c4510ec1c64781"
+        }
+      ],
+      "emissivePairing": "Owner supplied together; bind only this image to this GLB.",
+      "runtime": "plaza-angel-fountain",
+      "category": "plaza-angel-fountain"
+    }
+  ]
+}

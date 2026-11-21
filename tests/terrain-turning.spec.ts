@@ -1,7 +1,7 @@
 import { chooseCharacter } from './helpers/character-selection';
 import { test, expect } from '@playwright/test';
 import { Client } from '@colyseus/sdk';
-import { openSettings, closeSettings } from './helpers/game-settings';
+import { setWheelZoom } from './helpers/game-settings';
 
 test('local and remote players rotate through intermediate angles before running', async ({ page }) => {
   test.setTimeout(60000);
@@ -15,7 +15,7 @@ test('local and remote players rotate through intermediate angles before running
   await page.goto('/'); await page.locator('#guest').click(); await chooseCharacter(page);
   const state = () => page.evaluate(() => (window as any).turnWorld?.inspect());
   await expect.poll(async () => (await state())?.renderedPlayers, { timeout: 30000 }).toBe(1);
-  await openSettings(page); await page.locator('#camera-zoom').fill('200'); await closeSettings(page);
+  await setWheelZoom(page,200);
   const mine = (await state()).id;
   const startSampling = () => page.evaluate(() => {
     const w = window as any; w.turnSamples = [];

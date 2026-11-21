@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { CHARACTERS, type CharacterDefinition } from '../shared/character-catalog.mjs';
 import { createCharacterAssets, type CharacterAssets, type PlayerAvatar } from './terrain/character-assets';
+import {equipment, type PlayerClass, type Weapon, type PreviewMotion} from './terrain/skinned-player';
 import './character-selection.css';
 
 export type PreparedCharacters = CharacterAssets;
@@ -20,15 +21,22 @@ export function mountCharacterSelection(host: HTMLElement, username: string, tha
         <button type="button" data-gender="female" aria-pressed="false">${thai ? 'หญิง' : 'Female'}</button>
       </div><p class="character-availability">${thai ? `ตัวละครที่พร้อมให้เลือก ${CHARACTERS.length} แบบ` : `${CHARACTERS.length} characters available`}</p>
       <fieldset class="character-cards"><legend class="sr-only">${thai ? 'เลือกโมเดลตัวละคร' : 'Select a character model'}</legend>
-        ${CHARACTERS.map((c, i) => `<label class="character-card" data-character-gender="${c.gender}">
-          <input type="radio" name="character" value="${c.id}"><span class="character-number">0${i+1}</span>
-          <span><strong>${thai ? c.nameTh : c.nameEn}</strong><small>${thai ? (c.gender === 'male' ? 'ชาย' : 'หญิง') + (c.classId === 'warrior' ? ' · นักรบ' : ' · นักผจญภัยเริ่มต้น') : (c.gender === 'male' ? 'Male' : 'Female') + (c.classId === 'warrior' ? ' · Warrior' : ' · Beginning adventurer')}</small></span><span class="character-check" aria-hidden="true">✓</span></label>`).join('')}
+        ${Object.keys(equipment).map(job=>`<fieldset class="class-hairstyles" data-character-gender="male"><legend>${job[0].toUpperCase()+job.slice(1)}</legend>
+          ${CHARACTERS.filter(c=>c.classId===job).map(c=>`<label class="character-card">
+          <input type="radio" name="character" value="${c.id}" aria-label="${thai?c.nameTh:c.nameEn}"><strong>${thai?'ทรงผม':'Hairstyle'} ${c.hairStyle}</strong><span class="character-check" aria-hidden="true">✓</span></label>`).join('')}</fieldset>`).join('')}
       </fieldset><p id="character-empty" hidden>${thai ? 'ยังไม่มีโมเดลตัวละครหญิงให้เลือก' : 'No female character models are available yet.'}</p>
     </section><section class="character-stage" aria-label="${thai ? 'ตัวอย่างตัวละครสามมิติ' : '3D character preview'}">
       <div id="character-preview"></div><div class="character-preview-caption"><span>${thai ? 'ตัวอย่างตัวละคร' : 'CHARACTER PREVIEW'}</span><strong id="character-preview-name">Novice</strong></div>
       <p id="character-load-status" role="status">${thai ? 'กำลังโหลดตัวละคร…' : 'Loading character…'}</p>
       <button id="character-retry" type="button" hidden>${thai ? 'ลองโหลดอีกครั้ง' : 'Retry loading'}</button>
     </section></div>
+    <div class="preview-controls">
+      <label>${thai?'อาวุธในพรีวิว':'Preview weapon'} <select id="preview-weapon" disabled></select></label>
+      <label>${thai?'ท่าพรีวิว':'Preview motion'} <select id="preview-motion" disabled>
+        <option value="idle">${thai?'ยืน':'Idle'}</option><option value="slow">${thai?'ก้าวช้า (คลิปวิ่ง)':'Slow stride (run clip)'}</option>
+        <option value="run">${thai?'วิ่ง':'Run'}</option><option value="attack" disabled>${thai?'โจมตี':'Attack'}</option>
+      </select></label>
+    </div>
     <footer class="character-footer"><p id="character-selection-hint" aria-live="polite">${thai ? 'เลือกตัวละครหนึ่งแบบเพื่อเริ่มต้น' : 'Select a character to begin.'}</p>
       <button id="enter-city" type="button" disabled>${thai ? 'เข้าสู่เมือง' : 'Enter city'} <span aria-hidden="true">→</span></button></footer>
     <p id="character-error" class="error" role="alert"></p>
@@ -41,6 +49,10 @@ export function mountCharacterSelection(host: HTMLElement, username: string, tha
   const error = host.querySelector<HTMLElement>('#character-error')!;
   const name = host.querySelector<HTMLElement>('#character-preview-name')!;
   const hint = host.querySelector<HTMLElement>('#character-selection-hint')!;
+  const gear = host.querySelector<HTMLSelectElement>('#preview-weapon')!;
+  const motion = host.querySelector<HTMLSelectElement>('#preview-motion')!;
+  const attack = motion.querySelector<HTMLOptionElement>('[value="attack"]')!;
+  const weaponNames = thai ? {dagger:'มีดสั้น',longsword:'ดาบยาว',bow:'ธนู'} : {dagger:'Dagger',longsword:'Longsword',bow:'Bow'};
   let selected: CharacterDefinition | undefined;
   const assets = createCharacterAssets();
   let previewCharacter: CharacterDefinition | undefined = CHARACTERS[0];
@@ -51,12 +63,12 @@ export function mountCharacterSelection(host: HTMLElement, username: string, tha
   scene.add(new THREE.HemisphereLight('#f2f5e6', '#718478', 2.15));
   const light = new THREE.DirectionalLight('#fff0d0', 2.5); light.position.set(-4, 6, 5); scene.add(light);
   const camera = new THREE.OrthographicCamera(-2, 2, 2, -2, .1, 50);
-  camera.position.set(0, 2.5, 7); camera.lookAt(0, 1.35, 0);
+  camera.position.set(3, 2.5, 7); camera.lookAt(0, 1.35, 0);
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
   const animate = (now: number) => {
     if (disposed || !renderer) return;
     if (!document.hidden) {
-      avatar?.update(reducedMotion.matches ? 0 : Math.min((now-previous)/1000, .05), false, 5);
+      avatar?.preview(reducedMotion.matches && motion.value==='idle' ? 0 : Math.min((now-previous)/1000,.05),motion.value as PreviewMotion);
       renderer.render(scene, camera);
     }
     previous = now; frame = requestAnimationFrame(animate);
@@ -70,13 +82,18 @@ export function mountCharacterSelection(host: HTMLElement, username: string, tha
     if (disposed) return;
     previewCharacter = character;
     const version = ++previewVersion;
+    gear.disabled=motion.disabled=true;
+    const allowed:readonly Weapon[]=equipment[character.model as PlayerClass];
+    const item=allowed.find(w=>w===gear.value);
+    gear.replaceChildren(new Option(thai?'มือเปล่า':'Unarmed',''),...allowed.map(w=>new Option(weaponNames[w],w)));
+    gear.value=item??'';
     submit.disabled = true; retry.hidden = true; status.hidden = false;
     delete previewHost.dataset.ready; delete previewHost.dataset.characterId;
     // Remove the previous model while a different class loads; keep one canvas.
     avatar?.dispose(); avatar = undefined;
     status.textContent = thai ? 'กำลังโหลดตัวละคร…' : 'Loading character…';
     try {
-      const factory = await assets.ensure(character);
+      const [factory,weaponAsset] = await Promise.all([assets.ensure(character),item?assets.loadWeapon(item):undefined]);
       if (disposed || version !== previewVersion) return;
       if (!renderer) {
         renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
@@ -94,6 +111,10 @@ export function mountCharacterSelection(host: HTMLElement, username: string, tha
         previous = performance.now(); frame = requestAnimationFrame(animate);
       }
       avatar = factory.create(true, character.hairStyle); scene.add(avatar.group);
+      if(item) avatar.setWeapon(item,weaponAsset);
+      attack.disabled=!item || !avatar.canPreviewAttack(item);
+      if(attack.disabled && motion.value==='attack') motion.value='idle';
+      gear.disabled=motion.disabled=false;
       status.hidden = true; previewHost.dataset.ready = 'true'; previewHost.dataset.characterId = character.id;
       submit.disabled = selected?.id !== character.id || busy;
     } catch {
@@ -103,11 +124,15 @@ export function mountCharacterSelection(host: HTMLElement, username: string, tha
       }
     }
   };
+  gear.onchange=()=>{if(previewCharacter) void load(previewCharacter);};
   const choose = (character: CharacterDefinition) => {
     selected = character;
     name.textContent = thai ? character.nameTh : character.nameEn;
     hint.textContent = thai ? `เลือกแล้ว: ${character.nameTh}` : `Selected: ${character.nameEn}`;
-    void load(character);
+    if(avatar && previewCharacter?.model===character.model){
+      avatar.setHairStyle(character.hairStyle);previewCharacter=character;
+      previewHost.dataset.characterId=character.id;submit.disabled=busy;
+    } else void load(character);
   };
   host.querySelectorAll<HTMLInputElement>('input[name="character"]').forEach(input => input.addEventListener('change', () => {
     const character = CHARACTERS.find(c => c.id === input.value); if (character) choose(character);
@@ -127,7 +152,7 @@ export function mountCharacterSelection(host: HTMLElement, username: string, tha
     if (!selected) {
       const preview = available[0];
       if (preview) void load(preview);
-      else { ++previewVersion; previewCharacter = undefined; avatar?.dispose(); avatar = undefined; status.hidden = true; retry.hidden = true; delete previewHost.dataset.ready; delete previewHost.dataset.characterId; }
+      else { ++previewVersion; previewCharacter = undefined; avatar?.dispose(); avatar = undefined; gear.disabled=motion.disabled=true; status.hidden = true; retry.hidden = true; delete previewHost.dataset.ready; delete previewHost.dataset.characterId; }
       name.textContent = preview ? (thai ? preview.nameTh : preview.nameEn) : (thai ? 'ยังไม่มีตัวละครในหมวดนี้' : 'No characters in this category');
     }
   }));

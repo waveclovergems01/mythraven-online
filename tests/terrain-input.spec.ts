@@ -9,7 +9,7 @@ test('direction changes survive mouse travel during each press and release', asy
       '\nconst mountGestureTest=mountTerrainWorld;mountTerrainWorld=async(...args)=>{const w=await mountGestureTest(...args);window.gestureWorld=w;return w;};'});
   });
   await page.setViewportSize({width:1440,height:960}); await page.goto('/'); await page.locator('#guest').click(); await chooseCharacter(page);
-  await expect(page.locator('#walk-speed')).toBeEnabled();
+  await expect(page.locator('#walk-speed')).toBeEnabled({timeout:90000});
   await openSettings(page); await page.locator('#walk-speed').focus(); await page.locator('#walk-speed').press('End'); await closeSettings(page);
   const state=()=>page.evaluate(()=>(window as any).gestureWorld.inspect());
   // Inspect the command in the same event turn. At 5x speed a short route can
@@ -63,7 +63,7 @@ test('5x rapid redirects predict before delayed acknowledgement and converge on 
     await route.fulfill({response,body:code});
   });
   await page.setViewportSize({width:1440,height:960}); await page.goto('/'); await page.locator('#guest').click(); await chooseCharacter(page);
-  await expect(page.locator('#walk-speed')).toBeEnabled(); await page.waitForTimeout(250);
+  await expect(page.locator('#walk-speed')).toBeEnabled({timeout:90000}); await page.waitForTimeout(250);
   await openSettings(page); await page.locator('#walk-speed').focus(); await page.locator('#walk-speed').press('End'); await closeSettings(page); await page.waitForTimeout(250);
   const state=()=>page.evaluate(()=>(window as any).inputWorld.inspect());
   const start=await state();

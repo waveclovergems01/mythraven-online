@@ -2,13 +2,16 @@ import { Room, ServerError } from '@colyseus/core';
 import { schema, t } from '@colyseus/schema';
 import { TerrainMovement, DEFAULT_SPEED_LEVEL } from '../shared/terrain-movement.mjs';
 import { characterById } from '../shared/character-catalog.mjs';
+import { buildWestMarch, cityArrival, mapPortal, PORTAL_RADIUS } from '../shared/west-march.mjs';
 
 export const TERRAIN_ROOM_CAPACITY = 64;
 let worldTerrain;
+let frontierTerrain;
 export function configureTerrainWorld(data) { worldTerrain = data; }
 const Player = schema({ name: t.string().default(''), x: t.float32().default(0), y: t.float32().default(0),
   z: t.float32().default(0), heading: t.float32().default(0), moving: t.boolean().default(false), turning: t.boolean().default(false),
   targetX: t.float32().default(0), targetZ: t.float32().default(0), speedLevel: t.uint8().default(DEFAULT_SPEED_LEVEL),
+  path: t.string().default('[]'), pathIndex: t.uint16().default(0),
   inputSeq: t.uint32().default(0), hairStyle: t.uint8().default(1), characterId: t.string().default('') });
 const World = schema({ players: t.map(Player) });
 
@@ -16,7 +19,7 @@ const World = schema({ players: t.map(Player) });
 export class TerrainRoom extends Room {
   onCreate() {
     if (!worldTerrain) throw new Error('Terrain world is not configured');
-    this.terrainData = worldTerrain;
+    this.terrainData = this.roomName === 'mythraven-west-march' ? (frontierTerrain ??= buildWestMarch()) : worldTerrain;
     this.maxClients = TERRAIN_ROOM_CAPACITY;
     this.setState(new World()); this.movers = new Map(); this.pendingCommands = new Map();
     this.setPatchRate(50); this.setSimulationInterval(dt => this.tick(dt), 50);
@@ -50,10 +53,12 @@ export class TerrainRoom extends Room {
     const character = characterById(options?.characterId);
     if (!character) throw new ServerError(400, 'Choose a valid character before entering the city');
     const mover = new TerrainMovement(this.terrainData);
+    const arrival = !this.terrainData.area && options?.fromWest ? cityArrival(this.terrainData) : mover.spawn;
+    const portal = mapPortal(this.terrainData);
     // Separated spawn points keep new arrivals visible instead of stacking capsules.
     search: for (let radius = 0; radius < 15; radius++) for (let z = -radius; z <= radius; z++) for (let x = -radius; x <= radius; x++) {
-      const candidate = { x: mover.spawn.x + x * 2.6, z: mover.spawn.z + z * 2.6 };
-      if (mover.canStand(candidate) && [...this.movers.values()].every(other =>
+      const candidate = { x: arrival.x + x * 2.6, z: arrival.z + z * 2.6 };
+      if (Math.hypot(candidate.x-portal.x,candidate.z-portal.z) > PORTAL_RADIUS + 1 && mover.canStand(candidate) && [...this.movers.values()].every(other =>
         Math.hypot(other.position.x - candidate.x, other.position.z - candidate.z) > 2)) {
         Object.assign(mover.position, candidate); break search;
       }
@@ -70,6 +75,7 @@ export class TerrainRoom extends Room {
     player.x = mover.position.x; player.z = mover.position.z; player.y = mover.height;
     player.heading = mover.heading; player.moving = mover.moving; player.turning = mover.turning;
     player.speedLevel = mover.speedLevel;
+    player.path = mover.path; player.pathIndex = mover.next;
     player.targetX = mover.destination?.x ?? mover.position.x; player.targetZ = mover.destination?.z ?? mover.position.z;
   }
   tick(milliseconds) {

@@ -1,3 +1,5 @@
+import { fitFortificationApproaches } from './terrain-fortifications.mjs';
+import {fitCityFoundations} from './city-layout.mjs';
 /** Terrain units are metres by convention; legacy pixel coordinates stay separate. */
 export const TERRAIN = {
     size: 500,
@@ -8,6 +10,9 @@ export const TERRAIN = {
     waterLevel: 0,
     bedLevel: -6,
     landLevel: 3.5,
+    plateauRise: 1.4,
+    plateauStart: 12,
+    plateauFull: 32,
     baseLevel: -13,
     shoreline: '/assets/maps/mythraven-land.png',
 };
@@ -76,8 +81,16 @@ export function buildTerrainData(image) {
             const land = smoothstep(-5.5, 4.5, distance);
             // Central ground stays gently graded; outskirts have slightly more relief.
             const outskirts = smoothstep(150, 235, Math.max(Math.abs(x), Math.abs(z)));
-            heights[i] = TERRAIN.bedLevel + (TERRAIN.landLevel - TERRAIN.bedLevel) * land
+            const original = TERRAIN.bedLevel + (TERRAIN.landLevel - TERRAIN.bedLevel) * land
                 + groundVariation(x, z) * (1 + outskirts * 2.2) * smoothstep(4, 15, distance);
+            // Set back from both riverbanks: a gentle shoulder rises to one level
+            // foundation across the city and outer land, ready for future walls.
+            // Keep the channel and immediate bank untouched; remove inland bumps.
+            const raised = smoothstep(TERRAIN.plateauStart, TERRAIN.plateauFull, distance);
+            heights[i] = original * (1 - raised) + (TERRAIN.landLevel + TERRAIN.plateauRise) * raised;
         }
-    return { heights, shoreDistance, side };
+    const data={ heights, shoreDistance, side };
+    fitFortificationApproaches(data);
+    fitCityFoundations(data);
+    return data;
 }

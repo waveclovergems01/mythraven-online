@@ -1,5 +1,15 @@
 # Image generation templates — MR-ART-v1
 
+> Angel fountain water, 2026-11-15: supplied GLB and paired emissive are integrated directly. Basin contour, curved stream and ripples use code-native geometry/materials; no raster generation prompt applies. Preserve original source maps.
+
+> City streets, 2026-11-15 supersedes bridge-atlas reuse below: use built-in image generation with the actual rendered owner-building contact sheet attached as a palette/style reference. Generate only seamless top-down warm-grey limestone cobblestones, narrow taupe mortar, staggered small rectangles, soft painted low-contrast albedo, flat illumination, no perspective/objects/text/borders/vignette. Runtime scale is 8 metres per image. Preserve owner GLB textures and emissive pairs; no generative changes to buildings.
+
+> City fortifications, 2026-11-14: integrate the five owner GLBs directly. No generation prompt applies. The stone approach surfaces reuse the supplied bridge's original deck triangles and UVs; do not generate a replacement atlas.
+
+> Tree follow-up, 2026-11-14: replace the earlier shaded GLBs with the owner's matching PBR exports, preserving all three embedded texture maps without raster edits. No generation prompt applies. Retire the earlier generated riverside oak and its source/exporter.
+
+> Owner tree import, 2026-11-14: the three supplied GLBs are directly integrated, with root/scale normalization and descriptive runtime/internal names. Preserve embedded painted textures byte-for-byte. No raster generation/editing prompt applies to this import.
+
 > 2026-11-14 grass replacement: built-in image_gen edits the actual former `painted-grass-v001.png` reference. Adapt shared painted-fantasy block and terrain/top-down override: opaque square albedo, low-contrast fine grass strokes with irregular placement, uniform diffuse lighting, palette from source, no prominent clumps, rows, diamonds, checkerboard, swirls, vignette or text. Seamless edges requested; verify in game before integration. No model name is exposed by the tool.
 
 > Warrior import, 2026-11-13: owner supplies both GLBs directly. No generation prompt or reference-image attachment applies. Preserve source appearance and animation; extract the second hair losslessly after validating Warrior bindings and clips.

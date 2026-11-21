@@ -1,9 +1,25 @@
 import * as THREE from 'three';
 
 /** Back-face shells outline the avatar silhouette, excluding its ground ring/shadow. */
-export function createPlayerHighlight(player: THREE.Group) {
+export function createPlayerHighlight(player: THREE.Object3D, selectionMask=false) {
   const surfaces: THREE.Mesh[] = [];
-  player.traverse(object => { if (object instanceof THREE.Mesh && object.userData.playerSurface) surfaces.push(object); });
+  player.traverse(object => { if (object instanceof THREE.Mesh && (selectionMask || object.userData.playerSurface)) surfaces.push(object); });
+  // Preserve the textured body even where double-sided fur and ears overlap.
+  // Only the selected creature writes the silhouette, using private materials.
+  const originals=new Map<THREE.Mesh,THREE.Material|THREE.Material[]>();
+  const maskedMaterials=new Map<THREE.Material,THREE.Material>();
+  function mask(source:THREE.Material){
+    let copy=maskedMaterials.get(source);
+    if(!copy){
+      copy=source.clone();copy.stencilWrite=true;copy.stencilRef=1;copy.stencilZPass=THREE.ReplaceStencilOp;
+      maskedMaterials.set(source,copy);
+    }
+    return copy;
+  }
+  if(selectionMask) for(const mesh of surfaces){
+    originals.set(mesh,mesh.material);
+    mesh.material=Array.isArray(mesh.material)?mesh.material.map(mask):mask(mesh.material);
+  }
   const material = new THREE.ShaderMaterial({
     uniforms: {
       viewport: { value: new THREE.Vector2(1, 1) },
@@ -33,6 +49,7 @@ export function createPlayerHighlight(player: THREE.Group) {
         #include <colorspace_fragment>
       }`,
     side: THREE.BackSide, depthWrite: false, toneMapped: false,
+    stencilWrite:selectionMask, stencilWriteMask:0, stencilRef:1, stencilFunc:THREE.NotEqualStencilFunc,
   });
   const shells = surfaces.map(surface => {
     const shell = surface instanceof THREE.SkinnedMesh
@@ -54,6 +71,10 @@ export function createPlayerHighlight(player: THREE.Group) {
       material.uniforms.tint.value.set(selected ? '#f1ce77' : '#fff1bd');
       for (const shell of shells) shell.visible = hovered || selected;
     },
-    dispose() { shells.forEach(shell => shell.removeFromParent()); material.dispose(); },
+    dispose() {
+      shells.forEach(shell => shell.removeFromParent()); material.dispose();
+      for(const [mesh,original] of originals) mesh.material=original;
+      for(const copy of maskedMaterials.values()) copy.dispose();
+    },
   };
 }

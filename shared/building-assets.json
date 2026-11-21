@@ -1,0 +1,82 @@
+{
+  "house-red-gable": {
+    "url": "/assets/models/buildings/house-red-gable.glb",
+    "height": 15,
+    "width": 10.695808252909856,
+    "depth": 9.708381150145057,
+    "sourceId": "2dca8b3d-f3f8-4e25-9777-709a67400077",
+    "emissive": false
+  },
+  "house-banner": {
+    "url": "/assets/models/buildings/house-banner.glb",
+    "height": 17,
+    "width": 15.14515664414668,
+    "depth": 14.278162109517961,
+    "sourceId": "43d57859-6d85-4bb3-97d5-3dca4ff45c5a",
+    "emissive": false
+  },
+  "house-blue-awning": {
+    "url": "/assets/models/buildings/house-blue-awning.glb",
+    "height": 16,
+    "width": 11.867713401820348,
+    "depth": 12.94302238574588,
+    "sourceId": "053bd146-5a25-48e1-b49a-4f08e4b58fd8",
+    "emissive": false
+  },
+  "house-red-cottage": {
+    "url": "/assets/models/buildings/house-red-cottage.glb",
+    "height": 14,
+    "width": 11.32096105953899,
+    "depth": 10.793631931079629,
+    "sourceId": "5512881d-0fe6-4c22-b77b-aeeec0672561",
+    "emissive": false
+  },
+  "castle-red-spires": {
+    "url": "/assets/models/buildings/castle-red-spires.glb",
+    "height": 56,
+    "width": 58.13280812245535,
+    "depth": 54.317726263266756,
+    "sourceId": "a8a40f5e-558d-4529-91ae-88680ac5f6c9",
+    "emissive": false
+  },
+  "market-produce-cart": {
+    "url": "/assets/models/buildings/market-produce-cart.glb",
+    "height": 6,
+    "width": 5.797124879587536,
+    "depth": 4.026398195033699,
+    "sourceId": "9fcf9c85-e326-4ac4-a9b4-c727eae27ca7",
+    "emissive": true
+  },
+  "tavern-red-awning": {
+    "url": "/assets/models/buildings/tavern-red-awning.glb",
+    "height": 17,
+    "width": 19.38763292651394,
+    "depth": 21.029071961265476,
+    "sourceId": "44a71b11-c739-49b2-94b3-cf1302d64453",
+    "emissive": true
+  },
+  "market-produce-stall": {
+    "url": "/assets/models/buildings/market-produce-stall.glb",
+    "height": 7,
+    "width": 7.319128279783652,
+    "depth": 3.92389814042415,
+    "sourceId": "e0fc4f01-f63a-4c72-930b-8fb084bfd793",
+    "emissive": true
+  },
+  "shop-red-awning": {
+    "url": "/assets/models/buildings/shop-red-awning.glb",
+    "height": 16,
+    "width": 13.04036145827806,
+    "depth": 14.519921141280566,
+    "sourceId": "efd3e0a4-d0e3-4545-a52a-2ee558042f68",
+    "emissive": true
+  },
+  "plaza-angel-fountain": {
+    "url": "/assets/models/buildings/plaza-angel-fountain.glb",
+    "height": 9,
+    "width": 15.314893290444857,
+    "depth": 15.373089881049808,
+    "sourceId": "c4c8b10a-2411-46b7-9b6d-07671fa66356",
+    "emissive": true
+  }
+}

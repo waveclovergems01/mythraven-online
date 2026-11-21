@@ -154,12 +154,19 @@ async function showCharacterSelection(session: Session, message?: string): Promi
   },()=>signOut(session));
   if(message) app.querySelector('#character-error')!.textContent=message;
 }
-async function showGame(session: Session, character?: CharacterDefinition, assets?: PreparedCharacters): Promise<void> {
+async function showGame(session: Session, character?: CharacterDefinition, assets?: PreparedCharacters,
+  area: import('../shared/west-march.mjs').Area = 'city', fromWest = false): Promise<void> {
   stopFittingAuth?.();
   stopFittingAuth = undefined;
   const version=++viewVersion;
   app.innerHTML=`<main class="game-page"><header class="game-header"><div><div class="mini-brand">MYTHRAVEN <span>ONLINE</span></div><p>${t('city')} · <span id="player-name"></span></p></div></header><div id="game" aria-label="${t('city')}"><p class="loading">${t('loading')}</p></div><footer class="game-footer"><span>${t('cityControls')}</span><span>${t('cityNote')}</span></footer><button class="leave" id="logout">${t('logout')}</button><p id="game-error" class="error" role="alert"></p></main>`;
   app.querySelector('#player-name')!.textContent=session.username;
+  if(area==='west-march'){
+    const name=locale()==='th'?'ทุ่งชายแดนตะวันตก':'West March';
+    app.querySelector('.game-header p')!.firstChild!.textContent=name+' · ';
+    app.querySelector('#game')!.setAttribute('aria-label',name);
+    app.querySelector('.loading')!.textContent=locale()==='th'?'กำลังเข้าสู่ทุ่งชายแดน…':'Entering West March…';
+  }
   if(new URLSearchParams(location.search).get('view')!=='2d') mountGameSettings(app.querySelector<HTMLElement>('.game-page')!,locale()==='th');
   app.querySelector('#logout')!.addEventListener('click',async()=>{
     const button=app.querySelector<HTMLButtonElement>('#logout')!; button.disabled=true;
@@ -174,7 +181,13 @@ async function showGame(session: Session, character?: CharacterDefinition, asset
   if(new URLSearchParams(location.search).get('view')!=='2d') {
     const {mountTerrainWorld}=await import('./terrain/TerrainWorld');
     if(version!==viewVersion) { assets?.dispose(); return; }
-    const terrain=await mountTerrainWorld(app.querySelector<HTMLElement>('#game')!,session.username,character?.id,assets);
+    const terrain=await mountTerrainWorld(app.querySelector<HTMLElement>('#game')!,session.username,character?.id,assets,area,fromWest,next=>{
+      if(version!==viewVersion) return;
+      game?.destroy(true); game=null;
+      void showGame(session,character,undefined,next,next==='city').catch(()=>{
+        if(viewVersion===version+1) void showCharacterSelection(session,locale()==='th'?'โหลดแผนที่ไม่สำเร็จ กรุณาลองอีกครั้ง':'Could not load the map. Please try again.');
+      });
+    });
     if(version!==viewVersion) { terrain.destroy(); return; }
     game=terrain;
     return;

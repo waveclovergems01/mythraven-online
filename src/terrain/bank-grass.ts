@@ -1,6 +1,8 @@
 import * as THREE from 'three';
 import { TERRAIN, type TerrainData } from './terrain-data';
 import { terrainHeight } from './terrain-movement';
+import { isFortificationPlantingClear } from '../../shared/terrain-fortifications.mjs';
+import {isCityPlantingClear} from '../../shared/city-layout.mjs';
 
 /** Upright ribbon blades, independent of ground textures and navigation. */
 export function createBankGrass(data: TerrainData) {
@@ -31,13 +33,20 @@ export function createBankGrass(data: TerrainData) {
   const radius = {value:.01}, aspect = {value:1}, playerDepth = {value:new THREE.Vector2(-1,-1)}, time = {value:0};
   const material = new THREE.MeshStandardMaterial({ vertexColors:true, side:THREE.DoubleSide,
     roughness:.95, transparent:true, depthWrite:false });
+  const wind = `transformed.x+=sin(grassTime*1.3+instanceMatrix[3].x*.6+instanceMatrix[3].z*.4)*position.y*position.y*.045;`;
+  const depthMaterial = new THREE.MeshDepthMaterial({depthPacking:THREE.RGBADepthPacking,side:THREE.DoubleSide});
+  depthMaterial.onBeforeCompile = shader => {
+    shader.uniforms.grassTime=time;
+    shader.vertexShader='uniform float grassTime;\n'+shader.vertexShader;
+    shader.vertexShader=shader.vertexShader.replace('#include <begin_vertex>','#include <begin_vertex>\n'+wind);
+  };
+  depthMaterial.customProgramCacheKey=()=> 'bank-grass-wind-shadow-v1';
   material.customProgramCacheKey = () => 'bank-grass-occlusion-v1';
   material.onBeforeCompile = shader => {
     Object.assign(shader.uniforms,{ grassFeet:feet,grassHead:head,grassRadius:radius,
       grassAspect:aspect,grassPlayerDepth:playerDepth,grassTime:time });
     shader.vertexShader='uniform float grassTime; varying vec4 grassClip;\n'+shader.vertexShader;
-    shader.vertexShader=shader.vertexShader.replace('#include <begin_vertex>',`#include <begin_vertex>
-      transformed.x+=sin(grassTime*1.3+instanceMatrix[3].x*.6+instanceMatrix[3].z*.4)*position.y*position.y*.045;`);
+    shader.vertexShader=shader.vertexShader.replace('#include <begin_vertex>','#include <begin_vertex>\n'+wind);
     shader.vertexShader=shader.vertexShader.replace('#include <project_vertex>','#include <project_vertex>\ngrassClip=gl_Position;');
     shader.fragmentShader=`uniform vec2 grassFeet; uniform vec2 grassHead; uniform float grassRadius;
       uniform float grassAspect; uniform vec2 grassPlayerDepth; varying vec4 grassClip;\n`+shader.fragmentShader;
@@ -63,6 +72,8 @@ export function createBankGrass(data: TerrainData) {
     const col=Math.round((px/TERRAIN.size+.5)*(data.side-1)), row=Math.round((pz/TERRAIN.size+.5)*(data.side-1));
     const i=row*data.side+col, d=data.shoreDistance[i];
     if(d<3.7 || d>7.6 || data.heights[i]<2.7) continue;
+    if(!isFortificationPlantingClear(data,px,pz))continue;
+    if(!isCityPlantingClear(data,px,pz))continue;
     dummy.position.set(px,terrainHeight(data,px,pz)-.025,pz);
     dummy.rotation.set(0,random(seed+5)*Math.PI*2,0);
     const scale=.75+random(seed+7)*.6;
@@ -73,6 +84,7 @@ export function createBankGrass(data: TerrainData) {
   }
   for(const matrices of patches.values()) {
     const mesh=new THREE.InstancedMesh(geometry,material,matrices.length);
+    mesh.castShadow=true; mesh.receiveShadow=true; mesh.customDepthMaterial=depthMaterial;
     matrices.forEach((matrix,index)=>mesh.setMatrixAt(index,matrix));
     mesh.computeBoundingBox(); mesh.computeBoundingSphere();
     // Account for the small wind displacement beyond the resting blade tips.
@@ -82,22 +94,22 @@ export function createBankGrass(data: TerrainData) {
   const bottom=new THREE.Vector3(), top=new THREE.Vector3(), view=new THREE.Vector3();
   return {
     group, count,
-    update(camera: THREE.OrthographicCamera, player: THREE.Vector3 | undefined, seconds: number) {
+    update(camera: THREE.PerspectiveCamera, player: THREE.Vector3 | undefined, seconds: number) {
       time.value=seconds;
       if(!player){ playerDepth.value.set(-1,-1); return; }
-      aspect.value=(camera.right-camera.left)/(camera.top-camera.bottom);
+      aspect.value=camera.aspect;
       bottom.copy(player); bottom.y+=.15; bottom.project(camera);
       top.copy(player); top.y+=2.8; top.project(camera);
       feet.value.set(bottom.x*aspect.value,bottom.y); head.value.set(top.x*aspect.value,top.y);
-      radius.value=2*1.0/(camera.top-camera.bottom);
       view.copy(player); view.y+=.15; view.applyMatrix4(camera.matrixWorldInverse);
+      radius.value=camera.projectionMatrix.elements[5]/Math.max(1,-view.z);
       playerDepth.value.x=-view.z;
       view.copy(player); view.y+=2.8; view.applyMatrix4(camera.matrixWorldInverse);
       playerDepth.value.y=-view.z;
     },
     dispose() {
       group.children.forEach(child => (child as THREE.InstancedMesh).dispose());
-      geometry.dispose(); material.dispose(); group.removeFromParent();
+      geometry.dispose(); material.dispose(); depthMaterial.dispose(); group.removeFromParent();
     },
   };
 }

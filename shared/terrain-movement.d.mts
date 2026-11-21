@@ -14,6 +14,8 @@ export class TerrainMovement {
   setSpeedLevel(level: number): boolean;
   readonly data: TerrainData; readonly position: GroundPoint; readonly spawn: GroundPoint;
   heading: number; readonly moving: boolean; readonly turning: boolean; readonly height: number; readonly destination: GroundPoint | undefined;
+  readonly path: string; readonly next: number;
+  restorePath(path: string, next: number, turning: boolean): void;
   canStand(point: GroundPoint): boolean;
   clearLine(a: GroundPoint, b: GroundPoint): boolean;
   moveTo(target: GroundPoint): boolean;

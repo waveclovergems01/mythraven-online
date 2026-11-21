@@ -8,6 +8,10 @@ export const CHARACTERS = Object.freeze([
     nameTh: 'Warrior · ทรงผม 1', nameEn: 'Warrior · Hairstyle 1' }),
   Object.freeze({ id: 'warrior-male-02', model: 'warrior', classId: 'warrior', gender: 'male', hairStyle: 2,
     nameTh: 'Warrior · ทรงผม 2', nameEn: 'Warrior · Hairstyle 2' }),
+  Object.freeze({ id: 'archer-male-01', model: 'archer', classId: 'archer', gender: 'male', hairStyle: 1,
+    nameTh: 'Archer · ทรงผม 1', nameEn: 'Archer · Hairstyle 1' }),
+  Object.freeze({ id: 'archer-male-02', model: 'archer', classId: 'archer', gender: 'male', hairStyle: 2,
+    nameTh: 'Archer · ทรงผม 2', nameEn: 'Archer · Hairstyle 2' }),
 ]);
 export const DEFAULT_CHARACTER_ID = CHARACTERS[0].id;
 export const characterById = id => CHARACTERS.find(character => character.id === id);

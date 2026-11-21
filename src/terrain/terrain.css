@@ -34,6 +34,7 @@
   padding: 3px 6px; background: #243a3080; border-radius: 3px;
 }
 .world-player-name[data-mine="true"] { color: #ffe5a0; }
+.world-player-name.monster-name { z-index: 1; color: #ffe9b3; background: #30291ee6; box-shadow: inset 0 0 0 1px #c79a57; }
 @media (max-width: 600px) { .terrain-network { top: 78px; left: 8px; font-size: 11px; } }
 .game-page:has(.terrain-minimap) { --terrain-minimap-size: clamp(140px, 17vw, 224px); }
 .terrain-minimap {
@@ -67,3 +68,4 @@
 .terrain-asset-status { position: absolute; top: 12px; left: 50%; transform: translateX(-50%); max-width: 45%; padding: 8px 12px; border-radius: 5px; background: #18332ee8; color: #eee2c2; font-size: 12px; z-index: 5; }
 .terrain-asset-status[hidden] { display: none; }
 .terrain-asset-status button { margin-left: 10px; padding: 4px 8px; background: #d2b477; color: #1c2d24; border: 0; border-radius: 3px; }
+.terrain-host canvas[data-orbiting="true"], #game canvas[data-orbiting="true"] { cursor: grabbing; }

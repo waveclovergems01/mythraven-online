@@ -1,34 +1,27 @@
-import type { CharacterDefinition } from '../../shared/character-catalog.mjs';
-import { loadNovicePlayers } from './novice-player';
-import { loadSkinnedPlayers } from './skinned-player';
+import type {CharacterDefinition} from '../../shared/character-catalog.mjs';
+import {createPlayerLibrary} from './player-library';
+import {equipment,loadSkinnedPlayers,type PlayerClass,type Weapon} from './skinned-player';
 
-export type PlayerFactory = Awaited<ReturnType<typeof loadSkinnedPlayers>>;
-export type PlayerAvatar = ReturnType<PlayerFactory['create']>;
-/** Session-owned cache: a preview and its world share assets, never player poses. */
-export function createCharacterAssets() {
-  const ready = new Map<string, PlayerFactory>();
-  const pending = new Map<string, Promise<PlayerFactory>>();
-  let disposed = false;
-  const load = (model: string) => {
-    if (model === 'novice') return loadNovicePlayers();
-    if (model === 'warrior') return loadSkinnedPlayers({ model, url: '/assets/models/characters/m1-warrior1.glb',
-      hairUrl: '/assets/models/characters/warrior-hair-02.glb', hairNode: 'Warrior_Hair_02',
-      hairMaterial: 'model.020', idle: 'n_war_idle', run: 'n_war_run' });
-    return Promise.reject(new Error(`No player loader for ${model}`));
-  };
+export type PlayerFactory=Awaited<ReturnType<typeof loadSkinnedPlayers>>;
+export type PlayerAvatar=ReturnType<PlayerFactory['create']>;
+export function createCharacterAssets(){
+  const library=createPlayerLibrary(), ready=new Map<string,PlayerFactory>(), pending=new Map<string,Promise<PlayerFactory>>();
+  let disposed=false;
   return {
-    get(character: CharacterDefinition) { return ready.get(character.model); },
-    ensure(character: CharacterDefinition): Promise<PlayerFactory> {
-      if (disposed) return Promise.reject(new Error('Character assets disposed'));
-      const cached = ready.get(character.model); if (cached) return Promise.resolve(cached);
-      const inflight = pending.get(character.model); if (inflight) return inflight;
-      const request = load(character.model).then(factory => {
-        if (disposed) { factory.dispose(); throw new Error('Character assets disposed'); }
-        ready.set(character.model, factory); return factory;
-      }).finally(() => pending.delete(character.model));
-      pending.set(character.model, request); return request;
+    get(character:CharacterDefinition){return ready.get(character.model);},
+    loadWeapon(weapon:Weapon){return library.load('weapons/'+weapon);},
+    ensure(character:CharacterDefinition){
+      const model=character.model;
+      if(disposed || !Object.hasOwn(equipment,model)) return Promise.reject(new Error('Unavailable character '+model));
+      const cached=ready.get(model);if(cached) return Promise.resolve(cached);
+      const inflight=pending.get(model);if(inflight) return inflight;
+      const request=loadSkinnedPlayers(model as PlayerClass,library).then(factory=>{
+        if(disposed){factory.dispose();throw new Error('Character assets disposed');}
+        ready.set(model,factory);return factory;
+      }).finally(()=>pending.delete(model));
+      pending.set(model,request);return request;
     },
-    dispose() { if (disposed) return; disposed = true; ready.forEach(factory => factory.dispose()); ready.clear(); },
+    dispose(){if(disposed)return;disposed=true;ready.forEach(f=>f.dispose());ready.clear();library.dispose();},
   };
 }
-export type CharacterAssets = ReturnType<typeof createCharacterAssets>;
+export type CharacterAssets=ReturnType<typeof createCharacterAssets>;

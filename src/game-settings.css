@@ -23,9 +23,16 @@
 .settings-dialog .terrain-speed-heading, .settings-range-heading { display: flex; justify-content: space-between; gap: 8px; font-size: 13px; }
 .settings-range output { white-space: nowrap; font-variant-numeric: tabular-nums; }
 .settings-dialog .settings-range input { display: block; width: 100%; height: 34px; padding: 0; margin: 16px 0 0; accent-color: #d6ba71; cursor: pointer; }
-.settings-range-ends { display: flex; justify-content: space-between; align-items: center; gap: 8px; font-size: 11px; color: #b8c5b8; }
 .settings-reset { padding: 5px 8px; border: 1px solid #88784e80; border-radius: 4px; background: transparent; color: var(--settings-gold); font: inherit; }
 .settings-reset:hover { background: #ffffff10; }
+.time-presets { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; margin-top: 14px; }
+.time-presets button { padding: 8px 2px; font: inherit; font-size: 12px; color: #d8dfce; background: #ffffff08; border: 1px solid #88784e80; border-radius: 5px; }
+.time-presets button:hover, .time-presets button[aria-pressed="true"] { color: #ffe4a0; border-color: #d7bd80; background: #d7bd8020; }
+.light-heading { margin-top: 22px; }
+.settings-help, .orbit-help { font-size: 12px; line-height: 1.65; color: #b8c5b8; }
+.settings-help { margin: 8px 0 18px; }
+.orbit-help { padding-top: 12px; border-top: 1px solid #8e81523d; }
+.orbit-help p { margin-top: 0; }
 .settings-footer { padding: 18px 22px; border-top: 1px solid #8e81523d; }
 .settings-footer .leave { width: 100%; padding: 12px; color: #e9c0a3; background: #392d26; border: 1px solid #987258; border-radius: 5px; }
 .settings-footer .leave:hover { background: #50372c; }
