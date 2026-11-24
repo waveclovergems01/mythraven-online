@@ -1,3 +1,4 @@
+import {SCENERY_EXTENSION} from './world-surroundings';
 import * as THREE from 'three';
 import { TERRAIN, type TerrainData } from './terrain-data';
 import { createGroundMaterial, createRiverMaterial, terrainGrassCoverage, type TerrainTiles } from './terrain-materials';
@@ -36,35 +37,26 @@ export function createTerrain(data: TerrainData, tiles: TerrainTiles): THREE.Gro
   land.castShadow = true; land.receiveShadow = true;
   land.name = 'continuous-terrain';
   land.userData.grassCoverage = grass.coverage;
-  group.add(land);
+  // Keep the full grid only for exact ground picking; render spatial tiles instead.
+  land.visible=false;group.add(land);
+  for(let row=0;row<TERRAIN.segments;row+=32)for(let col=0;col<TERRAIN.segments;col+=32){
+    const tile=new THREE.BufferGeometry(),indices:number[]=[],bounds=new THREE.Box3(),point=new THREE.Vector3();
+    for(const [name,attribute] of Object.entries(geometry.attributes))tile.setAttribute(name,attribute);
+    for(let z=row;z<=Math.min(row+32,TERRAIN.segments);z++)for(let x=col;x<=Math.min(col+32,TERRAIN.segments);x++){
+      const a=z*data.side+x;point.fromBufferAttribute(positions,a);bounds.expandByPoint(point);
+      if(x<Math.min(col+32,TERRAIN.segments) && z<Math.min(row+32,TERRAIN.segments)){
+        const b=a+data.side;indices.push(a,b,a+1,b,b+1,a+1);
+      }
+    }
+    tile.setIndex(indices);tile.boundingBox=bounds;tile.boundingSphere=bounds.getBoundingSphere(new THREE.Sphere());
+    const mesh=new THREE.Mesh(tile,material);mesh.name='terrain-patch';mesh.castShadow=mesh.receiveShadow=true;group.add(mesh);
+  }
 
-  // A cut earth edge makes the relief legible when inspecting the whole terrain.
-  const edge: number[] = [], n = data.side;
-  for (let x = 0; x < n; x++) edge.push(x);
-  for (let z = 1; z < n; z++) edge.push(z * n + n - 1);
-  for (let x = n - 2; x >= 0; x--) edge.push((n - 1) * n + x);
-  for (let z = n - 2; z > 0; z--) edge.push(z * n);
-  const skirtVertices: number[] = [], skirtColors: number[] = [], indices: number[] = [];
-  const earth = new THREE.Color('#8d795c'), bottom = new THREE.Color('#635b48');
-  edge.forEach((index, i) => {
-    const x = positions.getX(index), z = positions.getZ(index);
-    skirtVertices.push(x, data.heights[index], z, x, TERRAIN.baseLevel, z);
-    earth.toArray(skirtColors, i * 6); bottom.toArray(skirtColors, i * 6 + 3);
-    const a = i * 2, b = ((i + 1) % edge.length) * 2;
-    indices.push(a, b, a + 1, b, b + 1, a + 1);
-  });
-  const skirt = new THREE.BufferGeometry();
-  skirt.setAttribute('position', new THREE.Float32BufferAttribute(skirtVertices, 3));
-  skirt.setAttribute('color', new THREE.Float32BufferAttribute(skirtColors, 3));
-  skirt.setIndex(indices); skirt.computeVertexNormals();
-  group.add(new THREE.Mesh(skirt, new THREE.MeshStandardMaterial({
-    vertexColors: true, roughness: 1, side: THREE.DoubleSide,
-  })));
   return group;
 }
 
 export function createWater(data: TerrainData): { mesh: THREE.Mesh; update: (time: number) => void } {
-  const geometry = new THREE.PlaneGeometry(TERRAIN.size, TERRAIN.size);
+  const geometry = new THREE.PlaneGeometry(TERRAIN.size+2*SCENERY_EXTENSION, TERRAIN.size+2*SCENERY_EXTENSION);
   geometry.rotateX(-Math.PI / 2);
   const water = createRiverMaterial(data);
   const mesh = new THREE.Mesh(geometry, water.material);

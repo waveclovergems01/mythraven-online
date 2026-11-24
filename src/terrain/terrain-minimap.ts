@@ -1,3 +1,4 @@
+import markerStyles from '../../shared/minimap-markers.json';
 import { TERRAIN, type TerrainData } from './terrain-data';
 import type { TerrainPlayer } from '../network/terrain-client';
 import { createTreePlacements } from '../../shared/terrain-props.mjs';
@@ -8,6 +9,8 @@ import type {WildlifeTarget} from './frontier-wildlife';
 
 const SVG = 'http://www.w3.org/2000/svg';
 const SIZE = 256;
+let mapSerial=0;
+const NO_PARTY:ReadonlySet<string>=new Set();
 const mapCoordinate = (value: number) => (value / TERRAIN.size + .5) * SIZE;
 
 /** Code-native map of the same heightfield; no second renderer or image asset. */
@@ -23,6 +26,18 @@ export function createTerrainMinimap(host: HTMLElement, data: TerrainData, thai:
   compass.setAttribute('aria-label', thai ? 'ทิศเหนือ ใต้ ตะวันออก ตะวันตก' : 'North, south, east and west');
   compass.innerHTML = '<svg viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="23"/><path d="M24 12 28 24 24 36 20 24Z"/><path class="north" d="M24 12 28 24 20 24Z"/><text x="24" y="10">N</text><text x="24" y="45">S</text><text x="43" y="27">E</text><text x="5" y="27">W</text></svg>';
   const svg = document.createElementNS(SVG, 'svg'); svg.setAttribute('viewBox', '0 0 256 256');
+  // Shared radial gradients give every point a bright core and soft halo, without 500 blur filters.
+  const markerPrefix='radar-'+(++mapSerial)+'-';
+  const defs=document.createElementNS(SVG,'defs');
+  for(const [kind,style] of Object.entries(markerStyles)){
+    const glow=document.createElementNS(SVG,'radialGradient');glow.id=markerPrefix+kind;
+    for(const [offset,color,opacity] of [[0,'#fffafa',1],[.16,style.color,1],[.4,style.color,.65],[1,style.color,0]] as const){
+      const stop=document.createElementNS(SVG,'stop');stop.setAttribute('offset',String(offset));
+      stop.setAttribute('stop-color',color);stop.setAttribute('stop-opacity',String(opacity));glow.append(stop);
+    }
+    defs.append(glow);
+  }
+  svg.append(defs);
   svg.setAttribute('role', 'img'); svg.setAttribute('aria-label', thai ? 'แผนที่พื้นดิน ร่องน้ำ และตำแหน่งผู้เล่น' : 'Terrain, river and player locations');
   const base = document.createElementNS(SVG, 'rect');
   base.setAttribute('width', '256'); base.setAttribute('height', '256'); base.setAttribute('fill', '#73adb7'); svg.append(base);
@@ -104,40 +119,76 @@ export function createTerrainMinimap(host: HTMLElement, data: TerrainData, thai:
   svg.append(footprint);
   const wildlifeDots = document.createElementNS(SVG,'g'); svg.append(wildlifeDots);
   const animalMarkers=new Map<string,SVGCircleElement>();
+  const boundary=document.createElementNS(SVG,'circle');
+  boundary.setAttribute('fill','none');boundary.setAttribute('stroke','#ffe39a');boundary.setAttribute('stroke-width','1.5');
+  boundary.style.display='none';if(field)svg.append(boundary);
   const dots = document.createElementNS(SVG, 'g'); svg.append(dots);
-  panel.append(svg, title, compass); host.append(panel);
+  const travelButton=document.createElement('button');
+  travelButton.type='button';travelButton.className='terrain-portal-travel';travelButton.disabled=true;
+  travelButton.textContent=field?(thai?'เดินกลับเมืองหลัก':'Walk to the city'):(thai?'เดินไปทุ่งชายแดนตะวันตก':'Walk to West March');
+  travelButton.title=thai?'เดินไปยังวาร์ปและเปลี่ยนแมพอัตโนมัติ':'Walk to the portal and enter the next map';
+  panel.append(svg, title, compass,travelButton); host.append(panel);
   const markers = new Map<string, SVGCircleElement>();
+  const flares=new WeakMap<SVGCircleElement,SVGPathElement>();
+  function flare(dot:SVGCircleElement,kind:keyof typeof markerStyles,x:string,y:string,radius:number){
+    let rays=flares.get(dot);
+    if(!rays){
+      rays=document.createElementNS(SVG,'path');
+      rays.setAttribute('d','M-1 0 L-.12 -.1 L0 -1 L.12 -.1 L1 0 L.12 .1 L0 1 L-.12 .1Z');
+      rays.setAttribute('pointer-events','none');dot.before(rays);flares.set(dot,rays);
+    }
+    rays.setAttribute('fill',markerStyles[kind].color);rays.setAttribute('opacity',kind==='other'?'.35':'.65');
+    const transform=`translate(${x} ${y}) scale(${radius})`;
+    if(rays.getAttribute('transform')!==transform)rays.setAttribute('transform',transform);
+    rays.style.display=dot.style.display;
+  }
   return {
+    travelButton,
+    huntingRange(center:{x:number;z:number},radius:number){
+      boundary.style.display=radius?'':'none';
+      if(!radius)return;
+      boundary.setAttribute('cx',String(mapCoordinate(center.x)));boundary.setAttribute('cy',String(mapCoordinate(center.z)));
+      boundary.setAttribute('r',String(radius*SIZE/TERRAIN.size));
+    },
     update(players: ReadonlyMap<string, TerrainPlayer>, ownId: string | undefined,
-      view: { x: number; z: number }[], animals?:ReadonlyMap<string,WildlifeTarget>, selected?:string) {
+      view: { x: number; z: number }[], animals?:ReadonlyMap<string,WildlifeTarget>, selected?:string, partyMembers:ReadonlySet<string>=NO_PARTY) {
       if(animals) for(const [id,animal] of animals) {
         let dot=animalMarkers.get(id);
         if(!dot){
           dot=document.createElementNS(SVG,'circle'); dot.dataset.monster=id;
-          dot.setAttribute('fill',animal.kind==='rabbit'?'#fff0c8':'#d88664');
-          dot.setAttribute('stroke','#5b4637'); dot.setAttribute('stroke-width','.8');
+          dot.setAttribute('fill',`url(#${markerPrefix}monster)`);
+          dot.dataset.markerType='monster';
           const tooltip=document.createElementNS(SVG,'title');tooltip.textContent=thai?animal.th:animal.en;
           dot.append(tooltip);wildlifeDots.append(dot);animalMarkers.set(id,dot);
         }
-        dot.setAttribute('r',selected===id?'3.3':'1.9');
-        dot.setAttribute('cx',String(mapCoordinate(animal.position.x)));dot.setAttribute('cy',String(mapCoordinate(animal.position.z)));
+        const display=animal.alive?'':'none';
+        if(dot.style.display!==display)dot.style.display=display;
+        if(!animal.alive){const rays=flares.get(dot);if(rays)rays.style.display='none';continue;}
+        const radius=String(markerStyles.monster.radius*(selected===id?1.5:1));
+        if(dot.getAttribute('r')!==radius)dot.setAttribute('r',radius);
+        const x=mapCoordinate(animal.position.x).toFixed(1),y=mapCoordinate(animal.position.z).toFixed(1);
+        if(dot.getAttribute('cx')!==x)dot.setAttribute('cx',x);
+        if(dot.getAttribute('cy')!==y)dot.setAttribute('cy',y);
+        flare(dot,'monster',x,y,Number(radius)*.85);
       }
-      for (const [id, dot] of markers) if (!players.has(id)) { dot.remove(); markers.delete(id); }
+      for (const [id, dot] of markers) if (!players.has(id)) { flares.get(dot)?.remove();dot.remove(); markers.delete(id); }
       for (const [id, player] of players) {
         let dot = markers.get(id);
         if (!dot) {
           dot = document.createElementNS(SVG, 'circle'); dot.classList.add('terrain-minimap-player'); dot.dataset.playerId = id;
-          dot.setAttribute('stroke', '#20372f'); dot.setAttribute('stroke-width', '1.2');
           const name = document.createElementNS(SVG, 'title'); name.textContent = player.name; dot.append(name);
           markers.set(id, dot); dots.append(dot);
         }
         const mine = id === ownId;
-        dot.dataset.mine = String(mine); dot.setAttribute('r', mine ? '3.5' : '2.5');
-        dot.setAttribute('fill', mine ? '#ffe49a' : '#d4efff');
+        const kind=mine?'self':partyMembers.has(id)?'party':'other';
+        dot.dataset.mine = String(mine);dot.dataset.markerType=kind;
+        dot.setAttribute('r',String(markerStyles[kind].radius));
+        dot.setAttribute('fill',`url(#${markerPrefix}${kind})`);
         dot.setAttribute('cx', String(mapCoordinate(player.x))); dot.setAttribute('cy', String(mapCoordinate(player.z)));
+        flare(dot,kind,dot.getAttribute('cx')!,dot.getAttribute('cy')!,markerStyles[kind].radius);
       }
       const own = ownId ? markers.get(ownId) : undefined;
-      if (own) dots.append(own); // Local marker stays readable in a group.
+      if (own) {dots.append(flares.get(own)!,own);} // Local marker stays readable in a group.
       footprint.style.display = own ? '' : 'none';
       footprint.setAttribute('points', view.map(point => `${mapCoordinate(point.x)},${mapCoordinate(point.z)}`).join(' '));
     },

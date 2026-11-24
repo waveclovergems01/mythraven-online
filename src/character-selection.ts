@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import { CHARACTERS, type CharacterDefinition } from '../shared/character-catalog.mjs';
 import { createCharacterAssets, type CharacterAssets, type PlayerAvatar } from './terrain/character-assets';
-import {equipment, type PlayerClass, type Weapon, type PreviewMotion} from './terrain/skinned-player';
+import {equipment, weaponsFor, type PlayerClass, type Weapon, type PreviewMotion} from './terrain/skinned-player';
 import './character-selection.css';
 
 export type PreparedCharacters = CharacterAssets;
@@ -83,7 +83,7 @@ export function mountCharacterSelection(host: HTMLElement, username: string, tha
     previewCharacter = character;
     const version = ++previewVersion;
     gear.disabled=motion.disabled=true;
-    const allowed:readonly Weapon[]=equipment[character.model as PlayerClass];
+    const allowed=weaponsFor(character.model as PlayerClass);
     const item=allowed.find(w=>w===gear.value);
     gear.replaceChildren(new Option(thai?'มือเปล่า':'Unarmed',''),...allowed.map(w=>new Option(weaponNames[w],w)));
     gear.value=item??'';

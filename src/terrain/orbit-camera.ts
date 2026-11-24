@@ -1,3 +1,4 @@
+import {sceneryHeight} from './world-surroundings';
 import * as THREE from 'three';
 import { TERRAIN, type TerrainData } from './terrain-data';
 import { terrainHeight } from './terrain-movement';
@@ -12,7 +13,7 @@ export function createOrbitCamera(data: TerrainData) {
   let yaw = 0, pitch = Math.atan2(45, 55);
   const reset = () => { yaw = 0; pitch = Math.atan2(45, 55); };
   const floor = (x: number, z: number) => Math.abs(x) <= TERRAIN.size / 2 && Math.abs(z) <= TERRAIN.size / 2
-    ? Math.max(TERRAIN.waterLevel, terrainHeight(data, x, z)) : TERRAIN.waterLevel;
+    ? Math.max(TERRAIN.waterLevel, terrainHeight(data, x, z)) : Math.max(TERRAIN.waterLevel,sceneryHeight(data,x,z));
   return {
     camera,
     reset,

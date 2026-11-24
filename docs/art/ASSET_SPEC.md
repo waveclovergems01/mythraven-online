@@ -1,5 +1,9 @@
 # Asset and sprite contract — MR-ART-v1
 
+## Loading-screen illustrations — 2026-11-23
+
+Owner-supplied backgrounds live in `public/assets/loading/*.png`. `shared/loading-art.json` is the runtime registry of seven original filenames, normalized runtime paths and exact dimensions (1671/1672 × 941). Copies are hash-verified against the supplied Downloads files with no pixel changes. All seven are used by the loading-screen rotation; none supersedes existing login or character imagery. Desktop/mobile CSS uses centered cover cropping and a dark lower gradient for readable real text and progress. QA screenshots belong in `test-results/loading`. No generated candidates, extra source copies or exporters are retained, and no obsolete image was replaced.
+
 Plaza paving uses continuous cobblestone up to the fountain base and through road junctions. The circle and diamond line overlays are retired. Local cloth masks in flag-panels.json identify free pennants and hanging banners on the city architecture. Their moving vertices and shadow pass share one wind phase per world location. Poles and attachment edges stay fixed.
 
 Current plaza fountain revision: place the 9-unit source model at 2.5 uniform scale (22.5 high, about 38.4 across). Its circular collision and plaza inlay follow the enlarged footprint. Clear sea-blue water shows the stone beneath. Shallow traveling waves and ripples from the urn impact deform the surface, replacing the earlier bright caustic spots and separate ripple rings.
@@ -662,3 +666,11 @@ src/world/occlusion-fade.ts caches original texture alpha and samples the local 
 Minimap fountain placement uses FOUNTAIN.x/y, width846, source768x796 and anchor(367,584) at the same world-to-minimap scale as other landmarks. It draws the original source image, independent of world object alpha, and creates no additional runtime bitmap file. No navigation, bridge projection or server movement changes.
 
 Visibility validation: npm run build passed. Playwright castle regression passed; landmark-visibility test passed real server walks behind/in front of both props, synchronized water/flag opacity, opacity restoration, animated fountain water, transparent-padding rejection and reentry with exactly two POST_UPDATE subscriptions. The fountain thumbnail matched source color averages within0.9 RGB levels and its blue-basin centroid within0.34 minimap pixels. Screenshots and measurements are in test-results/landmark-visibility. Existing user dev processes were reused and left running unchanged; no extra server or image files were introduced.
+
+
+### Combat impact revision — 2026-11-24
+Owner reference: `Animated Cyan Starburst Explosion.gif` (309×309, 16 frames, 1120 ms), reviewed as animation direction only. Runtime remains a chest-anchored, camera-facing depth-independent GPU shader: pinpoint expands into four long/four short tapered rays, then rays fade ahead of the trailing circular shell and sparks. Ordinary hits are white, critical hits pale gold, incoming player hits red. Preserve 0.28/0.32/0.26-second normal/critical/incoming durations. Multiply the existing victim-based size by one random 0.8–1.0 factor per hit; no critical enlargement. No new raster export or GIF texture is shipped. All weapon/class critical impacts use the byte-identical owner `critical_01_deep_heavy.mp3`, registered at `shared/combat-effects.json`; ordinary dagger and monster audio remain unchanged.
+
+
+### Archer bow arrow — 2026-11-24
+Code-native `energy-arrow.ts`: two double-sided crossed planes, red glow/white shaft, alpha blending, no depth write/test, no shadow casting. Normalized arrow points along +X; the draw arrow stretches from the weighted string nock to 18% past the bow grip. Nock vertices are selected once on equipment attachment by maximum `DEF-hold-tweak.L` weight (0.5 in the current bow) and evaluated through skinning as the bow draws. This preserves the actual 50/50 deformation rather than anchoring to the control bone origin. Runtime GLBs remain byte-identical. `shared/bow-projectile.json` defines draw frames 2–6, ten total frames, projectile speed 85 units/s and 0.045–0.16-second flight bounds. Existing character-relative hit effect sizes/colors remain separate. No production raster, source copy or exporter is added.

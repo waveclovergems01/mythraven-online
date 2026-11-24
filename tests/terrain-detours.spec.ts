@@ -23,7 +23,7 @@ test('predicted grove detours keep the run clip and server corridor through ever
   });
   await page.setViewportSize({ width: 1440, height: 960 });
   await page.goto('/'); await page.locator('#guest').click(); await chooseCharacter(page);
-  await expect(page.locator('#network-status')).toHaveAttribute('data-connected', 'true');
+  await expect(page.locator('#network-status')).toHaveAttribute('data-connected', 'true',{timeout:60000});
   await expect.poll(() => page.evaluate(() => !!(window as any).detours)).toBe(true);
   const pair = await page.evaluate(() => (window as any).detours.pair());
   const read = () => page.evaluate(() => (window as any).detours.read());

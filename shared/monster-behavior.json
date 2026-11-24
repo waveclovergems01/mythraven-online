@@ -1,0 +1,9 @@
+{
+  "speedLevel": 4,
+  "restSeconds": {"min": 10, "max": 30},
+  "walkMetres": {"min": 5, "max": 30},
+  "footsteps": {
+    "rabbit": ["/assets/audio/wildlife/rabbit_hop_01_soft_duik.mp3", "/assets/audio/wildlife/rabbit_hop_02_bouncy_dit.mp3"],
+    "wolf": ["/assets/audio/wildlife/rabbit_hop_03_low_dook.mp3"]
+  }
+}

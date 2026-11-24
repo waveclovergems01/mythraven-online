@@ -1,0 +1,8 @@
+{
+  "dagger": {
+    "normal": "/assets/audio/combat/dagger_stab_hit_01.mp3"
+  },
+  "bow": {"normal": "/assets/audio/combat/knife_chop_01_chik.mp3"},
+  "monster": "/assets/audio/combat/dagger_stab_hit_07.mp3",
+  "critical": "/assets/audio/combat/critical_01_deep_heavy.mp3"
+}

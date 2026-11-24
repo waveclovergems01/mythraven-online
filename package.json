@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "concurrently --kill-others -n AUTH,GAME,WEB \"node server/index.mjs\" \"node server/game.mjs\" \"vite\"",
+    "dev": "concurrently --kill-others -n AUTH,GAME,WEB \"node server/index.mjs\" \"node --watch server/game.mjs\" \"vite\"",
     "typecheck": "tsc --noEmit",
     "build": "npm run typecheck && vite build",
     "preview": "vite preview --host 127.0.0.1",

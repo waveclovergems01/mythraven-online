@@ -1,8 +1,8 @@
 import { shortestPath } from './pathfinding.mjs';
 import { TERRAIN } from './terrain-data.mjs';
 import { isTreeCellClear } from './terrain-props.mjs';
-import { createFortifications, fortificationSurface, isFortificationClear } from './terrain-fortifications.mjs';
-import {isBuildingClear} from './city-layout.mjs';
+import { fortificationSurface, isFortificationClear } from './terrain-fortifications.mjs';
+import {isBuildingClear,FOUNTAIN_RESERVE_RADIUS} from './city-layout.mjs';
 import {FIELD_ARRIVAL, FIELD_LIMIT} from './west-march.mjs';
 export const WALK_SPEED = 7;
 export const MAX_SPEED_LEVEL = 10;
@@ -72,9 +72,9 @@ export class TerrainMovement {
                     .every(index => (fortificationSurface(data,index%data.side*STEP-HALF,Math.floor(index/data.side)*STEP-HALF,PLAYER_RADIUS)!==undefined)
                       || (data.shoreDistance[index] > 4 + PLAYER_RADIUS && data.heights[index] > 1)));
             }
-        // Start on the southern city approach so nearby banks establish world scale.
+        // New city arrivals stand on the plaza, just in front of the fountain's southern steps.
         const preferred = data.area === 'west-march' ? FIELD_ARRIVAL :
-          { x: 0, z: createFortifications(data).bridges.find(b=>b.id==='south').from-35 };
+          { x: 0, z: FOUNTAIN_RESERVE_RADIUS+6 };
         let best = -1, distance = Infinity;
         for (let i = 0; i < this.safe.length; i++) {
             if (!this.safe[i])
@@ -175,22 +175,27 @@ export class TerrainMovement {
         if (path !== this.path) { this.route = JSON.parse(path); this.path = path; }
         this.next = next; this.aligning = turning;
     }
-    moveTo(target) {
+    planRoute(target) {
         if (!this.canStand(target))
-            return false;
-        const travelling = this.moving && !this.aligning;
+            return undefined;
         if (this.clearLine(this.position, target))
-            this.route = [{ ...target }];
+            return [{ ...target }];
         else {
             const start = this.cell(this.position), end = this.cell(target);
             const cells = shortestPath(start, end, { columns: TERRAIN.segments, rows: TERRAIN.segments,
                 width: STEP, height: STEP, walkable: this.walkable });
             if (!cells.length)
-                return false;
+                return undefined;
             // Start from the current position, not a backwards trip to this cell's centre.
             // canStep already requires both adjacent cells for every diagonal transition.
-            this.route = this.smoothRoute([...cells.map(cell => this.center(cell)), { ...target }]);
+            return this.smoothRoute([...cells.map(cell => this.center(cell)), { ...target }]);
         }
+    }
+    moveTo(target) {
+        const route=this.planRoute(target);
+        if(!route)return false;
+        const travelling = this.moving && !this.aligning;
+        this.route=route;
         this.next = 0;
         // Small course corrections during a run steer like bends on the existing route.
         const first = this.route[0];

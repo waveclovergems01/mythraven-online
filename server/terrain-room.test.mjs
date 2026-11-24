@@ -140,16 +140,334 @@ test('authoritative path snapshots resume the same corridor and turn phase witho
   assert.equal(server.moving, false); assert.equal(client.moving, false);
 });
 
-function createRoom() {
+function createRoom(roomName='mythraven-world',ready=true) {
   const handlers = new Map();
-  const room = { setState(state) { this.state = state; }, setPatchRate() {}, setSimulationInterval() {},
+  const room = { roomName,events:[],broadcast(name,data){this.events.push({name,data});},setState(state) { this.state = state; }, setPatchRate() {}, setSimulationInterval() {},
     onMessage(name, handler) { handlers.set(name, handler); } };
   for (const name of Object.getOwnPropertyNames(TerrainRoom.prototype)) if (name !== 'constructor') room[name] = TerrainRoom.prototype[name];
   room.onCreate();
-  const client = id => ({ sessionId: id, errors: [], send(message) { this.errors.push(message); } });
+  const client = id => ({ sessionId: id, errors: [], messages:[],send(message,data) { this.errors.push(message);this.messages.push({message,data}); } });
   const a = client('a'), b = client('b'); room.onJoin(a, { displayName: 'Alice', characterId: 'novice-male-01' }); room.onJoin(b, { displayName: 'Bob', characterId: 'novice-male-02' });
+  if(ready)for(const p of room.state.players.values()){p.sceneReady=true;p.protectedUntil=0;}
   return { room, a, b, send: (client, message) => { handlers.get('move')(client, message); room.tick(0); }, handlers };
 }
+test('city arrivals spawn on the plaza in front of the fountain, separately and on walkable ground',()=>{
+  const {room,a,b}=createRoom();
+  const fountain=createCityLayout(terrainData).buildings.find(building=>building.model==='plaza-angel-fountain');
+  for(const client of [a,b]){
+    const p=room.state.players.get(client.sessionId),nav=room.movers.get(client.sessionId);
+    assert.ok(nav.canStand(p));assert.ok(Math.abs(p.x)<6);
+    assert.ok(p.z>fountain.radius && p.z<fountain.radius+12);
+  }
+  const pa=room.state.players.get('a'),pb=room.state.players.get('b');
+  assert.ok(Math.hypot(pa.x-pb.x,pa.z-pb.z)>2);
+});
+
+test('loading players cannot move, attack or be targeted; readiness grants exactly 15 seconds once',()=>{
+  const {room,a,handlers}=createRoom('mythraven-west-march',false);
+  const player=room.state.players.get('a'),before={...room.movers.get('a').position};
+  handlers.get('weapon')(a,'dagger');
+  handlers.get('move')(a,{x:190,z:28,seq:1});room.tick(50);
+  handlers.get('fight')(a,'rabbit-0');
+  handlers.get('auto-hunt')(a,{enabled:true,radius:null,kinds:['rabbit']});
+  assert.deepEqual(room.movers.get('a').position,before);
+  assert.equal(room.fighters.get('a').target,'');assert.equal(player.autoHunt,false);
+  assert.equal(room.canTargetPlayer('a',9999999999),false);
+  assert.equal(player.protectedUntil,0);
+  room.markSceneReady('a',100);
+  assert.equal(player.protectedUntil,115);
+  assert.equal(room.canTargetPlayer('a',114.999),false);
+  assert.equal(room.canTargetPlayer('a',115),true);
+  room.markSceneReady('a',200);
+  assert.equal(player.protectedUntil,115,'repeated ready messages cannot renew protection');
+  handlers.get('scene-ready')(a);
+  assert.equal(player.protectedUntil,115);
+  assert.equal(a.messages.at(-1).message,'scene-ready');
+});
+
+test('arrival protection prevents retaliation acquisition and cancels a pending hit',async t=>{
+  const {room,a,b,handlers,key,now,mob,health}=await claimFixture(t);
+  const player=room.state.players.get('a');
+  player.protectedUntil=now+15;
+  handlers.get('fight')(a,key);room.combatTick(now);room.combatTick(now+.3);
+  assert.ok(health.hp<100);assert.equal(health.engaged,false);
+  // A stale target or queued hit must also pass the server protection gate.
+  mob.mover=new TerrainMovement(room.terrainData);mob.victim='a';mob.impactAt=now+.4;
+  health.engaged=true;health.x=player.x;health.z=player.z;
+  room.retaliate(now+.5);
+  assert.equal(player.hp,100);assert.equal(health.engaged,false);assert.equal(mob.victim,'');assert.equal(mob.impactAt,0);
+  assert.equal(room.events.filter(e=>e.name==='combat-hit'&&e.data.to==='player').length,0);
+  // A different, ready player is independently targetable.
+  assert.equal(room.canTargetPlayer(b.sessionId,now),true);
+});
+
+test('server auto hunting travels, kills and retargets without client frames or follow-up commands',async t=>{
+  const {room,a,b,handlers}=createRoom('mythraven-west-march');
+  let now=2000;t.mock.method(Date,'now',()=>now*1000);t.mock.method(Math,'random',()=>.5);
+  const place=(client,kind)=>{
+    const route=[...room.patrols.values()].find(mob=>mob.route.kind===kind).route;
+    const point=route.spawn,nav=room.movers.get(client.sessionId);
+    Object.assign(nav.position,point);room.sync(client.sessionId);
+    handlers.get('weapon')(client,'dagger');
+    room.setBuild(client.sessionId,{level:100,stats:{STR:101,AGI:99,DEX:1,INT:1,VIT:100,LUK:1}});
+    handlers.get('auto-hunt')(client,{enabled:true,radius:null,kinds:[kind]});
+  };
+  place(a,'rabbit');place(b,'wolf');
+  const initial={...room.movers.get('a').position};
+  for(let i=0;i<800;i++){now+=.05;room.tick(50);}
+  for(const [id,kind] of [['a','rabbit'],['b','wolf']]){
+    const kills=room.events.filter(event=>event.name==='combat-hit' && event.data.player===id && event.data.to==='monster' && event.data.lethal);
+    assert.ok(kills.length>=2,`${id} must keep killing while no browser sends inputs`);
+    assert.ok(new Set(kills.map(event=>event.data.mob)).size>=2,'must select another monster');
+    assert.ok(kills.every(event=>event.data.mob.startsWith(kind+'-')));
+    assert.equal(room.state.players.get(id).autoHunt,true);
+  }
+  assert.ok(Math.hypot(room.state.players.get('a').x-initial.x,room.state.players.get('a').z-initial.z)>1);
+  handlers.get('auto-hunt')(a,{enabled:false});
+  assert.equal(room.state.players.get('a').autoHunt,false);
+  assert.equal(room.movers.get('a').moving,false);
+  assert.equal(room.state.players.get('b').autoHunt,true);
+  handlers.get('weapon')(b,'');
+  assert.equal(room.state.players.get('b').autoHunt,false);
+});
+
+test('server hunt preserves a pinned radius and rejects invalid settings or unarmed starts',async t=>{
+  const {room,a,handlers}=createRoom('mythraven-west-march');
+  let now=2000;t.mock.method(Date,'now',()=>now*1000);
+  handlers.get('auto-hunt')(a,{enabled:true,radius:null,kinds:['wolf']});
+  assert.equal(room.state.players.get('a').autoHunt,false);
+  handlers.get('weapon')(a,'dagger');
+  for(const radius of [-1,NaN,500,'all'])handlers.get('auto-hunt')(a,{enabled:true,radius,kinds:['wolf']});
+  assert.equal(room.state.players.get('a').autoHunt,false);
+  const nav=room.movers.get('a'),f=room.fighters.get('a');
+  Object.assign(nav.position,room.patrols.get('rabbit-0').route.spawn);room.sync('a');
+  room.setBuild('a',{level:100,stats:{STR:101,AGI:99,DEX:1,INT:1,VIT:100,LUK:1}});
+  handlers.get('auto-hunt')(a,{enabled:true,radius:10,kinds:['rabbit']});
+  const anchor={...f.hunt.anchor};
+  for(let i=0;i<200;i++){
+    now+=.05;room.tick(50);
+    assert.ok(Math.hypot(nav.position.x-anchor.x,nav.position.z-anchor.z)<=10.001);
+  }
+  handlers.get('auto-hunt')(a,{enabled:true,radius:20,kinds:['wolf']});
+  assert.deepEqual(f.hunt.anchor,anchor);
+});
+for(const [agi,hits] of [[1,5],[99,75],[198,146],[1021,733]])test(`AGI ${agi} lands ${hits} hits in five seconds across uneven simulation ticks`,async(t)=>{
+  const {room,a,handlers}=createRoom('mythraven-west-march');
+  const id='rabbit-0',mob=room.state.monsters.get(id),route=room.patrols.get(id).route;
+  const time=2000; // Already in range and facing a resting target.
+  t.mock.method(Math,'random',()=>.07);
+  handlers.get('weapon')(a,'dagger');
+  room.setBuild('a',{level:205,stats:{...room.fighters.get('a').stats,AGI:agi}});
+  handlers.get('fight')(a,id);
+  mob.hp=10000;
+  Object.assign(room.movers.get('a').position,route.spawn);room.sync('a');
+  room.combatTick(time);
+  for(let i=0;i<50;i++){
+    room.combatTick(time+i*.1+.035);
+    room.combatTick(time+(i+1)*.1);
+  }
+  assert.equal(room.events.filter(e=>e.data?.to==='monster').length,hits);
+  assert.equal(mob.hp,10000-6*hits);
+  if(agi>1)assert.ok(room.events.some(e=>e.data?.to==='player' && e.data.dodged && e.data.damage===0));
+  handlers.get('fight')(a,'');
+  room.combatTick(time+20);
+  assert.equal(mob.hp,10000-6*hits);
+});
+
+test('a turned-away opener and an AGI change use the current swing clock immediately',async(t)=>{
+  const {room,a,handlers}=createRoom('mythraven-west-march');
+  t.mock.method(Math,'random',()=>.9);
+  const id='rabbit-0',route=room.patrols.get(id).route,time=2000;
+  const target=route.spawn,mover=room.movers.get('a'),fighter=room.fighters.get('a');
+  Object.assign(mover.position,{x:target.x,z:target.z+1});mover.heading=0;room.sync('a');
+  handlers.get('weapon')(a,'dagger');handlers.get('fight')(a,id);
+  room.combatTick(time);
+  assert.equal(room.state.players.get('a').swing,1);
+  room.setBuild('a',{level:21,stats:{...fighter.stats,AGI:99}});
+  const hits=()=>room.events.filter(e=>e.data?.to==='monster').length;
+  for(let frame=1;frame<=60;frame++){
+    room.combatTick(time+frame/60,1/60);
+    if(frame===2)assert.equal(hits(),0);
+    if(frame===3)assert.equal(hits(),1);
+  }
+  assert.equal(hits(),15);
+});
+
+async function claimFixture(t){
+  const fixture=createRoom('mythraven-west-march'),{room,a,b,handlers}=fixture;
+  t.mock.method(Math,'random',()=>.9);
+  const key='rabbit-0',mob=room.patrols.get(key),health=room.state.monsters.get(key),now=2000;
+  for(const client of [a,b]){
+    Object.assign(room.movers.get(client.sessionId).position,mob.route.spawn);room.sync(client.sessionId);
+    handlers.get('weapon')(client,'dagger');
+  }
+  return {...fixture,key,mob,health,now};
+}
+
+test('late attackers are denied manually and auto hunting skips another active fight',async t=>{
+  const {room,a,b,handlers,key,now,health}=await claimFixture(t);
+  handlers.get('fight')(a,key);room.combatTick(now);room.combatTick(now+.3);
+  handlers.get('fight')(b,key);room.combatTick(now+.5);
+  assert.equal(room.state.players.get('b').swing,0);
+  assert.equal(room.fighters.get('b').target,'');
+  assert.equal(health.hp,94);
+  assert.ok(b.messages.some(event=>event.message==='combat-blocked' && event.data.mob===key));
+  handlers.get('auto-hunt')(b,{enabled:true,radius:null,kinds:['rabbit']});
+  room.huntTick(now+.6);
+  assert.notEqual(room.fighters.get('b').target,key);
+  assert.ok(room.fighters.get('b').target,'auto hunt must find another eligible rabbit');
+});
+
+test('near-simultaneous attackers remain eligible and share a conserved damage-weighted EXP pool',async t=>{
+  const {room,a,b,handlers,key,now,health,mob}=await claimFixture(t);
+  room.setBuild('a',{level:10,stats:{STR:14,AGI:1,DEX:1,INT:1,VIT:1,LUK:1}});
+  room.setBuild('b',{level:10,stats:{STR:7,AGI:1,DEX:1,INT:1,VIT:1,LUK:1}});
+  handlers.get('fight')(a,key);room.combatTick(now);
+  handlers.get('fight')(b,key);room.combatTick(now+.1);
+  room.combatTick(now+.3);room.combatTick(now+.4);
+  assert.equal(health.hp,50);
+  assert.equal(room.canAttack('b',key,now+.8),true);
+  room.combatTick(now+1);room.combatTick(now+1.1);room.combatTick(now+1.3);room.combatTick(now+1.4);
+  assert.equal(health.hp,0);
+  assert.deepEqual([...mob.damage.values()],[64,36]);
+  const rewards=[a,b].map(client=>client.messages.filter(event=>event.message==='combat-reward'));
+  assert.deepEqual(rewards.map(list=>list.map(event=>event.data.amount)),[[22],[13]]);
+  assert.equal(rewards.flat().reduce((sum,event)=>sum+event.data.amount,0),35);
+  room.combatTick(now+2);assert.equal(a.messages.filter(event=>event.message==='combat-reward').length,1);
+  room.combatTick(now+6.5);
+  assert.equal(health.hp,100);assert.equal(mob.damage,undefined);assert.equal(mob.claim,undefined);assert.equal(mob.defenders,undefined);
+});
+
+for(const release of ['stop','death','disconnect'])test(`a wounded abandoned monster is available after ${release}, with previous damage retained`,async t=>{
+  const {room,a,b,handlers,key,now,mob,health}=await claimFixture(t);
+  handlers.get('fight')(a,key);room.combatTick(now);room.combatTick(now+.3);
+  if(release==='stop')handlers.get('fight')(a,'');
+  if(release==='death'){room.state.players.get('a').hp=0;room.fighters.get('a').reviveAt=Infinity;}
+  if(release==='disconnect')room.onLeave(a);
+  assert.equal(room.canAttack('b',key,now+.6),true);
+  // A finishing blow must receive credit for 94 HP, not its nominal 1000 damage.
+  room.setBuild('b',{level:101,stats:{STR:498,AGI:1,DEX:1,INT:1,VIT:1,LUK:1}});
+  handlers.get('fight')(b,key);room.combatTick(now+.6);room.combatTick(now+.91);
+  assert.equal(health.hp,0);assert.equal(mob.damage.get('a'),6);assert.equal(mob.damage.get('b'),94);
+  assert.equal(room.events.at(-1).data.damage,1000);
+  assert.equal(b.messages.find(event=>event.message==='combat-reward').data.amount,33);
+  if(release!=='disconnect')assert.equal(a.messages.find(event=>event.message==='combat-reward').data.amount,2);
+});
+
+test('a monster damaging a bystander grants self-defense priority over an existing claim',async t=>{
+  const {room,a,b,handlers,key,now,mob}=await claimFixture(t);
+  handlers.get('fight')(a,key);room.combatTick(now);room.combatTick(now+.3);
+  assert.equal(room.canAttack('b',key,now+.8),false);
+  mob.victim='b';mob.nextCounter=now+.8;
+  room.retaliate(now+.8);room.retaliate(now+1.45);
+  assert.ok(room.state.players.get('b').hp<100);
+  assert.equal(room.canAttack('b',key,now+1.46),true);
+  handlers.get('fight')(b,key);room.combatTick(now+1.46);
+  assert.ok(room.state.players.get('b').swing>0);
+});
+
+test('frontier damage requires range, respects cooldown, and a shared kill rewards only once',async(t)=>{
+  const {room,a,b,handlers}=createRoom('mythraven-west-march');
+  const id='rabbit-0',mob=room.state.monsters.get(id),route=room.patrols.get(id).route;
+  const align=(client,time)=>{
+    Object.assign(room.movers.get(client.sessionId).position,{x:mob.x,z:mob.z});
+    room.sync(client.sessionId);
+  };
+  const time=2000;
+  const roll=t.mock.method(Math,'random',()=>.9);
+  handlers.get('weapon')(a,'dagger');handlers.get('weapon')(b,'dagger');
+  handlers.get('fight')(a,id);
+  Object.assign(room.movers.get('a').position,{x:-190,z:120});room.sync('a');
+  room.combatTick(time);
+  assert.equal(mob.hp,100);
+  align(a,time);room.combatTick(time);
+  assert.equal(mob.hp,100);assert.equal(room.state.players.get('a').swing,1);
+  room.combatTick(time+.28);assert.equal(mob.hp,100);
+  align(a,time+.30);room.combatTick(time+.30);const hitHp=mob.hp;
+  assert.equal(hitHp,94);assert.equal(room.state.players.get('a').hp,100);
+  assert.equal(room.events.at(-1).data.damage,6);
+  assert.equal(room.events.at(-1).data.to,'monster');
+  room.fighters.get('a').nextHit=time+4;
+  room.combatTick(time+2.01);assert.equal(room.state.players.get('a').hp,100);
+  room.combatTick(time+2.66);
+  assert.ok(room.state.players.get('a').hp<100);
+  assert.equal(room.events.at(-1).data.to,'player');
+  handlers.get('fight')(a,id);room.combatTick(time+2.7);assert.equal(mob.hp,hitHp);
+  mob.hp=1;
+  room.setBuild('a',{level:12,stats:room.fighters.get('a').stats});
+  for(const client of [a,b]){
+    Object.assign(room.movers.get(client.sessionId).position,{x:mob.x,z:mob.z});room.sync(client.sessionId);
+    handlers.get('fight')(client,id);
+  }
+  room.combatTick(time+4);room.combatTick(time+4.31);assert.equal(mob.hp,0);
+  assert.equal(room.events.at(-1).data.damage,6);
+  assert.equal(a.errors.filter(e=>e==='combat-reward').length,1);
+  assert.equal(b.errors.includes('combat-reward'),false);
+  room.combatTick(time+9.30);assert.equal(mob.hp,0);
+  room.combatTick(time+9.32);assert.equal(mob.hp,100);
+  assert.equal(room.fighters.get('b').target,'');
+  align(b,time+22);room.state.players.get('b').hp=1;
+  roll.mock.mockImplementation(()=>0);
+  handlers.get('fight')(b,id);room.combatTick(time+22);
+  align(b,time+22.31);room.combatTick(time+22.31);
+  assert.equal(room.events.at(-1).data.damage,9);
+  assert.equal(room.events.at(-1).data.critical,true);
+  room.combatTick(time+24.02);room.combatTick(time+24.67);assert.equal(room.state.players.get('b').hp,0);
+  assert.ok(room.events.at(-1).data.damage>1);
+  room.combatTick(time+27.68);assert.equal(room.state.players.get('b').hp,100);
+  assert.equal(room.state.players.get('b').x,room.movers.get('b').spawn.x);
+});
+
+test('attacking requires an equipped weapon through the impact frame',async()=>{
+  const {room,a,handlers}=createRoom('mythraven-west-march');
+  const id='rabbit-0',fighter=room.fighters.get('a'),p=room.state.players.get('a');
+  Object.assign(room.movers.get('a').position,room.patrols.get(id).route.spawn);room.sync('a');
+  handlers.get('fight')(a,id);room.combatTick(2000);
+  assert.equal(fighter.target,'');assert.equal(p.swing,0);
+  handlers.get('weapon')(a,'dagger');handlers.get('fight')(a,id);room.combatTick(2000);
+  assert.equal(p.swing,1);
+  handlers.get('weapon')(a,'');handlers.get('fight')(a,id);room.combatTick(2000.31);
+  assert.equal(room.state.monsters.get(id).hp,100);assert.equal(fighter.target,'');
+  handlers.get('weapon')(a,'dagger');room.combatTick(2002);
+  assert.equal(p.swing,1);
+});
+
+test('combat closes to the inner range once and holds through small target steps',async()=>{
+  const {weaponRange}=await import('../shared/battle-stats.mjs');
+  for(const [characterId,weapon] of [['novice-male-01','dagger'],['archer-male-01','bow']]){
+    const {room,handlers}=createRoom('mythraven-west-march');
+    const client={sessionId:'hunter',send(){}};
+    room.onJoin(client,{characterId,weapon});
+    room.state.players.get('hunter').sceneReady=true;
+    const mover=room.movers.get('hunter'),player=room.state.players.get('hunter');
+    const range=weaponRange(weapon),id='rabbit-0',route=room.patrols.get(id).route;
+    const time=2000,target=route.spawn;
+    // Find a clear approach to this real patrol point.
+    let angle;
+    for(let i=0;i<32;i++){
+      const a=i*Math.PI/16,d=range.reach+1;
+      if(mover.clearLine(target,{x:target.x+d*Math.sin(a),z:target.z+d*Math.cos(a)})){angle=a;break;}
+    }
+    assert.notEqual(angle,undefined);
+    function standAt(gap){
+      Object.assign(mover.position,{x:target.x+gap*Math.sin(angle),z:target.z+gap*Math.cos(angle)});
+      mover.heading=Math.atan2(target.x-mover.position.x,target.z-mover.position.z);
+      room.sync('hunter');
+    }
+    standAt(range.reach-.1);
+    mover.moveTo(target);handlers.get('fight')(client,id);
+    room.combatTick(time);
+    assert.equal(mover.moving,true,'finish the approach before starting the first swing');
+    standAt(range.settle-.1);
+    room.combatTick(time);
+    assert.equal(mover.moving,false);assert.equal(player.swing,1);
+    standAt(range.reach-.1);
+    room.combatTick(time+.31);
+    if(weapon==='bow'){assert.equal(room.state.monsters.get(id).hp,100);room.combatTick(time+.42);}
+    assert.ok(room.state.monsters.get(id).hp<100,'the wind-up still lands inside weapon reach');
+  }
+});
+
 test('terrain server chooses separated safe spawns and owns movement speed and identity', () => {
   const { room, a, b, send, handlers } = createRoom();
   assert.equal(room.state.players.get(a.sessionId).speedLevel, 5);
@@ -204,6 +522,7 @@ test('terrain server rejects invalid destinations, coalesces bursts to the newes
 test('ten speed levels span 1x to 5x, change mid-route and remain server bounded per player', () => {
   const { room, a, b, send, handlers } = createRoom();
   const mover = room.movers.get(a.sessionId), player = room.state.players.get(a.sessionId);
+  Object.assign(mover.position,{x:0,z:90});room.sync(a.sessionId);
   const start = { ...mover.position }, target = { x: start.x, z: start.z - 50 };
   assert.ok(mover.clearLine(start, target));
   for (let level = 1; level <= 10; level++) {
@@ -292,7 +611,9 @@ test('turns in place before travel, accepts redirects immediately and stops mid-
 
 test('turns across angle wrap by the short arc and shares the tick budget with travel', () => {
   const { room } = createRoom();
-  const mover = new TerrainMovement(room.terrainData), start = { ...mover.position };
+  const mover = new TerrainMovement(room.terrainData);
+  Object.assign(mover.position,{x:0,z:60});
+  const start = { ...mover.position };
   mover.heading = 179 * Math.PI / 180; mover.setSpeedLevel(1);
   const desired = -179 * Math.PI / 180;
   mover.moveTo({ x: start.x + Math.sin(desired)*15, z: start.z + Math.cos(desired)*15 });
@@ -349,3 +670,139 @@ test('3D building fronts are reachable, buildings block movement and the central
   for(const t of createTreePlacements(terrainData))assert.ok(isCityPlantingClear(terrainData,t.x,t.z,2.07));
 });
 
+
+
+test('roaming pauses for 10–30 seconds, walks 5–30 metres at level 4 and can cross the forest',async()=>{
+  const {nextExcursion,pathLength,roamingRandom,restDuration}=await import('./monster-roaming.mjs');
+  const nav=new TerrainMovement(buildWestMarch());
+  Object.assign(nav.position,{x:82,z:-100});
+  const destination={x:122,z:-100};
+  assert.equal(nav.clearLine(nav.position,destination),false);
+  const mob={mover:nav,random:roamingRandom(73)};
+  const origin={...nav.position};let travelled=0;
+  for(let outing=0;outing<100 && Math.hypot(nav.position.x-destination.x,nav.position.z-destination.z)>5;outing++){
+    const pause=restDuration(mob.random);assert.ok(pause>=10 && pause<=30);
+    assert.equal(nextExcursion(mob,[destination]),true);
+    const length=pathLength(nav.position,nav.route);assert.ok(length>=5-1e-6 && length<=30+1e-6);
+    assert.equal(nav.speedLevel,4);
+    for(let frame=0;nav.moving && frame<1000;frame++){
+      const previous={...nav.position};nav.update(.05);
+      assert.ok(nav.canStand(nav.position));assert.ok(nav.clearLine(previous,nav.position));
+      travelled+=Math.hypot(nav.position.x-previous.x,nav.position.z-previous.z);
+    }
+    assert.equal(nav.moving,false);
+  }
+  assert.ok(Math.hypot(nav.position.x-destination.x,nav.position.z-destination.z)<5);
+  assert.ok(travelled>Math.hypot(origin.x-destination.x,origin.z-destination.z)+20,'takes the bridge, not the river');
+});
+
+test('server roaming replicates positions, rests after arrival and resumes at the abandoned fight',()=>{
+  const {room}=createRoom('mythraven-west-march');
+  const id='rabbit-0',mob=room.patrols.get(id),health=room.state.monsters.get(id);
+  room.patrols=new Map([[id,mob]]);
+  const now=Date.now()/1000,origin={x:health.x,z:health.z};mob.waitUntil=now+20;
+  room.roamTick(now+19,.05);assert.deepEqual({x:health.x,z:health.z},origin);
+  let end=now+20;
+  room.roamTick(end,.05);
+  for(let i=0;mob.mover.moving && i<1000;i++){end+=.05;room.roamTick(end,.05);}
+  assert.ok(Math.hypot(health.x-origin.x,health.z-origin.z)>1);
+  assert.ok(mob.waitUntil-end>=10 && mob.waitUntil-end<=30);
+  assert.equal(health.moving,false);
+  const current={x:health.x,z:health.z};room.roamTick(mob.waitUntil-.01,.05);
+  assert.deepEqual({x:health.x,z:health.z},current);
+  health.engaged=true;mob.victim='missing';room.retaliate(end,.05);
+  assert.equal(health.engaged,false);assert.deepEqual({x:health.x,z:health.z},current);
+  assert.ok(mob.waitUntil-end>=10 && mob.waitUntil-end<=30);
+  health.hp=0;mob.respawnAt=end+5;room.combatTick(end+5);
+  assert.ok(health.hp>0);assert.ok(mob.mover.canStand(health));
+  assert.equal(health.moving,false);
+});
+
+
+function bowFixture(t,agi=1){
+  t.mock.method(Math,'random',()=>.9);
+  const {room,handlers}=createRoom('mythraven-west-march');
+  const client={sessionId:'archer',send(){}};room.onJoin(client,{characterId:'archer-male-01',weapon:'bow'});
+  const p=room.state.players.get('archer'),nav=room.movers.get('archer'),health=room.state.monsters.get('rabbit-0');
+  p.sceneReady=true;p.protectedUntil=Infinity;
+  for(let n=0;n<32;n++){
+    const candidate={x:health.x+8*Math.sin(n*Math.PI/16),z:health.z+8*Math.cos(n*Math.PI/16)};
+    if(nav.canStand(candidate) && nav.clearLine(candidate,health)){Object.assign(nav.position,candidate);break;}
+  }
+  room.sync('archer');room.setBuild('archer',{level:Math.ceil((agi-1)/5)+1,stats:{STR:1,AGI:agi,DEX:1,INT:1,VIT:1,LUK:1}});
+  handlers.get('fight')(client,'rabbit-0');return {room,handlers,client,p,health};
+}
+
+test('bow releases on frame six and applies damage only on arrival, retaining a released shot after unequipping',t=>{
+  const {room,handlers,client,health}=bowFixture(t);const now=1000;
+  room.combatTick(now);room.combatTick(now+.249);assert.equal(room.arrows.length,0);assert.equal(health.hp,100);
+  room.combatTick(now+.25);assert.equal(room.arrows.length,1);assert.equal(health.hp,100);
+  const shot=room.arrows[0];assert.equal(shot.releaseAt,now+.25);assert.ok(shot.impactAt>shot.releaseAt);
+  room.combatTick(shot.impactAt-.001);assert.equal(health.hp,100);
+  handlers.get('weapon')(client,'');handlers.get('fight')(client,'');
+  health.x+=.5;room.combatTick(shot.impactAt);
+  assert.equal(health.hp,93);assert.equal(room.arrows.length,0);
+  const event=room.events.filter(e=>e.name==='combat-hit').at(-1).data;
+  assert.equal(event.weapon,'bow');assert.equal(event.shotId,shot.id);
+});
+
+test('a bow projectile cannot damage a new life after its original target respawns',t=>{
+  const {room,health}=bowFixture(t);room.combatTick(1000);room.combatTick(1000.25);
+  const shot=room.arrows[0],mob=room.patrols.get('rabbit-0');
+  health.hp=0;mob.respawnAt=1000.27;room.fighters.get('archer').target='';
+  room.combatTick(1000.28);assert.equal(health.hp,100);
+  room.combatTick(shot.impactAt);assert.equal(health.hp,100);assert.equal(room.arrows.length,0);
+});
+
+test('AGI 99 bow attacks sustain 15 releases per second with overlapping flights and unique impacts',t=>{
+  const {room,health}=bowFixture(t,99);health.hp=60000;
+  let maxFlying=0;
+  for(let i=0;i<500;i++){room.combatTick(1000+i*.01,.01);maxFlying=Math.max(maxFlying,room.arrows.length);}
+  const releases=room.events.filter(e=>e.name==='bow-shot').map(e=>e.data);
+  const hits=room.events.filter(e=>e.name==='combat-hit').map(e=>e.data);
+  assert.ok(releases.length>=74 && releases.length<=75);assert.ok(maxFlying>=2);
+  assert.equal(hits.length,releases.filter(s=>s.impactAt<=1004.99).length);
+  assert.equal(new Set(hits.map(h=>h.shotId)).size,hits.length);
+  assert.equal(health.hp,60000-hits.length*7);
+});
+
+
+test('critical chance starts at 5%, reaches 60% at LUK 99 and caps at 100%',async()=>{
+  const {deriveCombatStats}=await import('../shared/battle-stats.mjs');
+  const chance=LUK=>deriveCombatStats(100,{STR:1,AGI:1,DEX:1,INT:1,VIT:1,LUK}).criticalChance;
+  assert.equal(chance(1),.05);assert.ok(Math.abs(chance(99)-.60)<1e-12);
+  assert.ok(chance(170)<1);assert.equal(chance(171),1);assert.equal(chance(9999),1);
+  for(let luk=2;luk<=171;luk++)assert.ok(chance(luk)>chance(luk-1));
+});
+
+test('100% critical chance produces a critical bow impact even on the highest random roll',t=>{
+  const {room,health}=bowFixture(t);health.hp=1000;
+  t.mock.method(Math,'random',()=>.999999);
+  room.setBuild('archer',{level:35,stats:{STR:1,AGI:1,DEX:1,INT:1,VIT:1,LUK:171}});
+  room.combatTick(1000);room.combatTick(1000.25);
+  const shot=room.arrows[0];room.combatTick(shot.impactAt);
+  const hit=room.events.filter(e=>e.name==='combat-hit').at(-1).data;
+  assert.equal(hit.critical,true);assert.equal(hit.weapon,'bow');
+  assert.equal(health.hp,1000-hit.damage);
+});
+
+test('level gains fully restore HP and MP, while repeated builds and stat allocation preserve missing resources',()=>{
+  const {room}=createRoom(),p=room.state.players.get('a');
+  const stats={STR:1,AGI:1,DEX:1,INT:1,VIT:1,LUK:1};
+  assert.equal(p.mp,30);assert.equal(p.maxMp,30);
+  p.hp=12;p.mp=3;
+  room.setBuild('a',{level:2,stats});
+  assert.equal(p.hp,105);assert.equal(p.maxHp,105);assert.equal(p.mp,32);assert.equal(p.maxMp,32);
+  p.hp=25;p.mp=2;
+  room.setBuild('a',{level:2,stats});
+  assert.equal(p.hp,25);assert.equal(p.mp,2);
+  room.setBuild('a',{level:2,stats:{...stats,VIT:2,INT:2}});
+  assert.equal(p.hp,33);assert.equal(p.maxHp,113);assert.equal(p.mp,7);assert.equal(p.maxMp,37);
+  p.hp=0;p.mp=0;room.fighters.get('a').reviveAt=9999;
+  room.setBuild('a',{level:5,stats:{...stats,VIT:2,INT:2}});
+  assert.equal(p.hp,128);assert.equal(p.maxHp,128);assert.equal(p.mp,43);assert.equal(p.maxMp,43);
+  assert.equal(room.fighters.get('a').reviveAt,0);
+  p.hp=1;p.mp=0;
+  room.setBuild('a',{level:6,stats:{...stats,LUK:1000}});
+  assert.equal(p.hp,1);assert.equal(p.mp,0,'invalid builds cannot refill resources');
+});

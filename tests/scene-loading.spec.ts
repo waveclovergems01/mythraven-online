@@ -1,0 +1,65 @@
+import {test,expect} from '@playwright/test';
+
+test('loading counts completed tasks and covers the scene until body, equipment and server readiness',async({page})=>{
+  test.setTimeout(120000);
+  const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));
+  await page.addInitScript(()=>{
+    (window as any).loadingSamples=[];
+    new MutationObserver(()=>{
+      const screen=document.querySelector('.scene-loading'),bar=screen?.querySelector('progress');
+      if(bar)(window as any).loadingSamples.push(bar.value);
+    }).observe(document,{subtree:true,childList:true,attributes:true,attributeFilter:['value']});
+  });
+  await page.route('**/src/terrain/TerrainWorld.ts*',async route=>{
+    const response=await route.fetch();
+    await route.fulfill({response,body:(await response.text()).replace('renderer.render(scene, camera);',`
+      window.loadingQA={network,area,enter:()=>onWarp('west-march'),read:()=>({
+        mine:network.players.get(network.room?.sessionId),own:views.get(network.room?.sessionId)?.avatar.inspect(),
+        weapon:views.get(network.room?.sessionId)?.weapon,initialModelsReady,revealed})};
+      renderer.render(scene, camera);`)});
+  });
+  let releaseBuildings!:()=>void;
+  const buildingsGate=new Promise<void>(resolve=>releaseBuildings=resolve);
+  await page.route('**/assets/models/buildings/**',async route=>{await buildingsGate;await route.continue();});
+  await page.setViewportSize({width:1440,height:900});
+  await page.goto('/');await page.locator('#guest').click();
+  await page.locator('input[name="character"][value="novice-male-01"]').check();
+  await expect(page.locator('#enter-city')).toBeEnabled({timeout:30000});await page.locator('#enter-city').click();
+  await expect(page.locator('.scene-loading')).toBeVisible();
+  await expect.poll(()=>page.locator('.scene-loading progress').evaluate((el:HTMLProgressElement)=>el.value)).toBeGreaterThan(0);
+  const progress=await page.locator('.scene-loading progress').evaluate((el:HTMLProgressElement)=>el.value);
+  expect(progress).toBeLessThan(100);
+  await page.screenshot({path:'test-results/loading/city-loading.png'});
+  releaseBuildings();
+  await expect(page.locator('.scene-loading')).toBeHidden({timeout:60000});
+  const city=await page.evaluate(()=>(window as any).loadingQA.read());
+  expect(city.own).toBeTruthy();expect(city.initialModelsReady).toBe(true);expect(city.mine.sceneReady).toBe(true);
+  await expect(page.locator('.arrival-protection')).toBeVisible();
+  const samples=await page.evaluate(()=>(window as any).loadingSamples as number[]);
+  expect(samples).toContain(0);expect(samples).toContain(100);
+  expect(samples.every((value,i)=>!i||value>=samples[i-1])).toBe(true);
+  await page.keyboard.press('i');await page.locator('[data-item=dagger]').click({button:'right'});await page.keyboard.press('i');
+  await page.waitForFunction(()=>(window as any).loadingQA.read().weapon==='dagger');
+  let releaseWeapon!:()=>void;
+  const weaponGate=new Promise<void>(resolve=>releaseWeapon=resolve);
+  await page.route('**/assets/models/characters/weapons/dagger.glb',async route=>{await weaponGate;await route.continue();});
+  await page.evaluate(()=>(window as any).loadingQA.enter());
+  await page.waitForFunction(()=>{
+    const q=(window as any).loadingQA;return q?.area==='west-march'&&q.network.connected;
+  },undefined,{timeout:45000});
+  await expect(page.locator('.scene-loading')).toBeVisible();
+  const waiting=await page.evaluate(()=>(window as any).loadingQA.read());
+  expect(waiting.mine.sceneReady).toBe(false);expect(waiting.mine.protectedUntil).toBe(0);expect(waiting.weapon).toBeUndefined();
+  const stalled=await page.locator('.scene-loading progress').evaluate((el:HTMLProgressElement)=>el.value);
+  await page.waitForTimeout(600);
+  expect(await page.locator('.scene-loading progress').evaluate((el:HTMLProgressElement)=>el.value)).toBe(stalled);
+  await page.setViewportSize({width:390,height:844});
+  await page.screenshot({path:'test-results/loading/field-loading-mobile.png'});
+  releaseWeapon();
+  await expect(page.locator('.scene-loading')).toBeHidden({timeout:30000});
+  const field=await page.evaluate(()=>(window as any).loadingQA.read());
+  expect(field.weapon).toBe('dagger');expect(field.mine.sceneReady).toBe(true);
+  expect(field.mine.protectedUntil-Date.now()/1000).toBeGreaterThan(12);
+  await page.screenshot({path:'test-results/loading/field-ready.png'});
+  expect(errors).toEqual([]);
+});

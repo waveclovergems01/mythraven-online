@@ -1,0 +1,8 @@
+{
+  "drawStartFrame": 2,
+  "releaseFrame": 6,
+  "totalFrames": 10,
+  "speed": 85,
+  "minFlightSeconds": 0.045,
+  "maxFlightSeconds": 0.16
+}

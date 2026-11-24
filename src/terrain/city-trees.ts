@@ -1,3 +1,4 @@
+import {sceneryTrees,sceneryHeight} from './world-surroundings';
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { TREE_MODELS, createTreePlacements } from '../../shared/terrain-props.mjs';
@@ -23,7 +24,8 @@ export async function loadCityTrees(data: TerrainData) {
     resources.forEach(value => { value.dispose(); if (value instanceof THREE.Texture && typeof ImageBitmap !== 'undefined' && value.image instanceof ImageBitmap) value.image.close(); }); };
   const failure = loaded.find(result => result.status === 'rejected');
   if (failure?.status === 'rejected') { dispose(); throw failure.reason; }
-  const placements = createTreePlacements(data);
+  const playable = createTreePlacements(data), backdrop=sceneryTrees(data);
+  const placements = [...playable,...backdrop];
   const feet = { value: new THREE.Vector2(10, 10) }, head = { value: new THREE.Vector2(10, 10) };
   const radius = { value: .01 }, aspect = { value: 1 }, depth = { value: new THREE.Vector2(-1, -1) };
   const dummy = new THREE.Object3D(), projected = new THREE.Vector3();
@@ -62,7 +64,7 @@ export async function loadCityTrees(data: TerrainData) {
     const patches = new Map<string, THREE.Matrix4[]>();
     for (const placement of placements.filter(p => p.model === modelIndex)) {
       const key = `${Math.floor(placement.x/50)},${Math.floor(placement.z/50)}`;
-      dummy.position.set(placement.x, terrainHeight(data, placement.x, placement.z) - .04, placement.z);
+      dummy.position.set(placement.x, (placement.region==='scenery'?sceneryHeight(data,placement.x,placement.z):terrainHeight(data, placement.x, placement.z)) - .04, placement.z);
       dummy.rotation.set(0, placement.yaw, 0); dummy.scale.setScalar(placement.scale); dummy.updateMatrix();
       if (!patches.has(key)) patches.set(key, []); patches.get(key)!.push(dummy.matrix.clone());
     }
@@ -88,7 +90,7 @@ export async function loadCityTrees(data: TerrainData) {
       radius.value = camera.projectionMatrix.elements[5] / Math.max(1, -projected.z);
       projected.copy(player); projected.y += 3; projected.applyMatrix4(camera.matrixWorldInverse); depth.value.y = -projected.z;
     },
-    inspect: () => ({ count: placements.length, batches: group.children.length, placements, windTime: windTime.value }),
+    inspect: () => ({ count: playable.length, sceneryCount:backdrop.length, batches: group.children.length, placements:playable, windTime: windTime.value }),
     dispose,
   };
 }

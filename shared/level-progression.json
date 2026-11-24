@@ -1,0 +1,4 @@
+{
+  "expToNextLevel": [100, 160, 240, 340, 460, 600, 760, 940, 1140, 1360],
+  "additionalExpPerLevelAfterTable": 240
+}

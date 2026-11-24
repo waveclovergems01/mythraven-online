@@ -1,0 +1,18 @@
+{
+  "monster": {
+    "color": "#ff313d",
+    "radius": 2.8
+  },
+  "self": {
+    "color": "#36ddff",
+    "radius": 6
+  },
+  "other": {
+    "color": "#a1b4ce",
+    "radius": 3.5
+  },
+  "party": {
+    "color": "#60ff83",
+    "radius": 4.8
+  }
+}

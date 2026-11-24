@@ -107,7 +107,7 @@ test('independent players share the 3D city, authoritative clicks, late joins, d
     await other.evaluate(() => (window as any).onlineNetwork.room.connection.close());
     await expect(other.locator('#network-status')).toHaveAttribute('data-connected', 'false');
     await expect.poll(async () => (await snapshot(page)).players[b.id]).toBeUndefined();
-    await expect(other.locator('.world-player-name')).toHaveCount(0);
+    await expect(other.locator('.world-player-name[data-player-id]')).toHaveCount(0);
     await expect(other.locator('.terrain-minimap-player')).toHaveCount(0);
     await other.locator('#network-status button').click();
     await expect(other.locator('#network-status')).toHaveAttribute('data-connected', 'true');
@@ -117,17 +117,17 @@ test('independent players share the 3D city, authoritative clicks, late joins, d
     for (const width of [390, 320]) {
       await other.setViewportSize({ width, height: 844 });
       const map = (await other.locator('.terrain-minimap').boundingBox())!;
-      const brand = (await other.locator('.game-header > div').boundingBox())!;
+      const vitals = (await other.locator('.game-header .combat-vitals').boundingBox())!;
       const leave = (await other.locator('#settings-toggle').boundingBox())!;
       expect(map.x + map.width).toBeLessThanOrEqual(width);
-      expect(brand.x + brand.width).toBeLessThanOrEqual(map.x);
+      expect(vitals.x + vitals.width).toBeLessThanOrEqual(map.x);
       expect(leave.y + leave.height).toBeLessThanOrEqual(844);
       expect(leave.y).toBeGreaterThan(780);
       await other.screenshot({ path: 'test-results/terrain-online/minimap-mobile-' + width + '.png' });
     }
     await openSettings(other); await other.locator('#logout').click();
     await expect.poll(async () => Object.keys((await snapshot(page)).players).length).toBe(1);
-    await expect(page.locator('.world-player-name')).toHaveCount(1);
+    await expect(page.locator('.world-player-name[data-player-id]')).toHaveCount(1);
     await expect(page.locator('.terrain-minimap-player')).toHaveCount(1);
     expect(errors).toEqual([]);
   } finally { await secondContext.close(); }

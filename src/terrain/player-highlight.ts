@@ -7,6 +7,8 @@ export function createPlayerHighlight(player: THREE.Object3D, selectionMask=fals
   // Preserve the textured body even where double-sided fur and ears overlap.
   // Only the selected creature writes the silhouette, using private materials.
   const originals=new Map<THREE.Mesh,THREE.Material|THREE.Material[]>();
+  const masked=new Map<THREE.Mesh,THREE.Material|THREE.Material[]>();
+  let maskActive=false;
   const maskedMaterials=new Map<THREE.Material,THREE.Material>();
   function mask(source:THREE.Material){
     let copy=maskedMaterials.get(source);
@@ -18,7 +20,7 @@ export function createPlayerHighlight(player: THREE.Object3D, selectionMask=fals
   }
   if(selectionMask) for(const mesh of surfaces){
     originals.set(mesh,mesh.material);
-    mesh.material=Array.isArray(mesh.material)?mesh.material.map(mask):mask(mesh.material);
+    masked.set(mesh,Array.isArray(mesh.material)?mesh.material.map(mask):mask(mesh.material));
   }
   const material = new THREE.ShaderMaterial({
     uniforms: {
@@ -66,6 +68,10 @@ export function createPlayerHighlight(player: THREE.Object3D, selectionMask=fals
   return {
     surfaces,
     update(hovered: boolean, selected: boolean, width: number, height: number) {
+      if(selectionMask && maskActive!==selected){
+        for(const [mesh,mat] of selected?masked:originals)mesh.material=mat;
+        maskActive=selected;
+      }
       material.uniforms.viewport.value.set(Math.max(1, width), Math.max(1, height));
       material.uniforms.thickness.value = selected ? 2.5 : 2;
       material.uniforms.tint.value.set(selected ? '#f1ce77' : '#fff1bd');

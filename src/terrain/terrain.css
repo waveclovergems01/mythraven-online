@@ -9,6 +9,51 @@
   pointer-events: none;
 }
 .terrain-status { top: 45%; }
+.game-page .game-header.player-hud{justify-content:flex-start;gap:6px;flex-wrap:wrap}
+.game-header .combat-vitals{box-sizing:border-box;width:200px;max-width:100%;display:grid;grid-template-columns:max-content minmax(0,1fr);align-items:center;gap:3px 8px;padding:7px 10px;color:#eee4cd;background:#192c28ed;border:1px solid #8d805b;border-radius:5px;font:12px/1.3 system-ui;font-variant-numeric:tabular-nums}
+.vital-heading{grid-column:1/-1;display:flex;justify-content:space-between;gap:5px;border-bottom:1px solid #8d805b70;margin-bottom:2px;padding-bottom:3px;color:#e4c887}
+.vital-heading #player-name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.game-header .combat-controls{padding:0;background:transparent;display:grid;gap:5px;justify-items:start;pointer-events:auto}
+.combat-controls .terrain-network{position:static;max-width:none}
+.hunt-controls,.hunt-panel{
+  --hunt-edge:#8d805b;
+  color:#f4e8c7;background:#1c302df5;border:1px solid var(--hunt-edge);
+  border-radius:6px;box-shadow:0 3px 14px #10221e55;font-size:13px;
+}
+.hunt-controls{position:absolute;z-index:4;right:76px;bottom:18px;display:flex;overflow:hidden}
+.hunt-controls button{margin:0;min-height:34px;padding:5px 10px;font:inherit;color:inherit;background:transparent;border:0;cursor:pointer}
+.hunt-controls .hunt-launch{border-left:1px solid #8d805b;min-width:34px}
+.hunt-controls button:focus-visible{outline:2px solid #f4db9b;outline-offset:-3px}
+.auto-combat::before{content:'▶';margin-right:6px;color:#e4c887}
+.auto-combat[aria-pressed=true]{background:#40533c;color:#ffdfa1}
+.auto-combat[aria-pressed=true]::before{content:'■'}
+.hunt-panel{position:fixed;inset:auto 76px 64px auto;margin:0;padding:14px;width:min(244px,calc(100vw - 24px));max-height:calc(100dvh - 105px);overflow:auto}
+.hunt-panel .hunt-range{display:grid;gap:6px;font-weight:bold}
+.hunt-panel input{accent-color:#dac186}
+.hunt-panel fieldset{border:0;border-top:1px solid #897b525c;margin:12px 0;padding:8px 0 0}
+.hunt-panel legend{padding:0 8px 0 0;color:#d6be86}
+.hunt-panel fieldset label{display:flex;align-items:center;gap:7px;padding:4px 0;cursor:pointer}
+.hunt-panel small{display:block;margin:0 0 8px;color:#eed0ad}
+.hunt-panel small[hidden]{display:none}
+.hunt-panel [hidden]{display:none}
+.hunt-controls button:disabled{opacity:.65;cursor:default}
+@media(max-width:600px){.hunt-controls{right:60px;bottom:12px}.hunt-panel{right:8px;bottom:58px}}
+.combat-vitals progress,.monster-name progress{display:block;width:100%;height:5px;border:0;appearance:none;background:#111e1a;color:#d97669;border-radius:2px;overflow:hidden}
+.combat-vitals progress::-webkit-progress-bar,.monster-name progress::-webkit-progress-bar{background:#111e1a}
+.combat-vitals progress::-webkit-progress-value,.monster-name progress::-webkit-progress-value{background:#d97669}
+.combat-vitals .exp-meter::-webkit-progress-value{background:#d6b466}
+.combat-vitals progress::-moz-progress-bar,.monster-name progress::-moz-progress-bar{background:#d97669}
+.combat-vitals .exp-meter::-moz-progress-bar{background:#d6b466}
+.monster-name progress{margin:2px 0}
+ .combat-vitals .mp-meter::-webkit-progress-value{background:#76ade5}
+.combat-vitals .mp-meter::-moz-progress-bar{background:#76ade5}
+@media(max-width:600px){.game-header .combat-vitals{width:178px;font-size:10px}.game-header .combat-controls{display:flex;flex-wrap:wrap;gap:3px}.combat-controls .terrain-network,.auto-combat{font-size:10px;padding:4px 6px}}
+.combat-damage{pointer-events:none;position:absolute;z-index:2;isolation:isolate;animation:hit-rise .9s ease-out both;color:#fff;font:bold 23px/1 Georgia,serif;text-shadow:0 2px 1px #281818,-1px -1px #312320}
+.combat-damage.critical::before{content:'';position:absolute;inset:-5px -11px;z-index:-1;background:#7e4214df;clip-path:polygon(0 38%,23% 37%,15% 9%,38% 27%,53% 0,59% 24%,88% 9%,77% 38%,100% 43%,81% 59%,94% 86%,66% 75%,53% 100%,43% 75%,12% 94%,24% 62%)}
+.combat-damage.incoming{color:#ff7772}
+.combat-damage.critical{z-index:3;color:#ffcd54;font-size:31px}
+@keyframes hit-rise{0%{transform:translate(-50%,-16px) scale(.88)}18%{transform:translate(-50%,-42px) scale(1.08)}72%{opacity:1}100%{transform:translate(-50%,-124px);opacity:0}}
+@media(prefers-reduced-motion:reduce){.combat-damage{animation:none;transform:translate(-50%,-46px)}}
 .terrain-move-hint { bottom: 60px; font-size: 12px; }
 #game[data-renderer="three"] canvas { cursor: default; touch-action: none; outline: none; user-select: none; -webkit-user-select: none; }
 #game[data-renderer="three"] canvas[data-player-hover="true"] { cursor: pointer; }
@@ -45,6 +90,17 @@
   user-select: none; cursor: default;
 }
 .terrain-minimap > svg { display: block; width: 100%; aspect-ratio: 1; overflow: hidden; border-radius: 2px; }
+.terrain-portal-travel {
+  display: block; width: 100%; min-height: 34px; margin-top: 5px; padding: 6px;
+  border: 1px solid #ae9a6780; border-radius: 3px; background: #263d34;
+  color: #efdbab; font: inherit; font-size: 11px; cursor: pointer; line-height: 1.35;
+}
+.terrain-portal-travel:hover:not(:disabled),.terrain-portal-travel[aria-pressed="true"] { background: #45543a; border-color: #d5bc7c; }
+.terrain-portal-travel:focus-visible { outline: 2px solid #ffe39a; outline-offset: 2px; }
+.terrain-portal-travel:disabled { opacity: .5; cursor: default; }
+.terrain-portal-travel[hidden] { display: none; }
+.arrival-protection { display: block; margin-top: 5px; color: #c6e5c1; font-size: 10px; }
+.arrival-protection[hidden] { display: none; }
 .terrain-minimap-city { position: absolute; top: 8px; left: 8px; max-width: calc(100% - 65px); padding: 3px 7px; border: 1px solid #ac996966; border-radius: 4px; background: #172c29d9; font-size: 11px; }
 .terrain-minimap-compass { position: absolute; top: 7px; right: 7px; width: 44px; height: 44px; pointer-events: none; }
 .terrain-minimap-compass svg { width: 100%; height: 100%; }

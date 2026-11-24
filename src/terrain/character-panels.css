@@ -1,0 +1,70 @@
+.character-hud{--ink:#f2ebd8;--muted:#bcc9bc;--gold:#e2c78a;--edge:#82744f;--line:#81765466;--panel:#192b27;color:var(--ink)}
+.settings-menu .journal-launch{display:grid;border-bottom:1px solid #82744f66}
+.character-hud button{font:inherit;cursor:pointer}
+.adventure-journal button{color:var(--gold);border:1px solid var(--edge);border-radius:4px;background:#30433a}
+.settings-menu .journal-launch button{font:inherit;color:inherit}
+.journal-launch kbd{font:11px monospace;border:1px solid var(--line);border-radius:3px;padding:1px 4px}
+.journal-launch button[aria-expanded=true]{border-color:var(--gold)}
+.adventure-journal{position:fixed;top:clamp(12px,8vh,80px);z-index:5;box-sizing:border-box;max-height:calc(100dvh - clamp(12px,8vh,80px) - 8px);overflow:auto;overscroll-behavior:contain;background:var(--panel);border:1px solid var(--edge);border-radius:7px;box-shadow:0 12px 40px #06130f77;color:var(--ink)}
+.adventure-journal[hidden]{display:none}
+#journal-sheet{left:clamp(10px,2vw,36px);width:min(394px,calc(100vw - 24px))}
+#journal-bag{right:clamp(10px,2vw,36px);width:min(458px,calc(100vw - 24px))}
+.journal-front{z-index:6}
+.adventure-journal header,.journal-section,.bag-detail,.sheet-balance,.journal-stats>div,.adventure-journal dl div{display:flex;align-items:center;justify-content:space-between;gap:6px}
+.adventure-journal header{padding:10px 16px 9px;cursor:grab;touch-action:none;user-select:none;background:linear-gradient(110deg,#304135,#1d3029);border-bottom:1px solid var(--edge)}
+.adventure-journal header:active{cursor:grabbing}
+.adventure-journal h2{font-size:21px;margin:1px 0;line-height:1.3}
+.journal-job,.adventure-journal small{color:var(--gold);font-size:12px}
+.journal-job{letter-spacing:.09em}
+.adventure-journal button{padding:4px 9px}
+.adventure-journal button:disabled{opacity:.45;cursor:default}
+.character-hud :is(button,[tabindex]):focus-visible{outline:2px solid var(--gold);outline-offset:-2px}
+.adventure-journal .journal-close{border:0;background:transparent;font-size:24px}
+.journal-content{padding:14px}
+.adventure-journal h3{font-size:15px;color:var(--gold);margin:0 0 7px}
+.bag-pages{display:flex;gap:3px}
+.bag-pages button{font:13px/1.6 system-ui;background:transparent;border-color:transparent}
+.bag-pages button[aria-pressed=true]{background:#35463a;border-color:var(--edge)}
+.bag-count,.sheet-balance b,.journal-stats b,.adventure-journal dd{font-variant-numeric:tabular-nums}
+.bag-count{color:var(--muted);font-size:13px}
+.bag-scroll{margin-top:10px;max-height:45dvh;overflow:auto;overscroll-behavior:contain;scrollbar-color:#8e805b #172620}
+.bag-grid{display:grid;grid-template-columns:repeat(10,minmax(0,1fr));gap:3px;padding:2px}
+.bag-cell,.gear-cell{position:relative;box-sizing:border-box;aspect-ratio:1;border:1px solid #72775b80;border-radius:3px;background:linear-gradient(145deg,#17231e,#28382d);box-shadow:inset 0 1px 4px #0d191955}
+.adventure-journal .bag-item,.adventure-journal button.gear-cell{padding:0;background:#364336;border-color:var(--edge)}
+.bag-item:is(:hover,:focus-visible,[aria-pressed=true]),.gear-cell:is(button):hover{outline:1px solid var(--gold);outline-offset:-1px}
+.bag-item img,.worn-icon{display:block;width:100%;height:100%;object-fit:contain}
+.item-tip{display:none;position:absolute;bottom:100%;left:0;z-index:2;white-space:nowrap;pointer-events:none;padding:5px 8px;border:1px solid var(--edge);border-radius:3px;background:#101e19;color:var(--ink);font-size:12px}
+.bag-item:nth-child(-n+10) .item-tip{top:100%;bottom:auto}
+.bag-item:nth-child(10n) .item-tip,.bag-item:nth-child(10n - 1) .item-tip,.bag-item:nth-child(10n - 2) .item-tip{left:auto;right:0}
+.bag-item:is(:hover,:focus-visible) .item-tip{display:block}
+.bag-detail,.journal-empty{min-height:40px;margin:10px 0 0;padding-top:8px;border-top:1px solid var(--line)}
+.bag-detail small,.gear-slot small{display:block}
+.journal-empty{color:var(--muted);font-size:13px}
+.equipment-stage{display:grid;grid-template-columns:1fr minmax(0,1.75fr) 1fr;gap:8px;align-items:center}
+.gear-rail{display:grid;gap:8px;justify-items:center}
+.gear-slot{text-align:center}
+.gear-slot small{margin-top:2px}
+.gear-cell{width:42px;display:grid;place-items:center;color:#8d9c8c}
+.paper-doll{aspect-ratio:1;display:grid;place-items:center;overflow:hidden;background:radial-gradient(ellipse at 50% 70%,#67715a,#334a3f 65%,#2b3c34);border:1px solid var(--line);border-radius:4px;text-align:center}
+.paper-doll canvas{display:block;width:100%;height:auto}
+.worn-detail{display:flex;align-items:center;justify-content:center;gap:9px;margin-top:8px;font-size:13px}
+.sheet-columns{display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1.25fr);gap:18px;margin-top:14px;border-top:1px solid var(--line);padding-top:10px}
+.journal-stats>div,.adventure-journal dl div{border-bottom:1px solid #82744f3b;min-height:27px}
+.journal-stats abbr{flex:1;text-decoration:none;color:var(--muted);font-size:13px}
+.journal-stats button{padding:0;width:22px;height:20px;line-height:1;touch-action:none;user-select:none}
+.journal-stats [data-preview]{color:#a6db9d;white-space:nowrap}
+.allocation-actions{display:flex;justify-content:flex-end;gap:6px;margin-top:8px}
+.allocation-actions[hidden]{display:none}
+.adventure-journal [data-battle-preview]{color:#a6db9d;white-space:nowrap}
+.adventure-journal dd{text-align:right}
+.adventure-journal dl{margin:0}
+.adventure-journal dt{font-size:13px;color:var(--muted)}
+.adventure-journal dd{margin:0;font-size:14px}
+.sheet-balance{margin-top:12px;background:#293c30;color:var(--gold);padding:5px 9px;font-size:13px}
+.journal-test{margin-top:8px;font-size:12px!important}.journal-error{padding:0 14px;color:#f0aea0}
+@media(max-width:600px){
+
+  .journal-content{padding:10px}.bag-grid{grid-template-columns:repeat(5,minmax(0,1fr))}
+  .bag-item:nth-child(5n) .item-tip,.bag-item:nth-child(5n - 1) .item-tip{left:auto;right:0}
+  .sheet-columns{gap:10px}
+}

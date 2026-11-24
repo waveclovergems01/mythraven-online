@@ -26,7 +26,7 @@ export function createPlayerLibrary() {
     if(disposed) return Promise.reject(new Error('Character library disposed'));
     const cached=cache.get(path);
     if(cached) return cached;
-    const pending=loader.loadAsync('/assets/models/characters/'+path+'.glb').then(asset=>{
+    const pending=loader.loadAsync(path).then(asset=>{
       if(disposed){release(asset);throw new Error('Character library disposed');}
       asset.scene.traverse(mesh=>{
         if(!(mesh instanceof THREE.Mesh)) return;

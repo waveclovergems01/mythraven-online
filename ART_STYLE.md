@@ -1,5 +1,17 @@
 # ART_STYLE.md — Asset Style Guide & Generation Template
 
+## Archer energy arrow · 2026-11-24
+
+Owner supplies Blender draw-pose screenshots and `Luminous Energy Arrow.png` as direction for a red luminous magical arrow, scoped to Archer/bow attacks. Use code-native crossed shader planes with a bright shaft, pointed head and tail fins; do not modify the GLBs or import the screenshot as a texture. During authored frames 2–6 of the ten-frame bow clip, the tail follows the actual weighted string nock and the tip extends slightly through `DEF-hold.L`. The string's vertices blend hold/tweak bones; the distant control-bone origin is not the nock. Release after frame six and render a fast targeted projectile, with the established impact flash/damage only on arrival. Preserve the supplied raster files as external references; no generated art or broader appearance approval is implied.
+
+## Owner loading illustrations · 2026-11-23
+
+The owner explicitly supplies seven chibi fantasy illustrations for map loading backgrounds. Use these images only for the scene-transition cover, with a DOM progress bar at the bottom. Runtime PNGs in `public/assets/loading` are byte-identical copies, mapped to their original filenames and dimensions in `shared/loading-art.json`. Rotate among all seven without immediate repeats. Their appearance is authorized for this loading-screen scope; they do not replace character designs, world models or the general style master. No image generation, repainting, or exporter is involved.
+
+## Combat burst direction · 2026-11-23
+
+The owner's burst stills and `Animated Cyan Starburst Explosion.gif` guide the existing 3D combat effect only. Latest owner correction 2026-11-24: begin as a pinpoint, expand into four long/four short tapered light rays, then fade the central star before the trailing circular shell and sparks. Keep the earlier wide-base/sharp-tip ray profile. The GIF is motion reference only; do not copy its 1.12-second duration. Ordinary monster impacts are white, critical impacts pale gold, and incoming player impacts red. Runtime durations remain 0.28 seconds on monsters, 0.26 on players and 0.32 for critical hits. Chest-anchored shader billboards face the camera and remain visible through geometry. Monsters up to player height (2.8 units) share the player torso flash size (1.54-unit base quad); larger monsters use 40% of their own height. Each hit samples one fixed 80–100% size factor; critical hits have no extra size multiplier. No new raster asset, image generator or GLB texture modification is involved, and the references are not approved project character artwork.
+
 ## Modular male character kit · 2026-11-21
 
 The owner-supplied hairless Novice, Warrior and Archer bodies now use the same two male hairstyles. Runtime GLBs are grouped under `public/assets/models/characters/{bodies,hair,weapons}`. The preview supports Novice with a dagger, Warrior with a longsword or dagger, and Archer with a bow. Bodies retain their own animation clips. Hair and weapons carry only their weighted joint palette and no duplicate clips. The slow-stride preview plays the authored run at 55% cadence. Equipment and attacks are preview controls. This replaces the four previous class-specific body/hair files and their two extraction scripts.
@@ -987,3 +999,7 @@ Landing footprints are narrower and end on the banks before the city gates. A me
 Owner requests the existing city occlusion fade for the fountain and castle, plus a visible fountain image on the minimap. Reuses the current runtime PNGs; no generation, recoloring, replacement asset, or new art approval. Fountain statue/basin, streams, falls and ripples fade together; castle masonry sections and waving flag strips fade together. Ground shadow and collision remain independent. Only actual opaque source pixels overlapping the local actor's body and sorting in front trigger the fade; transparent sprite padding does not. Both groups ease toward0.48 opacity and restore to1 when clear.
 
 The minimap now draws the existing fountain PNG using shared FOUNTAIN dimensions, anchor and normalized world location, exactly as it draws the castle. The map thumbnail stays fully opaque when the world prop fades. Runtime source images remain unchanged and active; no art cleanup or extra exporter required. QA belongs in test-results/landmark-visibility.
+
+## Starter weapon inventory icons
+
+The 96×96 transparent PNGs in `public/assets/items` show the owner's actual training dagger, longsword and bow models. `scripts/render-item-icons.mjs` renders each icon from the GLB registered alongside it in `shared/character-master.json`. The bag and equipment slots share these images.

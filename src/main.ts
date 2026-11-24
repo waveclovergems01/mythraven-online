@@ -8,6 +8,7 @@ import { mountGameSettings } from './game-settings';
 import { restrictInput, usernameCharacters, passwordCharacters, validUsername, validPasswordCharacters, MAX_PASSWORD_LENGTH } from './auth/input-policy';
 import type { CharacterDefinition } from '../shared/character-catalog.mjs';
 import type { PreparedCharacters } from './character-selection';
+import {mountSceneLoading} from './scene-loading';
 
 const app = document.querySelector<HTMLDivElement>('#app')!;
 let mode: 'login' | 'register' = 'login';
@@ -179,17 +180,25 @@ async function showGame(session: Session, character?: CharacterDefinition, asset
   });
   // The old town remains an explicit comparison route during the terrain migration.
   if(new URLSearchParams(location.search).get('view')!=='2d') {
+    const loading=mountSceneLoading(app.querySelector<HTMLElement>('.game-page')!,locale()==='th',area==='west-march');
+    try {
+    await loading.artworkReady;
     const {mountTerrainWorld}=await import('./terrain/TerrainWorld');
-    if(version!==viewVersion) { assets?.dispose(); return; }
+    loading.complete('module');
+    if(version!==viewVersion) { assets?.dispose(); loading.finish();return; }
     const terrain=await mountTerrainWorld(app.querySelector<HTMLElement>('#game')!,session.username,character?.id,assets,area,fromWest,next=>{
       if(version!==viewVersion) return;
       game?.destroy(true); game=null;
       void showGame(session,character,undefined,next,next==='city').catch(()=>{
         if(viewVersion===version+1) void showCharacterSelection(session,locale()==='th'?'โหลดแผนที่ไม่สำเร็จ กรุณาลองอีกครั้ง':'Could not load the map. Please try again.');
       });
-    });
-    if(version!==viewVersion) { terrain.destroy(); return; }
+    },session.id,loading.complete);
+    if(version!==viewVersion) { terrain.destroy();loading.finish();void terrain.ready?.catch(()=>{});return; }
     game=terrain;
+    try { await terrain.ready; }
+    catch(error){terrain.destroy();if(game===terrain)game=null;throw error;}
+    loading.finish();
+    } catch(error){loading.finish();throw error;}
     return;
   }
   const [{default:Phaser},{WorldScene}]=await Promise.all([import('phaser'),import('./scenes/WorldScene')]);

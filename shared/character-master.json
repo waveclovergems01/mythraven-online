@@ -1,0 +1,18 @@
+{
+  "startingLevel": 1,
+  "pointsPerLevel": 5,
+  "criticalRate": {"baseChance": 0.05, "referenceLuck": 99, "referenceChance": 0.60, "maxChance": 1},
+  "inventory": {"capacity": 100, "slotsPerPage": 50},
+  "baseStats": {"STR": 1, "AGI": 1, "DEX": 1, "INT": 1, "VIT": 1, "LUK": 1},
+  "slots": ["weapon", "head", "body", "arms"],
+  "classes": {
+    "novice": {"starter": "dagger", "weapons": ["dagger"]},
+    "warrior": {"starter": "longsword", "weapons": ["longsword", "dagger"]},
+    "archer": {"starter": "bow", "weapons": ["bow"]}
+  },
+  "items": {
+    "dagger": {"en": "Training Dagger", "th": "มีดสั้นฝึกหัด", "slot": "weapon", "attack": 4, "stat": "STR", "model": "/assets/models/characters/weapons/dagger.glb", "icon": "/assets/items/training-dagger.png"},
+    "longsword": {"en": "Training Longsword", "th": "ดาบยาวฝึกหัด", "slot": "weapon", "attack": 7, "stat": "STR", "model": "/assets/models/characters/weapons/longsword.glb", "icon": "/assets/items/training-longsword.png"},
+    "bow": {"en": "Training Bow", "th": "ธนูฝึกหัด", "slot": "weapon", "attack": 5, "stat": "DEX", "model": "/assets/models/characters/weapons/bow.glb", "icon": "/assets/items/training-bow.png"}
+  }
+}

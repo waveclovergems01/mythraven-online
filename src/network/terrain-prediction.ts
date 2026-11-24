@@ -1,71 +1,97 @@
-import { TerrainMovement } from '../../shared/terrain-movement.mjs';
-import type { TerrainData } from '../../shared/terrain-data.mjs';
-import type { TerrainPlayer } from './terrain-client';
+import {TerrainMovement, WALK_SPEED, speedMultiplier} from '../../shared/terrain-movement.mjs';
+import type {TerrainData} from '../../shared/terrain-data.mjs';
+import type {TerrainPlayer} from './terrain-client';
 
-type Command = { seq: number; at: number; target?: { x: number; z: number } };
-
-/** Local input prediction with ordered acknowledgements and replay of unacknowledged inputs. */
+/** Simulation follows server-authored corridors. Rendering catches up continuously, even after a stop. */
 export class TerrainPrediction {
-  readonly movement: TerrainMovement;
-  ready = false;
-  private pending: Command[] = [];
-  private correction = { x: 0, z: 0 };
-  private signature = '';
-  private lastReconcile = 0;
-  private lastAck = -1;
-  private roundTrip = 80;
-  constructor(data: TerrainData) { this.movement = new TerrainMovement(data); }
-  get position() { return { x: this.movement.position.x + this.correction.x, z: this.movement.position.z + this.correction.z }; }
-  move(seq: number, x: number, z: number) {
-    if (!this.ready || !this.movement.moveTo({ x, z })) return false;
-    this.pending.push({ seq, at: performance.now(), target: { x, z } }); return true;
+  readonly movement:TerrainMovement;
+  private readonly display:TerrainMovement;
+  ready=false;
+  private pending?:{seq:number;at:number;detour?:{x:number;z:number}};
+  get awaitingRoute(){return !!this.pending?.detour;}
+  get destination(){return this.pending?.detour??this.movement.destination;}
+  private lastAck=-1;
+  private roundTrip=80;
+  private lastHp?:number;
+  private serverPosition={x:0,z:0};
+  private signature='';
+  private lastDetour=-Infinity;
+  constructor(data:TerrainData){
+    this.movement=new TerrainMovement(data);
+    this.display=new TerrainMovement(data);
   }
-  stop(seq: number) {
-    this.movement.stop(); this.correction = { x: 0, z: 0 };
-    if (this.ready) this.pending.push({ seq, at: performance.now() });
+  get position(){return {...this.display.position};}
+  get settling(){
+    const p=this.display.position;
+    return Math.hypot(p.x-this.movement.position.x,p.z-this.movement.position.z)>.015;
   }
-  reset() { this.lastAck = -1; this.ready = false; this.pending = []; this.signature = ''; this.movement.stop(); this.correction = { x: 0, z: 0 }; }
-  accept(player: TerrainPlayer) {
-    if (player.inputSeq < this.lastAck) return;
-    this.lastAck = player.inputSeq;
-    const signature = [player.inputSeq, player.x, player.z, player.heading, player.moving, player.turning, player.path, player.pathIndex, player.speedLevel].join(',');
-    if (signature === this.signature) return;
-    this.signature = signature;
-    const now = performance.now(), before = this.position;
-    const acknowledged = this.pending.find(command => command.seq === player.inputSeq);
-    if (acknowledged) this.roundTrip = Math.max(0, Math.min(400, now - acknowledged.at));
-    this.pending = this.pending.filter(command => command.seq > player.inputSeq);
-    // An older server turn cannot describe our newest local redirect. Let it run
-    // until acknowledged, but bound deferral during sustained input or divergence.
-    if (this.ready && this.pending.length && now - this.lastReconcile < 250 &&
-        Math.hypot(before.x-player.x, before.z-player.z) < 6) return;
-    this.lastReconcile = now;
-    Object.assign(this.movement.position, { x: player.x, z: player.z });
-    this.movement.heading = player.heading;
-    this.movement.setSpeedLevel(player.speedLevel);
-    this.movement.restorePath(player.path, player.pathIndex, player.turning);
-    // Estimate snapshot travel time, then replay newer clicks in their original order.
-    let cursor = this.ready ? now - Math.min(125, this.roundTrip / 2) : now;
-    for (const command of this.pending) {
-      const at = Math.max(cursor, Math.min(now, command.at));
-      this.advance((at - cursor) / 1000); cursor = at;
-      if (command.target) this.movement.moveTo(command.target); else this.movement.stop();
+  move(seq:number,x:number,z:number,serverDetour=false){
+    if(!this.ready)return false;
+    const target={x,z};
+    if(serverDetour && !this.movement.clearLine(this.movement.position,target)){
+      if(!this.movement.canStand(target))return false;
+      // The server already plans this detour. Leave the input frame available for rendering.
+      this.movement.stop();this.pending={seq,at:performance.now(),detour:target};return true;
     }
-    this.advance((now - cursor) / 1000);
-    const distance = Math.hypot(before.x - this.movement.position.x, before.z - this.movement.position.z);
-    if (this.ready && distance < 6 && this.movement.moving && this.movement.clearLine(before, this.movement.position))
-      this.correction = { x: before.x - this.movement.position.x, z: before.z - this.movement.position.z };
-    else this.correction = { x: 0, z: 0 };
-    this.ready = true;
+    if(!this.movement.moveTo(target))return false;
+    this.pending={seq,at:performance.now()};return true;
   }
-  private advance(seconds: number) {
-    while (seconds > 0) { const dt = Math.min(.05, seconds); this.movement.update(dt); seconds -= dt; }
+  stop(seq:number){
+    this.movement.stop();
+    if(this.ready)this.pending={seq,at:performance.now()};
   }
-  update(seconds: number) {
-    if (!this.ready) return;
-    const dt = Math.min(.1, Math.max(0, seconds)); this.advance(dt);
-    const decay = Math.exp(-dt / .065);
-    this.correction.x *= decay; this.correction.z *= decay;
-    if (!this.movement.moving) this.correction = { x: 0, z: 0 };
+  reset(){
+    this.pending=undefined;this.ready=false;this.lastAck=-1;this.lastHp=undefined;
+    this.signature='';this.roundTrip=80;this.lastDetour=-Infinity;
+    this.display.stop();this.movement.stop();
+  }
+  accept(player:TerrainPlayer){
+    if(player.inputSeq<this.lastAck)return;
+    this.lastAck=player.inputSeq;
+    const revived=this.lastHp===0 && (player.hp??0)>0;
+    this.lastHp=player.hp;
+    Object.assign(this.serverPosition,{x:player.x,z:player.z});
+    // A superseded destination cannot acknowledge the most recent redirect.
+    // Keep its position only as a bound on how far to predict while waiting.
+    if(this.pending && player.inputSeq<this.pending.seq && !revived && player.hp!==0)return;
+    if(this.pending && player.inputSeq===this.pending.seq)
+      this.roundTrip=Math.min(400,Math.max(0,performance.now()-this.pending.at));
+    this.pending=undefined;
+    const signature=[player.inputSeq,player.x,player.z,player.heading,player.moving,player.turning,player.path,player.pathIndex,player.speedLevel,player.hp===0].join(',');
+    if(signature===this.signature && !revived)return;
+    this.signature=signature;
+    Object.assign(this.movement.position,this.serverPosition);
+    this.movement.heading=player.heading;
+    this.movement.setSpeedLevel(player.speedLevel);
+    this.movement.restorePath(player.path,player.pathIndex,player.turning);
+    if(!this.ready || revived){
+      Object.assign(this.display.position,this.serverPosition);this.display.stop();
+    }else if(player.moving)this.advance(Math.min(.125,this.roundTrip/2000));
+    this.ready=true;
+  }
+  private advance(seconds:number){
+    while(seconds>0){const step=Math.min(.05,seconds);this.movement.update(step);seconds-=step;}
+  }
+  update(seconds:number){
+    if(!this.ready)return;
+    const dt=Math.min(.05,Math.max(0,seconds)),speed=WALK_SPEED*speedMultiplier(this.movement.speedLevel);
+    const target=this.movement.position;
+    if(!this.pending || (performance.now()-this.pending.at<300 &&
+      Math.hypot(target.x-this.serverPosition.x,target.z-this.serverPosition.z)<speed*.22))
+      this.advance(dt);
+    const drawn=this.display.position,dx=target.x-drawn.x,dz=target.z-drawn.z,distance=Math.hypot(dx,dz);
+    if(!distance)return;
+    if(this.movement.clearLine(drawn,target)){
+      if(this.display.moving)this.display.stop();
+      const fraction=Math.min(1,dt*speed*1.3/distance);
+      drawn.x+=dx*fraction;drawn.z+=dz*fraction;
+    }else{
+      // Corrections near a corner follow walkable ground at walking speed as well.
+      const now=performance.now(),dest=this.display.destination;
+      if(now-this.lastDetour>=120 && (!dest || Math.hypot(dest.x-target.x,dest.z-target.z)>1)){
+        this.display.moveTo(target);this.lastDetour=now;
+      }
+      this.display.setSpeedLevel(this.movement.speedLevel);this.display.update(dt);
+    }
   }
 }

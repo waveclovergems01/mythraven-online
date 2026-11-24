@@ -1,0 +1,4 @@
+{
+  "rabbit": {"th":"กระต่ายโคลเวอร์","en":"Clover Hare","level":3,"hp":100,"attack":5,"attackInterval":1.7,"exp":35,"respawnSeconds":5,"drops":[]},
+  "wolf": {"th":"ลูกหมาป่าแอชเฟอร์","en":"Ashfur Pup","level":5,"hp":150,"attack":9,"attackInterval":1.5,"exp":60,"respawnSeconds":7,"drops":[]}
+}

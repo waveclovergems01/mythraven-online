@@ -1,5 +1,6 @@
 import type {CharacterDefinition} from '../../shared/character-catalog.mjs';
 import {createPlayerLibrary} from './player-library';
+import master from '../../shared/character-master.json' with {type:'json'};
 import {equipment,loadSkinnedPlayers,type PlayerClass,type Weapon} from './skinned-player';
 
 export type PlayerFactory=Awaited<ReturnType<typeof loadSkinnedPlayers>>;
@@ -9,7 +10,7 @@ export function createCharacterAssets(){
   let disposed=false;
   return {
     get(character:CharacterDefinition){return ready.get(character.model);},
-    loadWeapon(weapon:Weapon){return library.load('weapons/'+weapon);},
+    loadWeapon(weapon:Weapon){return library.load(master.items[weapon].model);},
     ensure(character:CharacterDefinition){
       const model=character.model;
       if(disposed || !Object.hasOwn(equipment,model)) return Promise.reject(new Error('Unavailable character '+model));
