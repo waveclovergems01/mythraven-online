@@ -9,8 +9,10 @@ import { restrictInput, usernameCharacters, passwordCharacters, validUsername, v
 import type { CharacterDefinition } from '../shared/character-catalog.mjs';
 import type { PreparedCharacters } from './character-selection';
 import {mountSceneLoading} from './scene-loading';
+import {createBackgroundMusic} from './background-music';
 
 const app = document.querySelector<HTMLDivElement>('#app')!;
+const music = createBackgroundMusic();
 let mode: 'login' | 'register' = 'login';
 let errorKey: MessageKey | null = null;
 let game: { destroy: (removeCanvas: boolean) => void } | null = null;
@@ -22,6 +24,7 @@ setLocale(locale());
 const brand = '<img class="brand-logo" src="/assets/ui/mythraven-logo.webp" width="640" height="320" alt="Mythraven Online" fetchpriority="high">';
 
 function renderAuth(): void {
+  music.setPlaylist();
   selection?.destroy(); selection = undefined;
   stopFittingAuth?.();
   viewVersion++;
@@ -144,22 +147,32 @@ async function showCharacterSelection(session: Session, message?: string): Promi
   const version=++viewVersion;
   const {mountCharacterSelection}=await import('./character-selection');
   if(version!==viewVersion) return;
-  selection=mountCharacterSelection(app,session.username,locale()==='th',async(character,assets)=>{
+  music.setPlaylist('town');
+  const hairColorKey = 'mythraven.hair-color.' + session.id;
+  let savedHairColor = '';
+  try {
+    savedHairColor = localStorage.getItem(hairColorKey) ?? '';
+  } catch { /* Storage is optional. */ }
+  selection=mountCharacterSelection(app,session.username,locale()==='th',async(character,assets,hairColor)=>{
     const enteringVersion=viewVersion+1;
-    try { await showGame(session,character,assets); }
+    try {
+      localStorage.setItem(hairColorKey, hairColor);
+    } catch { /* Keep the color for this session. */ }
+    try { await showGame(session,character,assets,'city',false,hairColor); }
     catch {
       assets.dispose();
       if(viewVersion!==enteringVersion) return;
       await showCharacterSelection(session,locale()==='th'?'เข้าเมืองไม่สำเร็จ กรุณาลองอีกครั้ง':'Could not enter the city. Please try again.');
     }
-  },()=>signOut(session));
+  },()=>signOut(session),savedHairColor);
   if(message) app.querySelector('#character-error')!.textContent=message;
 }
 async function showGame(session: Session, character?: CharacterDefinition, assets?: PreparedCharacters,
-  area: import('../shared/west-march.mjs').Area = 'city', fromWest = false): Promise<void> {
+  area: import('../shared/west-march.mjs').Area = 'city', fromWest = false, hairColor = ''): Promise<void> {
   stopFittingAuth?.();
   stopFittingAuth = undefined;
   const version=++viewVersion;
+  music.setPlaylist(area === 'west-march' ? 'battle' : 'town');
   app.innerHTML=`<main class="game-page"><header class="game-header"><div><div class="mini-brand">MYTHRAVEN <span>ONLINE</span></div><p>${t('city')} · <span id="player-name"></span></p></div></header><div id="game" aria-label="${t('city')}"><p class="loading">${t('loading')}</p></div><footer class="game-footer"><span>${t('cityControls')}</span><span>${t('cityNote')}</span></footer><button class="leave" id="logout">${t('logout')}</button><p id="game-error" class="error" role="alert"></p></main>`;
   app.querySelector('#player-name')!.textContent=session.username;
   if(area==='west-march'){
@@ -168,7 +181,9 @@ async function showGame(session: Session, character?: CharacterDefinition, asset
     app.querySelector('#game')!.setAttribute('aria-label',name);
     app.querySelector('.loading')!.textContent=locale()==='th'?'กำลังเข้าสู่ทุ่งชายแดน…':'Entering West March…';
   }
-  if(new URLSearchParams(location.search).get('view')!=='2d') mountGameSettings(app.querySelector<HTMLElement>('.game-page')!,locale()==='th');
+  if(new URLSearchParams(location.search).get('view')!=='2d') {
+    mountGameSettings(app.querySelector<HTMLElement>('.game-page')!,locale()==='th',music);
+  }
   app.querySelector('#logout')!.addEventListener('click',async()=>{
     const button=app.querySelector<HTMLButtonElement>('#logout')!; button.disabled=true;
     try {
@@ -189,10 +204,10 @@ async function showGame(session: Session, character?: CharacterDefinition, asset
     const terrain=await mountTerrainWorld(app.querySelector<HTMLElement>('#game')!,session.username,character?.id,assets,area,fromWest,next=>{
       if(version!==viewVersion) return;
       game?.destroy(true); game=null;
-      void showGame(session,character,undefined,next,next==='city').catch(()=>{
+      void showGame(session,character,undefined,next,next==='city',hairColor).catch(()=>{
         if(viewVersion===version+1) void showCharacterSelection(session,locale()==='th'?'โหลดแผนที่ไม่สำเร็จ กรุณาลองอีกครั้ง':'Could not load the map. Please try again.');
       });
-    },session.id,loading.complete);
+    },session.id,loading.complete,hairColor);
     if(version!==viewVersion) { terrain.destroy();loading.finish();void terrain.ready?.catch(()=>{});return; }
     game=terrain;
     try { await terrain.ready; }

@@ -1,14 +1,42 @@
 import * as THREE from 'three';
 import { CHARACTERS, type CharacterDefinition } from '../shared/character-catalog.mjs';
+import { normalizeAppearanceColor } from '../shared/appearance-color.mjs';
 import { createCharacterAssets, type CharacterAssets, type PlayerAvatar } from './terrain/character-assets';
 import {equipment, weaponsFor, type PlayerClass, type Weapon, type PreviewMotion} from './terrain/skinned-player';
 import './character-selection.css';
 
 export type PreparedCharacters = CharacterAssets;
 
+const hairPresets = [
+  ['', 'สีเดิม', 'Original'],
+  ['#29252f', 'ดำ', 'Black'],
+  ['#895139', 'น้ำตาล', 'Brown'],
+  ['#d4dbe8', 'เงิน', 'Silver'],
+  ['#79c9ef', 'ฟ้า', 'Sky blue'],
+  ['#c93244', 'แดง', 'Red'],
+  ['#f7d479', 'ทอง', 'Gold'],
+  ['#e77a35', 'ส้ม', 'Orange'],
+  ['#a177d1', 'ม่วง', 'Purple'],
+];
+function hairColorControls(thai: boolean) {
+  const label = thai ? 'สีผม' : 'Hair color';
+  return `<fieldset class="hair-colors">
+    <legend>${label}</legend>
+    <div class="hair-swatches">
+      ${hairPresets.map(([hex, th, en]) => `<button type="button" data-hair-color="${hex}" aria-pressed="false"
+        aria-label="${thai ? th : en}" title="${thai ? th : en}" style="--swatch:${hex || '#9e6849'}">${hex ? '' : (thai ? th : en)}</button>`).join('')}
+    </div>
+    <label class="hair-picker">${thai ? 'เลือกสีเอง' : 'Custom color'}
+      <input id="hair-color" type="color" value="${hairPresets[2][0]}" aria-label="${label}">
+      <output for="hair-color"></output>
+    </label>
+  </fieldset>`;
+}
+
 /** The preview owns its assets until explicit selection transfers them to the city. */
 export function mountCharacterSelection(host: HTMLElement, username: string, thai: boolean,
-  enter: (character: CharacterDefinition, assets: PreparedCharacters) => Promise<void>, exit: () => Promise<void>) {
+  enter: (character: CharacterDefinition, assets: PreparedCharacters, hairColor: string) => Promise<void>,
+  exit: () => Promise<void>, initialHairColor = '') {
   host.innerHTML = `<main class="character-page" aria-labelledby="character-title">
     <header class="character-header"><div class="mini-brand">MYTHRAVEN <span>ONLINE</span></div>
       <div class="character-account"><span id="character-account-name"></span><button id="character-logout" type="button">${thai ? 'ออกจากระบบ' : 'Sign out'}</button></div></header>
@@ -25,8 +53,10 @@ export function mountCharacterSelection(host: HTMLElement, username: string, tha
           ${CHARACTERS.filter(c=>c.classId===job).map(c=>`<label class="character-card">
           <input type="radio" name="character" value="${c.id}" aria-label="${thai?c.nameTh:c.nameEn}"><strong>${thai?'ทรงผม':'Hairstyle'} ${c.hairStyle}</strong><span class="character-check" aria-hidden="true">✓</span></label>`).join('')}</fieldset>`).join('')}
       </fieldset><p id="character-empty" hidden>${thai ? 'ยังไม่มีโมเดลตัวละครหญิงให้เลือก' : 'No female character models are available yet.'}</p>
+      ${hairColorControls(thai)}
     </section><section class="character-stage" aria-label="${thai ? 'ตัวอย่างตัวละครสามมิติ' : '3D character preview'}">
-      <div id="character-preview"></div><div class="character-preview-caption"><span>${thai ? 'ตัวอย่างตัวละคร' : 'CHARACTER PREVIEW'}</span><strong id="character-preview-name">Novice</strong></div>
+      <div id="character-preview" tabindex="0" aria-describedby="preview-rotate-hint"></div>
+      <div class="character-preview-caption"><span id="preview-rotate-hint">${thai ? 'ลากหรือกด ← → เพื่อหมุน' : 'Drag or use ← → to rotate'}</span><strong id="character-preview-name">Novice</strong></div>
       <p id="character-load-status" role="status">${thai ? 'กำลังโหลดตัวละคร…' : 'Loading character…'}</p>
       <button id="character-retry" type="button" hidden>${thai ? 'ลองโหลดอีกครั้ง' : 'Retry loading'}</button>
     </section></div>
@@ -41,6 +71,7 @@ export function mountCharacterSelection(host: HTMLElement, username: string, tha
       <button id="enter-city" type="button" disabled>${thai ? 'เข้าสู่เมือง' : 'Enter city'} <span aria-hidden="true">→</span></button></footer>
     <p id="character-error" class="error" role="alert"></p>
   </main>`;
+  host.querySelector('.character-page')!.addEventListener('contextmenu', event => event.preventDefault());
   host.querySelector('#character-account-name')!.textContent = username;
   const previewHost = host.querySelector<HTMLElement>('#character-preview')!;
   const submit = host.querySelector<HTMLButtonElement>('#enter-city')!;
@@ -57,6 +88,28 @@ export function mountCharacterSelection(host: HTMLElement, username: string, tha
   const assets = createCharacterAssets();
   let previewCharacter: CharacterDefinition | undefined = CHARACTERS[0];
   let avatar: PlayerAvatar | undefined;
+  function bindHairColor(initial: string) {
+    const field = host.querySelector<HTMLFieldSetElement>('.hair-colors')!;
+    const picker = field.querySelector<HTMLInputElement>('input')!;
+    const colorValue = field.querySelector('output')!;
+    const attribute = `data-hair-color`;
+    const swatches = field.querySelectorAll<HTMLButtonElement>(`[${attribute}]`);
+    let color = '';
+    function select(value: string) {
+      color = normalizeAppearanceColor(value);
+      picker.value = color || picker.defaultValue;
+      colorValue.value = color.toUpperCase();
+      for (const swatch of swatches) {
+        swatch.setAttribute('aria-pressed', String(swatch.getAttribute(attribute) === color));
+      }
+      avatar?.setHairColor(color);
+    }
+    for (const swatch of swatches) swatch.onclick = () => select(swatch.getAttribute(attribute) ?? '');
+    picker.oninput = picker.onchange = () => select(picker.value);
+    select(initial);
+    return {field, get color() { return color; }};
+  }
+  const hair = bindHairColor(initialHairColor);
   let renderer: THREE.WebGLRenderer | undefined, observer: ResizeObserver | undefined;
   let disposed = false, transferred = false, busy = false, previewVersion = 0, frame = 0, previous = 0;
   const scene = new THREE.Scene();
@@ -64,6 +117,33 @@ export function mountCharacterSelection(host: HTMLElement, username: string, tha
   const light = new THREE.DirectionalLight('#fff0d0', 2.5); light.position.set(-4, 6, 5); scene.add(light);
   const camera = new THREE.OrthographicCamera(-2, 2, 2, -2, .1, 50);
   camera.position.set(3, 2.5, 7); camera.lookAt(0, 1.35, 0);
+  let previewYaw = 0;
+  let rotationDrag: { pointerId: number; x: number } | undefined;
+  function rotatePreview(delta: number) {
+    previewYaw = (previewYaw + delta) % (Math.PI * 2);
+    if (avatar) avatar.group.rotation.y = previewYaw;
+  }
+  previewHost.addEventListener('pointerdown', event => {
+    if (!avatar || event.button !== 0 || rotationDrag) return;
+    rotationDrag = { pointerId: event.pointerId, x: event.clientX };
+    previewHost.setPointerCapture(event.pointerId);
+    previewHost.classList.add('is-rotating');
+  });
+  previewHost.addEventListener('pointermove', event => {
+    if (!rotationDrag || event.pointerId !== rotationDrag.pointerId) return;
+    rotatePreview((event.clientX - rotationDrag.x) * Math.PI / 180);
+    rotationDrag.x = event.clientX;
+  });
+  previewHost.addEventListener('lostpointercapture', event => {
+    if (rotationDrag?.pointerId !== event.pointerId) return;
+    rotationDrag = undefined;
+    previewHost.classList.remove('is-rotating');
+  });
+  previewHost.addEventListener('keydown', event => {
+    if (!avatar || (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight')) return;
+    event.preventDefault();
+    rotatePreview(event.key === 'ArrowLeft' ? -Math.PI / 12 : Math.PI / 12);
+  });
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
   const animate = (now: number) => {
     if (disposed || !renderer) return;
@@ -110,7 +190,9 @@ export function mountCharacterSelection(host: HTMLElement, username: string, tha
         observer = new ResizeObserver(resize); observer.observe(previewHost); resize();
         previous = performance.now(); frame = requestAnimationFrame(animate);
       }
-      avatar = factory.create(true, character.hairStyle); scene.add(avatar.group);
+      avatar = factory.create(true, character.hairStyle, hair.color);
+      avatar.group.rotation.y = previewYaw;
+      scene.add(avatar.group);
       if(item) avatar.setWeapon(item,weaponAsset);
       attack.disabled=!item || !avatar.canPreviewAttack(item);
       if(attack.disabled && motion.value==='attack') motion.value='idle';
@@ -142,6 +224,7 @@ export function mountCharacterSelection(host: HTMLElement, username: string, tha
     host.querySelectorAll('[data-gender]').forEach(other => other.setAttribute('aria-pressed', String(other === button)));
     host.querySelectorAll<HTMLElement>('[data-character-gender]').forEach(card => { card.hidden = gender !== 'all' && card.dataset.characterGender !== gender; });
     const available = CHARACTERS.filter(c => gender === 'all' || c.gender === gender);
+    hair.field.hidden = available.length === 0;
     host.querySelector<HTMLElement>('#character-empty')!.hidden = available.length > 0;
     previewHost.style.visibility = available.length ? 'visible' : 'hidden';
     if (selected && gender !== 'all' && selected.gender !== gender) {
@@ -161,7 +244,7 @@ export function mountCharacterSelection(host: HTMLElement, username: string, tha
     if (busy || !selected || !avatar || previewHost.dataset.characterId !== selected.id) return;
     busy = true; submit.disabled = true; transferred = true;
     clearPreview(); disposed = true;
-    await enter(selected, assets);
+    await enter(selected, assets, hair.color);
   };
   host.querySelector<HTMLButtonElement>('#character-logout')!.onclick = async event => {
     const button = event.currentTarget as HTMLButtonElement; button.disabled = true;

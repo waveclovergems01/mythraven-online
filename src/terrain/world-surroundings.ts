@@ -4,7 +4,7 @@ import {trailZ} from '../../shared/west-march.mjs';
 import type {TreePlacement} from '../../shared/terrain-props.mjs';
 import {createGroundMaterial,type TerrainTiles} from './terrain-materials';
 
-export const SCENERY_EXTENSION=500;
+export const SCENERY_EXTENSION=250;
 const half=TERRAIN.size/2;
 /** Clamp to the real boundary: river mouths and roads continue without a vertical seam. */
 export function boundarySample(data:TerrainData,values:ArrayLike<number>,x:number,z:number){

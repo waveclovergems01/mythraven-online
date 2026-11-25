@@ -21,9 +21,25 @@ test('guest chooses a model before joining; previews share assets with the city 
   await expect(page.locator('input[name="character"]:checked')).toHaveCount(0);
   await expect(page.locator('#game')).toHaveCount(0);
   await expect(page.locator('#character-preview')).toHaveAttribute('data-ready', 'true', { timeout: 30000 });
+  const menuPrevented = await page.locator('#character-preview canvas').evaluate(canvas =>
+    !canvas.dispatchEvent(new MouseEvent('contextmenu', { bubbles: true, cancelable: true, button: 2 })));
+  expect(menuPrevented).toBe(true);
+  const caption = page.locator('#character-preview-name');
+  const bounds = (await caption.boundingBox())!;
+  const y = bounds.y + bounds.height / 2;
+  await page.mouse.move(bounds.x + 1, y);
+  await page.mouse.down();
+  await page.mouse.move(bounds.x + bounds.width - 1, y, { steps: 5 });
+  await page.mouse.up();
+  expect(await page.evaluate(() => getSelection()?.toString().trim())).toBe('Novice');
   expect(sockets).toHaveLength(0);
   await page.locator('input[value="novice-male-02"]').check();
   await expect(page.locator('#character-preview-name')).toContainText('2');
+  await page.locator('[data-hair-color="#d4dbe8"]').click();
+  await expect(page.locator('#hair-color')).toHaveValue('#d4dbe8');
+  await page.locator('#hair-color').fill('#36a2e8');
+  await expect(page.locator('output[for=hair-color]')).toHaveText('#36A2E8');
+  await expect(page.locator('#skin-color')).toHaveCount(0);
   await page.screenshot({ path: 'test-results/character-selection/desktop.png' });
   await page.locator('[data-gender="female"]').click();
   await expect(page.locator('#character-empty')).toBeVisible();
@@ -35,6 +51,7 @@ test('guest chooses a model before joining; previews share assets with the city 
   const mine = (await state()).id;
   expect((await state()).players[mine].characterId).toBe('novice-male-02');
   expect((await state()).avatars[mine].hairStyle).toBe(2);
+  expect((await state()).avatars[mine].hairColor).toBe('#36a2e8');
   expect(assets).toHaveLength(3); // One body and two shared hairstyles, reused on city entry.
   await expect(page.locator('#character-preview')).toHaveCount(0);
   await openSettings(page); await expect(page.locator('#hair-style')).toHaveCount(0);
@@ -42,18 +59,24 @@ test('guest chooses a model before joining; previews share assets with the city 
   const otherContext = await browser.newContext({ viewport: { width: 1200, height: 800 } });
   const other = await otherContext.newPage(); await hook(other);
   try {
-    await other.goto('/'); await other.locator('#guest').click(); await chooseCharacter(other);
+    await other.goto('/'); await other.locator('#guest').click();
+    await other.locator('[data-hair-color="#c93244"]').click();
+    await chooseCharacter(other);
     await expect.poll(async () => (await state()).renderedPlayers,{timeout:60000}).toBe(2);
     const peer = await other.evaluate(() => (window as any).selectionWorld.inspect());
     expect(peer.players[mine].characterId).toBe('novice-male-02'); expect(peer.avatars[mine].hairStyle).toBe(2);
+    expect(peer.avatars[mine].hairColor).toBe('#36a2e8');
     expect((await state()).avatars[peer.id].hairStyle).toBe(1);
+    expect((await state()).avatars[peer.id].hairColor).toBe('#c93244');
     await page.bringToFront(); await page.context().setOffline(true);
     await expect(page.locator('#network-status')).toHaveAttribute('data-connected','false',{timeout:15000});
     await page.context().setOffline(false); await page.locator('#network-status button').click();
     await expect(page.locator('#network-status')).toHaveAttribute('data-connected','true',{timeout:60000});
     const rejoined = await state(); expect(rejoined.players[rejoined.id].characterId).toBe('novice-male-02');
+    expect(rejoined.players[rejoined.id].hairColor).toBe('#36a2e8');
     await page.reload();
     await expect(page.locator('#character-title')).toBeVisible();
+    await expect(page.locator('#hair-color')).toHaveValue('#36a2e8');
     await expect(page.locator('#enter-city')).toBeDisabled();
     await expect(page.locator('#game')).toHaveCount(0);
     await page.setViewportSize({width:390,height:844});

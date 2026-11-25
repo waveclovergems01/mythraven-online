@@ -17,6 +17,15 @@
 .class-hairstyles[hidden] {display:none}
 .class-hairstyles legend { padding:0 0 6px; color:#dfc68d; }
 .class-hairstyles .character-card {padding:12px;gap:6px}
+.hair-colors { border:0; padding:0; margin:18px 0 0; min-width:0; }
+.hair-colors legend { color:#dfc68d; padding:0 0 8px; }
+.hair-swatches { display:flex; flex-wrap:wrap; gap:8px; align-items:center; }
+.hair-swatches button { min-width:36px; height:36px; padding:0 8px; border:1px solid #a89567; border-radius:6px; background:var(--swatch); cursor:pointer; }
+.hair-swatches button[data-hair-color=""] { background:#243a31; color:#f1e4c2; font:inherit; font-size:13px; }
+.hair-swatches button[aria-pressed="true"] { outline:2px solid #f3d495; outline-offset:2px; }
+.hair-picker { display:flex; flex-wrap:wrap; align-items:center; gap:10px; margin-top:10px; color:#c8d1c3; font-size:14px; }
+.hair-picker input { box-sizing:border-box; width:44px; height:36px; padding:3px; border:1px solid #738267; border-radius:5px; background:#243a31; cursor:pointer; }
+.hair-picker output { font-variant-numeric:tabular-nums; }
 .preview-controls {max-width:1120px;margin:14px auto;display:flex;justify-content:flex-end;flex-wrap:wrap;gap:12px}
 .preview-controls label {display:flex;align-items:center;gap:8px;font-size:14px;color:#c8d1c3}
 .preview-controls select {padding:6px 10px;border:1px solid #738267;background:#243a31;color:#f1e4c2;border-radius:5px;font:inherit}
@@ -34,8 +43,12 @@
 #character-empty { padding: 28px 10px; text-align: center; color: #b1bda8; font-size: 14px; }
 .character-stage { position: relative; min-height: 420px; height: min(55vh,560px); border-radius: 16px; overflow: hidden; background: radial-gradient(ellipse at 50% 70%,#84976518,transparent 65%); border: 1px solid #a4b18a1c; }
 #character-preview { position: absolute; inset: 0 0 58px; }
+#character-preview[data-ready] { cursor:grab; touch-action:pan-y pinch-zoom; user-select:none; }
+#character-preview.is-rotating { cursor:grabbing; }
+#character-preview:focus-visible { outline:2px solid #f3d495; outline-offset:-3px; border-radius:12px; }
 #character-preview canvas { display: block; width: 100%; height: 100%; }
 .character-preview-caption { position: absolute; bottom: 20px; left: 0; right: 0; text-align: center; pointer-events: none; }
+.character-preview-caption > * { width: fit-content; margin-inline: auto; pointer-events: auto; }
 .character-preview-caption span { display: block; font-size: 10px; letter-spacing: 2px; color: #98ad96; margin-bottom: 6px; }
 .character-preview-caption strong { font-weight: 500; color: #dcc493; }
 #character-load-status { position: absolute; top: 40%; left: 10%; width: 80%; text-align: center; color: #c8c5ac; }

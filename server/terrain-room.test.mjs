@@ -639,13 +639,15 @@ test('entry requires a known character and derives appearance from the server ca
     assert.equal(room.state.players.has('invalid'), false);
     assert.equal(room.movers.has('invalid'), false);
   }
-  room.onJoin({ sessionId: 'valid' }, { characterId: 'novice-male-02', hairStyle: 1 });
+  room.onJoin({ sessionId: 'valid' }, { characterId: 'novice-male-02', hairStyle: 1, hairColor: '#36A2E8' });
   assert.equal(room.state.players.get('valid').hairStyle, 2);
+  assert.equal(room.state.players.get('valid').hairColor, '#36a2e8');
   for (const hairStyle of [1, 2]) {
     const characterId = `warrior-male-0${hairStyle}`, sessionId = `warrior-${hairStyle}`;
-    room.onJoin({ sessionId }, { characterId, hairStyle: 99 });
+    room.onJoin({ sessionId }, { characterId, hairStyle: 99, hairColor: 'rgb(0, 0, 0)' });
     assert.equal(room.state.players.get(sessionId).characterId, characterId);
     assert.equal(room.state.players.get(sessionId).hairStyle, hairStyle);
+    assert.equal(room.state.players.get(sessionId).hairColor, '');
   }
   assert.equal(handlers.has('hair-style'), false);
 });

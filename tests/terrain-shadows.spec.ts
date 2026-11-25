@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test';
 import { Client } from '@colyseus/sdk';
 import sharp from 'sharp';
 import { chooseCharacter } from './helpers/character-selection';
-import { setWheelZoom } from './helpers/game-settings';
+import { openSettings,closeSettings,setWheelZoom } from './helpers/game-settings';
 
 test('front sunlight casts animated rear shadows for both classes and follows the visible map', async ({page}) => {
   test.setTimeout(120000);
@@ -24,10 +24,11 @@ test('front sunlight casts animated rear shadows for both classes and follows th
   });
   await page.setViewportSize({width:1440,height:960});await page.goto('/');await page.locator('#guest').click();
   await chooseCharacter(page,'warrior-male-02');await expect(page.locator('#network-status')).toHaveAttribute('data-connected','true');
-  await expect(page.locator('.world-player-name')).toHaveCount(1);
+  await expect(page.locator('.world-player-name[data-player-id]')).toHaveCount(1);
+  await openSettings(page);await page.locator('#world-time-auto').uncheck();await page.locator('#world-time').fill('9');await closeSettings(page);
   await setWheelZoom(page,200);
   const info=()=>page.evaluate(()=>(window as any).shadowProbe.info());
-  const lighting=await info();expect(lighting.live).toBe(true);
+  const lighting=await info();expect(lighting.live).toBe(true);expect(lighting.halfWidth).toBeGreaterThanOrEqual(250);
   expect(lighting.light[0]-lighting.target[0]).toBeCloseTo(0);
   expect(lighting.light[2]-lighting.target[2]).toBeGreaterThan(200);
   expect(lighting.avatars[0].surfaces.every((s:any)=>s.cast&&s.receive)).toBe(true);
@@ -61,7 +62,7 @@ test('front sunlight casts animated rear shadows for both classes and follows th
     const moved=await info();expect(Math.abs(moved.target[0]-moved.focus[0])).toBeLessThan(.1);
     await captureDifference('away-from-oak');
     await setWheelZoom(page,50);
-    await page.waitForTimeout(150);expect((await info()).halfWidth).toBeGreaterThan(lighting.halfWidth*2);
+    await page.waitForTimeout(150);expect((await info()).halfWidth).toBe(lighting.halfWidth);
     await page.screenshot({path:'test-results/terrain-shadows/wide.png'});
     await page.setViewportSize({width:390,height:844});await page.waitForTimeout(150);
     await page.screenshot({path:'test-results/terrain-shadows/mobile.png'});

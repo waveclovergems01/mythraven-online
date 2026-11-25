@@ -4,7 +4,7 @@ import type {CharacterAssets,PlayerAvatar} from './character-assets';
 import type {Weapon} from './character-profile';
 
 // Keep one fixed, orthographic view. Only an appearance change needs a draw.
-export function createEquipmentPortrait(character:CharacterDefinition,assets:CharacterAssets,thai:boolean){
+export function createEquipmentPortrait(character:CharacterDefinition,assets:CharacterAssets,thai:boolean,hairColor=''){
   const canvas=document.createElement('canvas');
   canvas.width=canvas.height=320;
   canvas.setAttribute('role','img');
@@ -31,7 +31,7 @@ export function createEquipmentPortrait(character:CharacterDefinition,assets:Cha
         renderer.setSize(canvas.width,canvas.height,false);
         renderer.toneMapping=THREE.ACESFilmicToneMapping;
         renderer.toneMappingExposure=1.12;
-        avatar=factory.create(true,character.hairStyle);
+        avatar=factory.create(true,character.hairStyle,hairColor);
         scene.add(avatar.group);
       }
       avatar!.setWeapon(weapon??undefined,gear);

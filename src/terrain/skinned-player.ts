@@ -7,6 +7,7 @@ import type {PlayerLibrary} from './player-library';
 import master from '../../shared/character-master.json' with {type:'json'};
 import bowTiming from '../../shared/bow-projectile.json';
 import {createEnergyArrow} from './energy-arrow';
+import {dyeHairMaterial} from './hair-material';
 export type PlayerClass = keyof typeof master.classes;
 export type Weapon = keyof typeof master.items;
 export const equipment=master.classes;
@@ -33,7 +34,7 @@ export async function loadSkinnedPlayers(modelId:PlayerClass, library:PlayerLibr
   }));
   return {
     dispose(){ringGeometry.dispose();ringMaterials.forEach(m=>m.dispose());},
-    create(mine:boolean,initialHairStyle=1){
+    create(mine:boolean,initialHairStyle=1,hairColor=''){
       const group=new THREE.Group(),visual=new THREE.Group(),model=clone(body.scene);
       group.name=modelId+'-player';visual.name=modelId+'-visual';
       visual.scale.setScalar(scale);visual.position.set(-center.x*scale,-bounds.min.y*scale,-center.z*scale);
@@ -72,6 +73,26 @@ export async function loadSkinnedPlayers(modelId:PlayerClass, library:PlayerLibr
         return meshes;
       }
       const hair=hairAssets.map(attach);
+      const dye = { value: new THREE.Color() };
+      const dyed = { value: 0 };
+      const hairMaterials = new Map<THREE.Material, THREE.Material>();
+      function materialFor(source: THREE.Material) {
+        let material = hairMaterials.get(source);
+        if (!material) {
+          material = dyeHairMaterial(source, dye, dyed);
+          if (material !== source) hairMaterials.set(source, material);
+        }
+        return material;
+      }
+      for (const mesh of hair.flat()) {
+        mesh.material = Array.isArray(mesh.material) ? mesh.material.map(materialFor) : materialFor(mesh.material);
+      }
+      function setHairColor(color: string) {
+        hairColor = color;
+        dyed.value = color ? 1 : 0;
+        if (color) dye.value.set(color);
+      }
+      setHairColor(hairColor);
       let hairStyle=initialHairStyle;
       function setHairStyle(style:number) {
         hairStyle=style===2?2:1;
@@ -117,7 +138,7 @@ export async function loadSkinnedPlayers(modelId:PlayerClass, library:PlayerLibr
         if(next!==active){next.reset().play().crossFadeFrom(active,.15,false);active=next;}
         active.setEffectiveTimeScale(rate);mixer.update(Math.min(delta,.1));updateArrow(active.time/active.getClip().duration);
       }
-      return {group,setHairStyle,
+      return {group,setHairStyle,setHairColor,
         setWeapon(next:Weapon|undefined,asset?:GLTF){
           if(next && (!asset || !weaponsFor(modelId).includes(next))) throw new Error('Invalid equipment');
           detach(gear);gear=asset?attach(asset):[];weapon=next;if(arrow)arrow.group.visible=false;
@@ -161,8 +182,8 @@ export async function loadSkinnedPlayers(modelId:PlayerClass, library:PlayerLibr
           mixer.update(0);updateArrow(state==='attack'?active.time/active.getClip().duration:0);
           return result;
         },
-        inspect:()=>({state,clip:active.getClip().name,hairStyle,model:modelId,weapon}),
-        dispose(){arrow?.dispose();mixer.stopAllAction();mixer.uncacheRoot(model);hair.forEach(detach);detach(gear);skeletons.forEach(s=>s.dispose());group.removeFromParent();},
+        inspect:()=>({state,clip:active.getClip().name,hairStyle,hairColor,model:modelId,weapon}),
+        dispose(){arrow?.dispose();mixer.stopAllAction();mixer.uncacheRoot(model);hair.forEach(detach);hairMaterials.forEach(material=>material.dispose());detach(gear);skeletons.forEach(s=>s.dispose());group.removeFromParent();},
       };
     },
   };

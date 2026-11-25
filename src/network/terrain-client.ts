@@ -1,3 +1,4 @@
+import {WorldClock} from '../../shared/world-time.mjs';
 import { Client, type Room } from '@colyseus/sdk';
 import { MAX_SPEED_LEVEL, DEFAULT_SPEED_LEVEL } from '../../shared/terrain-movement.mjs';
 import { DEFAULT_CHARACTER_ID } from '../../shared/character-catalog.mjs';
@@ -9,7 +10,7 @@ export interface BowShot {id:number;player:string;mob:string;releaseAt:number;im
 export interface CombatHit {shotId?:number;mob:string;player:string;to:'monster'|'player';weapon?:string;damage:number;dodged?:boolean;critical:boolean;lethal:boolean}
 export interface MonsterState {hp:number;engaged:boolean;x:number;z:number;heading:number;moving:boolean}
 export interface TerrainPlayer { name: string; x: number; y: number; z: number; heading: number;
-  moving: boolean; turning: boolean; path: string; pathIndex: number; targetX: number; targetZ: number; speedLevel: number; inputSeq: number; hairStyle: number; characterId: string; weapon:string; sceneReady?:boolean;protectedUntil?:number;autoHunt?:boolean;huntTarget?:string;hp?:number;maxHp?:number;mp?:number;maxMp?:number;swing?:number;hitTarget?:string;attackInterval?:number;swingStartedAt?:number }
+  moving: boolean; turning: boolean; path: string; pathIndex: number; targetX: number; targetZ: number; speedLevel: number; inputSeq: number; hairStyle: number; hairColor?: string; characterId: string; weapon:string; sceneReady?:boolean;protectedUntil?:number;autoHunt?:boolean;huntTarget?:string;hp?:number;maxHp?:number;mp?:number;maxMp?:number;swing?:number;hitTarget?:string;attackInterval?:number;swingStartedAt?:number }
 interface TerrainState { players: Map<string, TerrainPlayer>; monsters?:Map<string,MonsterState> }
 
 export class TerrainClient {
@@ -40,6 +41,17 @@ export class TerrainClient {
   private build?:Build;
   clockOffset=0;
   private clockRequested=false;
+  private worldClock=new WorldClock();
+  private clockTimer?:ReturnType<typeof setInterval>;
+  private clockRequest?:{sent:number;monotonic:number};
+  get serverNow(){return this.worldClock.now();}
+  get clockReady(){return this.worldClock.ready;}
+  private requestClock=()=>{
+    if(!this.room?.connection.isOpen)return;
+    const sent=Date.now();this.clockRequest={sent,monotonic:performance.now()};
+    this.room.send('combat-clock',sent);
+  };
+  private resumeClock=()=>{if(!document.hidden)this.requestClock();};
   get monsters(){return this.room?.state?.monsters;}
   setBuild(build:Build){
     const next={level:build.level,stats:build.stats};
@@ -56,9 +68,10 @@ export class TerrainClient {
   get nextInputSeq() { return this.inputSeq + 1; }
   constructor(private displayName: string, private status: (state: 'connecting' | 'online' | 'offline') => void,
     private rejected: () => void, private snapshot?: (player: TerrainPlayer) => void,
-    private characterId = DEFAULT_CHARACTER_ID, private area: Area = 'city', private fromWest = false,private reward?:(kind:string,amount:number)=>void,private hit?:(event:CombatHit)=>void) {}
+    private characterId = DEFAULT_CHARACTER_ID, private area: Area = 'city', private fromWest = false,private reward?:(kind:string,amount:number)=>void,private hit?:(event:CombatHit)=>void, private hairColor = '') {document.addEventListener('visibilitychange',this.resumeClock);}
   async connect(): Promise<void> {
     if (this.disposed) return;
+    clearInterval(this.clockTimer);this.clockRequest=undefined;
     const generation = ++this.generation;
     this.inputSeq = 0;this.clockRequested=false;
     const previous = this.room; this.room = undefined; this.connected = false; this.players.clear();
@@ -70,7 +83,7 @@ export class TerrainClient {
       const roomName = this.area === 'city' ? 'mythraven-world' : 'mythraven-west-march';
       const initialWeapon=this.weapon;
       const room = await new Client(endpoint).joinOrCreate<TerrainState>(roomName, { displayName: this.displayName,
-        characterId: this.characterId, fromWest: this.fromWest,weapon:initialWeapon,build:this.build });
+        characterId: this.characterId, hairColor: this.hairColor, fromWest: this.fromWest,weapon:initialWeapon,build:this.build });
       if (this.disposed || generation !== this.generation) { void room.leave().catch(() => {}); return; }
       this.room = room; room.reconnection.enabled = false;
       this.sentWeapon=initialWeapon;
@@ -80,13 +93,13 @@ export class TerrainClient {
         if (!current()) return;
         this.players.clear();
         state.players?.forEach((p, id) => this.players.set(id, { name: p.name, x: p.x, y: p.y, z: p.z,sceneReady:p.sceneReady,protectedUntil:p.protectedUntil,
-          heading: p.heading, moving: p.moving, turning: p.turning, path: p.path, pathIndex: p.pathIndex, targetX: p.targetX, targetZ: p.targetZ, speedLevel: p.speedLevel, inputSeq: p.inputSeq, hairStyle: p.hairStyle, characterId: p.characterId,weapon:p.weapon??'',autoHunt:p.autoHunt,huntTarget:p.huntTarget,hp:p.hp,maxHp:p.maxHp,mp:p.mp,maxMp:p.maxMp,swing:p.swing,hitTarget:p.hitTarget,attackInterval:p.attackInterval,swingStartedAt:p.swingStartedAt }));
+          heading: p.heading, moving: p.moving, turning: p.turning, path: p.path, pathIndex: p.pathIndex, targetX: p.targetX, targetZ: p.targetZ, speedLevel: p.speedLevel, inputSeq: p.inputSeq, hairStyle: p.hairStyle, hairColor: p.hairColor, characterId: p.characterId,weapon:p.weapon??'',autoHunt:p.autoHunt,huntTarget:p.huntTarget,hp:p.hp,maxHp:p.maxHp,mp:p.mp,maxMp:p.maxMp,swing:p.swing,hitTarget:p.hitTarget,attackInterval:p.attackInterval,swingStartedAt:p.swingStartedAt }));
         this.connected = this.players.has(room.sessionId);
         if (this.connected) {
           const mine = this.players.get(room.sessionId)!;
           this.syncWeapon();
-          if(state.monsters && !this.clockRequested){
-            this.clockRequested=true;room.send('combat-clock',Date.now());
+          if(!this.clockRequested){
+            this.clockRequested=true;this.requestClock();
             if(this.build)room.send('build',this.build);
           }
           this.inputSeq = Math.max(this.inputSeq, mine.inputSeq);
@@ -103,12 +116,15 @@ export class TerrainClient {
         if(current() && Number.isSafeInteger(message?.amount) && message.amount>0)this.reward?.(message.kind,message.amount);
       });
       room.onMessage('combat-clock',message=>{
-        if(current())this.clockOffset=(message.server-(Date.now()+message.sent)/2)/1000;
+        if(!current() || !this.clockRequest || message.sent!==this.clockRequest.sent)return;
+        if(this.worldClock.sample(message.server,this.clockRequest.monotonic))this.clockOffset=(this.serverNow-Date.now())/1000;
+        this.clockRequest=undefined;
       });
       room.onStateChange(sync); room.onMessage('move-rejected', (message: {seq?: number}) => {
         if (current() && (message?.seq ?? -1) >= this.inputSeq) this.rejected();
       });
       room.onDrop(lost); room.onLeave(lost); room.onError(lost);
+      this.clockTimer=setInterval(()=>{if(current())this.requestClock();},60000);
       if (room.state?.players) sync(room.state);
     } catch { if (!this.disposed && generation === this.generation) this.status('offline'); }
   }
@@ -123,6 +139,7 @@ export class TerrainClient {
   }
   stop(): void { if (this.connected) this.room?.send('stop', {seq: ++this.inputSeq}); }
   dispose(): void {
+    clearInterval(this.clockTimer);document.removeEventListener('visibilitychange',this.resumeClock);
     this.disposed = true; ++this.generation; this.connected = false; this.players.clear();
     void this.room?.leave().catch(() => {}); this.room = undefined;
   }

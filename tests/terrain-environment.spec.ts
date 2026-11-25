@@ -29,7 +29,7 @@ test('time, celestial sky and safe right-drag orbit preserve movement and recove
   await page.setViewportSize({ width: 1440, height: 960 }); await page.goto('/'); await page.locator('#guest').click();
   await chooseCharacter(page, 'warrior-male-02');
   await expect(page.locator('#network-status')).toHaveAttribute('data-connected', 'true');
-  await expect(page.locator('.world-player-name')).toHaveCount(1);
+  await expect(page.locator('.world-player-name[data-player-id]')).toHaveCount(1);
   const state = () => page.evaluate(() => (window as any).environmentWorld.inspect());
   const probe = () => page.evaluate(() => (window as any).environmentProbe());
   const visiblePlayer = async () => {
@@ -48,6 +48,7 @@ test('time, celestial sky and safe right-drag orbit preserve movement and recove
     await expect(page.locator('#game canvas')).not.toHaveAttribute('data-orbiting');
   };
   await page.screenshot({ path: 'test-results/terrain-environment/default.png' });
+  await openSettings(page);await page.locator('#world-time-auto').uncheck();await page.locator('#world-time').fill('9');await closeSettings(page);
   const initial = await state(), light = (await probe()).light;
   await drag(-300, 80);
   expect((await state()).orbit.yaw).toBeGreaterThan(90);
@@ -131,6 +132,6 @@ test('time, celestial sky and safe right-drag orbit preserve movement and recove
   await page.locator('#logout').click(); await page.locator('#guest').click(); await chooseCharacter(page);
   await expect(page.locator('#network-status')).toHaveAttribute('data-connected', 'true');
   await expect(page.locator('#world-time')).toHaveCount(1); await expect(page.locator('#game canvas')).toHaveCount(1);
-  expect((await state()).orbit.yaw).toBe(0); expect((await state()).lighting.hour).toBe(9);
+  expect((await state()).orbit.yaw).toBe(0); await expect(page.locator('#world-time-auto')).toBeChecked();await expect(page.locator('#world-time')).toBeDisabled();
   expect(errors).toEqual([]);
 });

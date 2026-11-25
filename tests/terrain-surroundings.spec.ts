@@ -38,10 +38,10 @@ for(const area of ['city','west-march'])test(area+' continues beyond all map edg
   }
   await expect(page.locator('.scene-loading')).toBeHidden();
   const info=await page.evaluate(()=>(window as any).sceneryQA.inspect());
-  expect(info.bounds[0]).toBe(-750);expect(info.bounds[2]).toBe(-750);
-  expect(info.max[0]).toBe(750);expect(info.max[2]).toBe(750);
+  expect(info.bounds[0]).toBe(-500);expect(info.bounds[2]).toBe(-500);
+  expect(info.max[0]).toBe(500);expect(info.max[2]).toBe(500);
   expect(info.size).toBe(500);expect(info.legalOutside).toBe(false);expect(info.patches).toBe(144);
-  expect(info.trees).toBeGreaterThan(300);expect(info.range.radius).toBe(500);
+  expect(info.trees).toBeGreaterThan(300);expect(info.range.radius).toBe(250);expect(info.range.fogStart).toBe(150);
   expect(info.range.visible).toBeLessThan(info.range.batches);
   for(const [name,point] of Object.entries({east:[238,30],west:[-238,-30],north:[30,-238],south:[-30,238],corner:[238,238],horizon:[238,0,1]})){
     await page.evaluate(p=>{(window as any).sceneryProbe=p;},point);

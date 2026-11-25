@@ -1,6 +1,7 @@
 import { Room, ServerError } from '@colyseus/core';
 import { schema, t } from '@colyseus/schema';
 import { TerrainMovement, DEFAULT_SPEED_LEVEL } from '../shared/terrain-movement.mjs';
+import { normalizeAppearanceColor } from '../shared/appearance-color.mjs';
 import { characterById } from '../shared/character-catalog.mjs';
 import characterMaster from '../shared/character-master.json' with {type:'json'};
 import { buildWestMarch, cityArrival, mapPortal, PORTAL_RADIUS } from '../shared/west-march.mjs';
@@ -23,7 +24,7 @@ const Player = schema({ name: t.string().default(''), x: t.float32().default(0),
   z: t.float32().default(0), heading: t.float32().default(0), moving: t.boolean().default(false), turning: t.boolean().default(false),
   targetX: t.float32().default(0), targetZ: t.float32().default(0), speedLevel: t.uint8().default(DEFAULT_SPEED_LEVEL),
   path: t.string().default('[]'), pathIndex: t.uint16().default(0),
-  inputSeq: t.uint32().default(0), hairStyle: t.uint8().default(1), characterId: t.string().default(''), weapon:t.string().default(''),
+  inputSeq: t.uint32().default(0), hairStyle: t.uint8().default(1), hairColor: t.string().default(''), characterId: t.string().default(''), weapon:t.string().default(''),
   autoHunt:t.boolean().default(false),huntTarget:t.string().default(''),
   sceneReady:t.boolean().default(false),protectedUntil:t.float64().default(0),
   mp:t.uint32().default(30),maxMp:t.uint32().default(30),
@@ -122,6 +123,7 @@ export class TerrainRoom extends Room {
     }
     const player = new Player();
     player.characterId = character.id; player.hairStyle = character.hairStyle;
+    player.hairColor = normalizeAppearanceColor(options?.hairColor);
     if(characterMaster.classes[character.classId].weapons.includes(options.weapon))player.weapon=options.weapon;
     // A display label is cosmetic; it grants no account identity or privileges.
     const label = typeof options?.displayName === 'string' ? options.displayName.replace(/[<>\p{C}]/gu, '').trim().slice(0, 24) : '';

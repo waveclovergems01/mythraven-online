@@ -1,11 +1,13 @@
+import {worldHour,WORLD_TIME} from '../../shared/world-time.mjs';
+import {FOG_START,VIEW_DISTANCE,SHADOW_CAMERA_EXTENT} from './view-distance';
 import * as THREE from 'three';
 
 /** One shared sky/light direction in world space; changing the view cannot turn the sun. */
 export function createDaylight(scene: THREE.Scene) {
   const ambient = new THREE.HemisphereLight('#f2f5e6', '#718478', 2.15);
   const sun = new THREE.DirectionalLight('#fff0d0', 2.5);
-  sun.castShadow = true; sun.shadow.mapSize.set(2048, 2048);
-  Object.assign(sun.shadow.camera, { near: 1, far: 900 });
+  sun.castShadow = true; sun.shadow.mapSize.set(4096, 4096);
+  Object.assign(sun.shadow.camera, { near: 1, far: 1100 });
   sun.shadow.normalBias = .025; sun.shadow.bias = -.00004; sun.shadow.radius = 2;
   const direction = new THREE.Vector3(), moonDirection = new THREE.Vector3();
   const uniforms = {
@@ -43,11 +45,12 @@ export function createDaylight(scene: THREE.Scene) {
   });
   const sky = new THREE.Mesh(new THREE.SphereGeometry(1100, 48, 24), material);
   sky.name = 'celestial-sky'; sky.renderOrder = -100; sky.frustumCulled = false;
-  const fog = new THREE.Fog('#c3d2cd', 220, 680); scene.fog = fog;
+  const fog = new THREE.Fog('#c3d2cd', FOG_START, VIEW_DISTANCE); scene.fog = fog;
   scene.add(ambient, sun, sun.target, sky);
-  let hour = 9, bearing = 180, day = 1;
+  let hour = worldHour(Date.now()), bearing = WORLD_TIME.bearing, day = 1;
   const daySky = new THREE.Color('#75abc9'), nightSky = new THREE.Color('#0a142d');
   const dayHorizon = new THREE.Color('#c6d9d5'), duskHorizon = new THREE.Color('#e8a67d'), nightHorizon = new THREE.Color('#273854');
+  const dayAmbient=new THREE.Color('#f2f5e6'),dayGround=new THREE.Color('#718478');
   const warm = new THREE.Color('#ffd1a0'), white = new THREE.Color('#fff0d0'), moonColor = new THREE.Color('#9fbbef');
   const configure = (nextHour: number, nextBearing: number) => {
     hour = THREE.MathUtils.clamp(nextHour, 0, 24); bearing = nextBearing;
@@ -62,26 +65,29 @@ export function createDaylight(scene: THREE.Scene) {
     uniforms.zenithColor.value.copy(nightSky).lerp(daySky, day);
     uniforms.horizonColor.value.copy(dayHorizon).lerp(duskHorizon, warmth * .75).lerp(nightHorizon, 1 - day);
     fog.color.copy(uniforms.horizonColor.value);
-    ambient.color.set('#a2b9e7').lerp(new THREE.Color('#f2f5e6'), day);
-    ambient.groundColor.set('#273549').lerp(new THREE.Color('#718478'), day);
+    ambient.color.set('#a2b9e7').lerp(dayAmbient, day);
+    ambient.groundColor.set('#273549').lerp(dayGround, day);
     ambient.intensity = THREE.MathUtils.lerp(.45, 2.15, day);
     sun.color.copy(warm).lerp(white, 1 - warmth).lerp(moonColor, 1 - day);
     sun.intensity = THREE.MathUtils.lerp(.65, 2.5, day);
+    // Fade shadows at the horizon before switching the casting light to the moon.
+    sun.shadow.intensity=THREE.MathUtils.smoothstep(Math.abs(direction.y),.015,.12);
   };
   configure(hour, bearing);
   const lightDirection = new THREE.Vector3(), right = new THREE.Vector3(), up = new THREE.Vector3(), center = new THREE.Vector3();
   const worldUp = new THREE.Vector3(0, 1, 0);
   return {
     sun, configure,
-    update(camera: THREE.PerspectiveCamera, focus: THREE.Vector3) {
+    update(camera: THREE.PerspectiveCamera, focus: THREE.Vector3,serverMs?:number) {
+      if(serverMs!==undefined)configure(worldHour(serverMs),WORLD_TIME.bearing);
       sky.position.copy(camera.position);
       lightDirection.copy(direction.y >= 0 ? direction : moonDirection);
       // Keep grazing-angle shadows usable at sunrise/sunset; the sky still shows
       // the true altitude. At night this same shadow map is lit by the moon.
       lightDirection.y = Math.max(.18, lightDirection.y); lightDirection.normalize();
-      const distance = camera.position.distanceTo(focus);
-      const halfSpan = Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)) * distance / camera.zoom;
-      const radius = Math.min(155, halfSpan * Math.max(1, camera.aspect) * 1.25 + 16);
+      // A fixed light-space volume covers the 150 m clear zone and the entire fog fade.
+      // Extra margin covers tall trees/buildings and texel snapping at every solar angle.
+      const radius = SHADOW_CAMERA_EXTENT;
       const shadowCamera = sun.shadow.camera;
       if (Math.abs(shadowCamera.right - radius) > .01) {
         Object.assign(shadowCamera, { left: -radius, right: radius, top: radius, bottom: -radius });
@@ -93,11 +99,11 @@ export function createDaylight(scene: THREE.Scene) {
       center.copy(focus);
       center.addScaledVector(right, Math.round(focus.dot(right) / texel) * texel - focus.dot(right));
       center.addScaledVector(up, Math.round(focus.dot(up) / texel) * texel - focus.dot(up));
-      sun.target.position.copy(center); sun.position.copy(center).addScaledVector(lightDirection, 350);
+      sun.target.position.copy(center); sun.position.copy(center).addScaledVector(lightDirection, 450);
     },
     // Imported painted characters use emission: dim it as well as ordinary lights.
     get paintedBrightness() { return THREE.MathUtils.lerp(.28, 1, day); },
-    inspect: () => ({ hour, bearing, daylight: day, sunDirection: direction.toArray(), moonDirection: moonDirection.toArray() }),
+    inspect: () => ({ hour, bearing, daylight: day, shadowExtent:SHADOW_CAMERA_EXTENT, sunDirection: direction.toArray(), moonDirection: moonDirection.toArray() }),
     dispose() { scene.remove(ambient, sun, sun.target, sky); sky.geometry.dispose(); material.dispose(); sun.shadow.dispose(); scene.fog = null; },
   };
 }

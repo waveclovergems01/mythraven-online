@@ -1,6 +1,9 @@
 import * as THREE from 'three';
-export const VIEW_DISTANCE=500;
-export const FOG_START=300;
+export const VIEW_DISTANCE=250;
+export const FOG_START=150;
+export const SHADOW_FULL_DISTANCE=FOG_START;
+export const SHADOW_FADE_END=VIEW_DISTANCE;
+export const SHADOW_CAMERA_EXTENT=280;
 /** Player-centred fog agrees with the distance culler regardless of camera orbit/zoom. */
 export function createViewDistance(scene:THREE.Scene){
   const focus={value:new THREE.Vector2()},seen=new WeakSet<THREE.Material>();
@@ -13,7 +16,7 @@ export function createViewDistance(scene:THREE.Scene){
       if(seen.has(material) || !('fog' in material) || !material.fog)continue;
       seen.add(material);
       const compile=material.onBeforeCompile,key=material.customProgramCacheKey();
-      material.customProgramCacheKey=()=>key+'-player-distance-v1';
+      material.customProgramCacheKey=()=>key+'-player-distance-shadow-v2';
       material.onBeforeCompile=(shader:Parameters<THREE.Material['onBeforeCompile']>[0],renderer:THREE.WebGLRenderer)=>{
         compile.call(material,shader,renderer);shader.uniforms.distanceFocus=focus;
         shader.vertexShader='varying vec2 distanceWorld;\n'+shader.vertexShader;
@@ -24,6 +27,9 @@ export function createViewDistance(scene:THREE.Scene){
           #endif
           distanceWorld=(modelMatrix*distancePosition).xz;`);
         shader.fragmentShader='varying vec2 distanceWorld;uniform vec2 distanceFocus;\n'+shader.fragmentShader;
+        const shadowStrength='directionalLightShadow.shadowIntensity * (1.0-smoothstep('+SHADOW_FULL_DISTANCE.toFixed(1)+','+SHADOW_FADE_END.toFixed(1)+',length(distanceWorld-distanceFocus)))';
+        shader.fragmentShader=shader.fragmentShader.replace('#include <lights_fragment_begin>',
+          THREE.ShaderChunk.lights_fragment_begin.replace('directionalLightShadow.shadowIntensity,',shadowStrength+','));
         shader.fragmentShader=shader.fragmentShader.replace('#include <fog_fragment>',`
           #ifdef USE_FOG
           float distanceFog=smoothstep(${FOG_START.toFixed(1)},${VIEW_DISTANCE.toFixed(1)},length(distanceWorld-distanceFocus));

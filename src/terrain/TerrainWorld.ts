@@ -48,7 +48,7 @@ export interface TerrainWorld {
 
 export async function mountTerrainWorld(host: HTMLElement, displayName = '', characterId = DEFAULT_CHARACTER_ID,
   preparedCharacters?: CharacterAssets, area: Area = 'city', fromWest = false,
-  onWarp?: (area:Area)=>void, ownerId=displayName,onLoad:(step:LoadStep)=>void=()=>{}): Promise<TerrainWorld> {
+  onWarp?: (area:Area)=>void, ownerId=displayName,onLoad:(step:LoadStep)=>void=()=>{},hairColor=''): Promise<TerrainWorld> {
   const thai = locale() === 'th';
   const field = area === 'west-march';
   const data = field ? buildWestMarch() : await loadTerrainData();
@@ -101,6 +101,7 @@ export async function mountTerrainWorld(host: HTMLElement, displayName = '', cha
   const scene = new THREE.Scene(); scene.background = new THREE.Color('#c3d2cd');
   const daylight = createDaylight(scene);
   const sun = daylight.sun;
+  sun.shadow.mapSize.setScalar(Math.min(4096,renderer.capabilities.maxTextureSize));
   scene.add(groves.group);
   scene.add(fortifications.group);
   scene.add(buildings.group);
@@ -267,7 +268,7 @@ export async function mountTerrainWorld(host: HTMLElement, displayName = '', cha
         impacts.show(event,victim.mesh.position,2.8,focus,victim.mesh);
       }
     }
-  });
+  },hairColor);
   network.bowShot=shot=>{
     const target=wildlife?.targets.get(shot.mob);
     if(target && !document.hidden)projectiles.launch(shot,target,views.get(shot.player)?.avatar.bowRelease());
@@ -457,7 +458,7 @@ export async function mountTerrainWorld(host: HTMLElement, displayName = '', cha
       const mine = id === network.room?.sessionId;
       let view = views.get(id);
       if (!view) {
-        const avatar = factory.create(mine, character.hairStyle), mesh = avatar.group, name = document.createElement('span');
+        const avatar = factory.create(mine, character.hairStyle, player.hairColor), mesh = avatar.group, name = document.createElement('span');
         mesh.rotation.y = player.heading;
         mesh.position.set(player.x, player.y, player.z); scene.add(mesh);viewDistance.materials(mesh);
         name.className = 'world-player-name'; name.dataset.playerId = id; name.dataset.mine = String(mine);
@@ -840,11 +841,12 @@ export async function mountTerrainWorld(host: HTMLElement, displayName = '', cha
     bankGrass.update(camera, network.connected ? focus : undefined, reducedMotion.matches ? 0 : (now - startedAt) / 1000);
     groves.update(camera, network.connected ? focus : undefined, reducedMotion.matches ? 0 : (now - startedAt) / 1000);
     if(network.connected)fortifications.update(camera,focus,reducedMotion.matches ? 0 : (now-startedAt)/1000);
-    daylight.update(camera, focus);
+    daylight.update(camera, focus,environmentSettings.automatic?network.serverNow:undefined);
+    environmentSettings.update(daylight.inspect().hour);
     if(network.connected)buildings.update(camera,focus,daylight.paintedBrightness,reducedMotion.matches ? 0 : (now-startedAt)/1000);
     viewDistance.update(focus);
     renderer.render(scene, camera); canvas.dataset.ready = 'true'; frame = requestAnimationFrame(animate);
-    if(network.connected && !readySent){
+    if(network.connected && network.clockReady && !readySent){
       onLoad('session');
       if(initialModelsReady && prediction.ready){
         onLoad('avatar');
@@ -880,7 +882,7 @@ export async function mountTerrainWorld(host: HTMLElement, displayName = '', cha
     }
   };
   const blur = () => { cancelPress(); pointerleave(); };
-  const portrait=createEquipmentPortrait(characterById(characterId)!,characters,thai);
+  const portrait=createEquipmentPortrait(characterById(characterId)!,characters,thai,hairColor);
   const journal=mountCharacterPanels(host.parentElement!,profile,job,thai,portrait);
   host.addEventListener('mythraven:settings-open', blur);
   canvas.addEventListener('webglcontextlost', contextLost); canvas.addEventListener('webglcontextrestored', contextRestored);

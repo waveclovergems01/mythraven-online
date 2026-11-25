@@ -1,7 +1,9 @@
 import './game-settings.css';
+import type {createBackgroundMusic} from './background-music';
 
 /** Native popover/dialog keep focus, Escape and world-click isolation in the browser. */
-export function mountGameSettings(root: HTMLElement, thai: boolean) {
+export function mountGameSettings(root: HTMLElement, thai: boolean,
+  music: Pick<ReturnType<typeof createBackgroundMusic>, 'volume' | 'setVolume'>) {
   const settings = thai ? 'ตั้งค่า' : 'Settings', close = thai ? 'ปิด' : 'Close';
   const shell = document.createElement('div'); shell.className = 'game-settings';
   shell.innerHTML = `
@@ -16,10 +18,24 @@ export function mountGameSettings(root: HTMLElement, thai: boolean) {
     </div>
     <dialog id="settings-dialog" class="settings-dialog" aria-labelledby="settings-title">
       <header><h2 id="settings-title">${settings}</h2><button id="close-settings" class="settings-close" type="button" aria-label="${close}">×</button></header>
-      <div id="settings-controls" class="settings-controls"></div>
+      <div id="settings-controls" class="settings-controls">
+        <label class="settings-range">
+          <span class="settings-range-heading"><span>${thai ? 'เพลงประกอบ' : 'Music'}</span><output for="music-volume"></output></span>
+          <input id="music-volume" type="range" min="0" max="100" step="1">
+        </label>
+      </div>
       <footer class="settings-footer"></footer>
     </dialog>`;
   root.append(shell);
+  const volume = shell.querySelector<HTMLInputElement>('#music-volume')!;
+  const volumeLabel = shell.querySelector<HTMLOutputElement>('output[for="music-volume"]')!;
+  volume.value = String(Math.round(music.volume * 100));
+  const showVolume = () => { volumeLabel.value = volume.value + '%'; };
+  showVolume();
+  volume.addEventListener('input', () => {
+    music.setVolume(volume.valueAsNumber / 100);
+    showVolume();
+  });
   const dialog=shell.querySelector<HTMLDialogElement>('#settings-dialog')!;
   const menu=shell.querySelector<HTMLElement>('#settings-menu')!;
   const gear=shell.querySelector<HTMLButtonElement>('#settings-toggle')!;
