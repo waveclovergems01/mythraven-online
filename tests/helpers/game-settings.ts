@@ -1,7 +1,7 @@
 import type { Page } from '@playwright/test';
 
 export async function openSettings(page: Page) {
-  await page.locator('#settings-toggle').click();
+  if(!await page.locator('#settings-menu').isVisible()) await page.locator('#settings-toggle').click();
   await page.locator('#open-settings').click();
 }
 

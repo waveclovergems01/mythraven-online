@@ -13,7 +13,8 @@ export function createCombatFeedback(host:HTMLElement){
     show(event:CombatHit,position:THREE.Vector3,height:number){
       const node=document.createElement('span');
       node.className='combat-damage '+(event.to==='player'?'incoming':event.critical?'critical':'outgoing');
-      node.textContent=event.dodged?(locale()==='th'?'หลบ':'Dodge'):String(event.damage);
+      node.textContent=event.missed?(locale()==='th'?'พลาด':'Miss'):
+        event.dodged?(locale()==='th'?'หลบ':'Dodge'):String(event.damage);
       node.setAttribute('aria-hidden','true');
       host.append(node);
       hits.add({node,position,height:height+.6,until:performance.now()+900});

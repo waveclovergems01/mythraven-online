@@ -7,7 +7,7 @@ import characterMaster from '../shared/character-master.json' with {type:'json'}
 import { buildWestMarch, cityArrival, mapPortal, PORTAL_RADIUS } from '../shared/west-march.mjs';
 
 import monsters from '../shared/monster-master.json' with {type:'json'};
-import {attackInterval,deriveCombatStats,swingDuration,IMPACT_FRACTION,weaponRange} from '../shared/battle-stats.mjs';
+import {attackInterval,chanceToHit,deriveCombatStats,statPointBudget,swingDuration,IMPACT_FRACTION,weaponRange} from '../shared/battle-stats.mjs';
 import {createPatrols} from '../shared/frontier-patrols.mjs';
 import behavior from '../shared/monster-behavior.json' with {type:'json'};
 import bow from '../shared/bow-projectile.json' with {type:'json'};
@@ -139,10 +139,10 @@ export class TerrainRoom extends Room {
     let spent=0;
     for(const key of Object.keys(characterMaster.baseStats)){
       const n=build.stats?.[key];
-      if(!Number.isSafeInteger(n) || n<1)return;
-      stats[key]=n;spent+=n-1;
+      if(!Number.isSafeInteger(n) || n<characterMaster.baseStats[key] || n>characterMaster.statCap)return;
+      stats[key]=n;spent+=n-characterMaster.baseStats[key];
     }
-    if(spent>(build.level-1)*characterMaster.pointsPerLevel)return;
+    if(spent>statPointBudget(build.level))return;
     if(p.swing && p.weapon && (stats.AGI!==fighter.stats.AGI || stats.DEX!==fighter.stats.DEX)){
       const rate=deriveCombatStats(build.level,stats,characterMaster.items[p.weapon]).attackSpeed;
       const interval=attackInterval(rate);
@@ -357,13 +357,18 @@ export class TerrainRoom extends Room {
     this.arrows=flying;
   }
   hitMonster(now,id,f,mob,health,pos,spec,stats,projectile){
-      const critical=Math.random()<stats.criticalChance;
-      const damage=Math.round(stats.physical*(critical?1.5:1));
-      const credited=Math.min(health.hp,damage);
-      mob.damage??=new Map();mob.damage.set(id,(mob.damage.get(id)??0)+credited);
+      const roll=Math.random();
+      const chance=chanceToHit(stats.hit,spec.flee);
+      const missed=roll>=chance;
+      const critical=!missed && roll<chance*stats.criticalChance;
+      const damage=missed?0:Math.round(stats.physical*(critical?stats.criticalDamage:1));
+      if(damage>0){
+        mob.damage??=new Map();
+        mob.damage.set(id,(mob.damage.get(id)??0)+Math.min(health.hp,damage));
+      }
       this.claimAttack(id,f.target,now);
       health.hp=Math.max(0,health.hp-damage);
-      this.broadcast('combat-hit',{mob:f.target,player:id,to:'monster',weapon:projectile?.weapon??this.state.players.get(id).weapon,shotId:projectile?.shotId,damage,critical,lethal:health.hp===0});
+      this.broadcast('combat-hit',{mob:f.target,player:id,to:'monster',weapon:projectile?.weapon??this.state.players.get(id).weapon,shotId:projectile?.shotId,damage,missed,critical,lethal:health.hp===0});
       if(!health.hp){
         const killed=f.target;
         mob.respawnAt=now+spec.respawnSeconds;mob.victim='';health.engaged=false;health.moving=false;
@@ -410,8 +415,9 @@ export class TerrainRoom extends Room {
       if(now<mob.impactAt)continue;
       mob.impactAt=0;
       const stats=deriveCombatStats(f.level,f.stats,characterMaster.items[p.weapon]);
-      const dodged=Math.random()<stats.dodgeChance;
-      const damage=dodged?0:Math.max(1,spec.attack-stats.defense);
+      const dodged=Math.random()<1-chanceToHit(spec.hit,stats.flee);
+      const defense=spec.attackType==='magic'?stats.magicDefense:stats.defense;
+      const damage=dodged?0:Math.max(1,spec.attack-defense);
       if(damage>0){mob.defenders??=new Set();mob.defenders.add(mob.victim);}
       p.hp=Math.max(0,p.hp-damage);
       this.broadcast('combat-hit',{mob:id,player:mob.victim,to:'player',damage,dodged,critical:false,lethal:p.hp===0});

@@ -1,11 +1,14 @@
 import * as THREE from 'three';
-import { CHARACTERS, type CharacterDefinition } from '../shared/character-catalog.mjs';
+import { CHARACTERS, DEFAULT_CHARACTER_ID, characterById, type CharacterDefinition } from '../shared/character-catalog.mjs';
 import { normalizeAppearanceColor } from '../shared/appearance-color.mjs';
 import { createCharacterAssets, type CharacterAssets, type PlayerAvatar } from './terrain/character-assets';
-import {equipment, weaponsFor, type PlayerClass, type Weapon, type PreviewMotion} from './terrain/skinned-player';
+import {weaponsFor, type PlayerClass, type Weapon, type PreviewMotion} from './terrain/skinned-player';
 import './character-selection.css';
 
 export type PreparedCharacters = CharacterAssets;
+
+const classIds = [...new Set(CHARACTERS.map(character => character.classId))];
+const hairStyles = [...new Set(CHARACTERS.map(character => character.hairStyle))].sort((a, b) => a - b);
 
 const hairPresets = [
   ['', 'สีเดิม', 'Original'],
@@ -20,23 +23,33 @@ const hairPresets = [
 ];
 function hairColorControls(thai: boolean) {
   const label = thai ? 'สีผม' : 'Hair color';
-  return `<fieldset class="hair-colors">
+  const customLabel = thai ? 'เลือกสีเอง' : 'Custom color';
+  return `<fieldset class="character-options-group hair-colors">
     <legend>${label}</legend>
-    <div class="hair-swatches">
-      ${hairPresets.map(([hex, th, en]) => `<button type="button" data-hair-color="${hex}" aria-pressed="false"
-        aria-label="${thai ? th : en}" title="${thai ? th : en}" style="--swatch:${hex || '#9e6849'}">${hex ? '' : (thai ? th : en)}</button>`).join('')}
+    <div class="hair-color-options">
+      <div>
+        <div class="hair-color-heading" id="hair-presets-heading">${thai ? 'พรีเซ็ต' : 'Presets'}</div>
+        <div class="hair-swatches" role="group" aria-labelledby="hair-presets-heading">
+          ${hairPresets.map(([hex, th, en]) => `<button type="button" data-hair-color="${hex}" aria-pressed="false"
+            aria-label="${thai ? th : en}" title="${thai ? th : en}" style="--swatch:${hex || '#243a31'}">${hex ? '' : '<span aria-hidden="true">↺</span>'}</button>`).join('')}
+        </div>
+      </div>
+      <div class="hair-custom-color">
+        <div class="hair-color-heading" id="hair-custom-heading">${customLabel}</div>
+        <div class="hair-picker">
+          <span class="hair-picker-swatch" aria-hidden="true"></span>
+          <input id="hair-color" type="color" value="${hairPresets[2][0]}" aria-labelledby="hair-custom-heading">
+          <output for="hair-color"></output><span aria-hidden="true">▾</span>
+        </div>
+      </div>
     </div>
-    <label class="hair-picker">${thai ? 'เลือกสีเอง' : 'Custom color'}
-      <input id="hair-color" type="color" value="${hairPresets[2][0]}" aria-label="${label}">
-      <output for="hair-color"></output>
-    </label>
   </fieldset>`;
 }
 
 /** The preview owns its assets until explicit selection transfers them to the city. */
 export function mountCharacterSelection(host: HTMLElement, username: string, thai: boolean,
   enter: (character: CharacterDefinition, assets: PreparedCharacters, hairColor: string) => Promise<void>,
-  exit: () => Promise<void>, initialHairColor = '') {
+  exit: () => Promise<void>) {
   host.innerHTML = `<main class="character-page" aria-labelledby="character-title">
     <header class="character-header"><div class="mini-brand">MYTHRAVEN <span>ONLINE</span></div>
       <div class="character-account"><span id="character-account-name"></span><button id="character-logout" type="button">${thai ? 'ออกจากระบบ' : 'Sign out'}</button></div></header>
@@ -47,13 +60,26 @@ export function mountCharacterSelection(host: HTMLElement, username: string, tha
         <button type="button" data-gender="all" aria-pressed="true">${thai ? 'ทั้งหมด' : 'All'}</button>
         <button type="button" data-gender="male" aria-pressed="false">${thai ? 'ชาย' : 'Male'}</button>
         <button type="button" data-gender="female" aria-pressed="false">${thai ? 'หญิง' : 'Female'}</button>
-      </div><p class="character-availability">${thai ? `ตัวละครที่พร้อมให้เลือก ${CHARACTERS.length} แบบ` : `${CHARACTERS.length} characters available`}</p>
-      <fieldset class="character-cards"><legend class="sr-only">${thai ? 'เลือกโมเดลตัวละคร' : 'Select a character model'}</legend>
-        ${Object.keys(equipment).map(job=>`<fieldset class="class-hairstyles" data-character-gender="male"><legend>${job[0].toUpperCase()+job.slice(1)}</legend>
-          ${CHARACTERS.filter(c=>c.classId===job).map(c=>`<label class="character-card">
-          <input type="radio" name="character" value="${c.id}" aria-label="${thai?c.nameTh:c.nameEn}"><strong>${thai?'ทรงผม':'Hairstyle'} ${c.hairStyle}</strong><span class="character-check" aria-hidden="true">✓</span></label>`).join('')}</fieldset>`).join('')}
-      </fieldset><p id="character-empty" hidden>${thai ? 'ยังไม่มีโมเดลตัวละครหญิงให้เลือก' : 'No female character models are available yet.'}</p>
-      ${hairColorControls(thai)}
+      </div>
+      <div class="character-customization">
+        <fieldset class="character-options-group">
+          <legend>${thai ? 'อาชีพ' : 'Class'}</legend>
+          <div class="character-class-grid">${classIds.map(job => `<label class="character-option character-class">
+            <input type="radio" name="character-class" value="${job}">
+            <span>${job[0].toUpperCase() + job.slice(1)}</span>
+          </label>`).join('')}</div>
+        </fieldset>
+        <fieldset class="character-options-group">
+          <legend>${thai ? 'ทรงผม' : 'Hairstyle'}</legend>
+          <div class="character-hair-grid">${hairStyles.map(style => `<label class="character-option hairstyle-tile">
+            <input type="radio" name="character-hair" value="${style}" aria-label="${thai ? 'ทรงผม' : 'Hairstyle'} ${style}">
+            <img class="hairstyle-thumbnail" src="/assets/ui/hairstyles/style-${String(style).padStart(2, '0')}.webp" alt="" width="192" height="192" decoding="async" draggable="false">
+            <span class="character-check" aria-hidden="true">✓</span>
+          </label>`).join('')}</div>
+        </fieldset>
+        ${hairColorControls(thai)}
+      </div>
+      <p id="character-empty" hidden>${thai ? 'ยังไม่มีโมเดลตัวละครหญิงให้เลือก' : 'No female character models are available yet.'}</p>
     </section><section class="character-stage" aria-label="${thai ? 'ตัวอย่างตัวละครสามมิติ' : '3D character preview'}">
       <div id="character-preview" tabindex="0" aria-describedby="preview-rotate-hint"></div>
       <div class="character-preview-caption"><span id="preview-rotate-hint">${thai ? 'ลากหรือกด ← → เพื่อหมุน' : 'Drag or use ← → to rotate'}</span><strong id="character-preview-name">Novice</strong></div>
@@ -86,11 +112,12 @@ export function mountCharacterSelection(host: HTMLElement, username: string, tha
   const weaponNames = thai ? {dagger:'มีดสั้น',longsword:'ดาบยาว',bow:'ธนู'} : {dagger:'Dagger',longsword:'Longsword',bow:'Bow'};
   let selected: CharacterDefinition | undefined;
   const assets = createCharacterAssets();
-  let previewCharacter: CharacterDefinition | undefined = CHARACTERS[0];
+  let previewCharacter: CharacterDefinition | undefined;
   let avatar: PlayerAvatar | undefined;
-  function bindHairColor(initial: string) {
+  function bindHairColor() {
     const field = host.querySelector<HTMLFieldSetElement>('.hair-colors')!;
     const picker = field.querySelector<HTMLInputElement>('input')!;
+    const pickerBox = field.querySelector<HTMLElement>('.hair-picker')!;
     const colorValue = field.querySelector('output')!;
     const attribute = `data-hair-color`;
     const swatches = field.querySelectorAll<HTMLButtonElement>(`[${attribute}]`);
@@ -98,6 +125,7 @@ export function mountCharacterSelection(host: HTMLElement, username: string, tha
     function select(value: string) {
       color = normalizeAppearanceColor(value);
       picker.value = color || picker.defaultValue;
+      pickerBox.style.setProperty('--picked-color', picker.value);
       colorValue.value = color.toUpperCase();
       for (const swatch of swatches) {
         swatch.setAttribute('aria-pressed', String(swatch.getAttribute(attribute) === color));
@@ -106,17 +134,17 @@ export function mountCharacterSelection(host: HTMLElement, username: string, tha
     }
     for (const swatch of swatches) swatch.onclick = () => select(swatch.getAttribute(attribute) ?? '');
     picker.oninput = picker.onchange = () => select(picker.value);
-    select(initial);
-    return {field, get color() { return color; }};
+    select('');
+    return {get color() { return color; }};
   }
-  const hair = bindHairColor(initialHairColor);
+  const hair = bindHairColor();
   let renderer: THREE.WebGLRenderer | undefined, observer: ResizeObserver | undefined;
   let disposed = false, transferred = false, busy = false, previewVersion = 0, frame = 0, previous = 0;
   const scene = new THREE.Scene();
   scene.add(new THREE.HemisphereLight('#f2f5e6', '#718478', 2.15));
   const light = new THREE.DirectionalLight('#fff0d0', 2.5); light.position.set(-4, 6, 5); scene.add(light);
   const camera = new THREE.OrthographicCamera(-2, 2, 2, -2, .1, 50);
-  camera.position.set(3, 2.5, 7); camera.lookAt(0, 1.35, 0);
+  camera.position.set(0, 2.5, Math.hypot(3, 7)); camera.lookAt(0, 1.35, 0);
   let previewYaw = 0;
   let rotationDrag: { pointerId: number; x: number } | undefined;
   function rotatePreview(delta: number) {
@@ -207,8 +235,18 @@ export function mountCharacterSelection(host: HTMLElement, username: string, tha
     }
   };
   gear.onchange=()=>{if(previewCharacter) void load(previewCharacter);};
+  const customization = host.querySelector<HTMLElement>('.character-customization')!;
+  const empty = host.querySelector<HTMLElement>('#character-empty')!;
+  const classOptions = host.querySelectorAll<HTMLInputElement>('input[name="character-class"]');
+  const hairOptions = host.querySelectorAll<HTMLInputElement>('input[name="character-hair"]');
+  let available: readonly CharacterDefinition[] = CHARACTERS;
   const choose = (character: CharacterDefinition) => {
     selected = character;
+    for (const option of classOptions) option.checked = option.value === character.classId;
+    for (const option of hairOptions) {
+      option.checked = Number(option.value) === character.hairStyle;
+      option.disabled = !available.some(c => c.classId === character.classId && c.hairStyle === Number(option.value));
+    }
     name.textContent = thai ? character.nameTh : character.nameEn;
     hint.textContent = thai ? `เลือกแล้ว: ${character.nameTh}` : `Selected: ${character.nameEn}`;
     if(avatar && previewCharacter?.model===character.model){
@@ -216,27 +254,34 @@ export function mountCharacterSelection(host: HTMLElement, username: string, tha
       previewHost.dataset.characterId=character.id;submit.disabled=busy;
     } else void load(character);
   };
-  host.querySelectorAll<HTMLInputElement>('input[name="character"]').forEach(input => input.addEventListener('change', () => {
-    const character = CHARACTERS.find(c => c.id === input.value); if (character) choose(character);
+  classOptions.forEach(input => input.addEventListener('change', () => {
+    const character = available.find(c => c.classId === input.value && c.hairStyle === selected?.hairStyle)
+      ?? available.find(c => c.classId === input.value);
+    if (character) choose(character);
+  }));
+  hairOptions.forEach(input => input.addEventListener('change', () => {
+    const character = available.find(c => c.classId === selected?.classId && c.hairStyle === Number(input.value));
+    if (character) choose(character);
   }));
   host.querySelectorAll<HTMLButtonElement>('[data-gender]').forEach(button => button.addEventListener('click', () => {
     const gender = button.dataset.gender;
     host.querySelectorAll('[data-gender]').forEach(other => other.setAttribute('aria-pressed', String(other === button)));
-    host.querySelectorAll<HTMLElement>('[data-character-gender]').forEach(card => { card.hidden = gender !== 'all' && card.dataset.characterGender !== gender; });
-    const available = CHARACTERS.filter(c => gender === 'all' || c.gender === gender);
-    hair.field.hidden = available.length === 0;
-    host.querySelector<HTMLElement>('#character-empty')!.hidden = available.length > 0;
+    available = CHARACTERS.filter(c => gender === 'all' || c.gender === gender);
+    customization.hidden = available.length === 0;
+    empty.hidden = available.length > 0;
     previewHost.style.visibility = available.length ? 'visible' : 'hidden';
-    if (selected && gender !== 'all' && selected.gender !== gender) {
-      selected = undefined; submit.disabled = true;
-      host.querySelectorAll<HTMLInputElement>('input[name="character"]').forEach(input => { input.checked = false; });
-      hint.textContent = thai ? 'เลือกตัวละครหนึ่งแบบเพื่อเริ่มต้น' : 'Select a character to begin.';
-    }
-    if (!selected) {
-      const preview = available[0];
-      if (preview) void load(preview);
-      else { ++previewVersion; previewCharacter = undefined; avatar?.dispose(); avatar = undefined; gear.disabled=motion.disabled=true; status.hidden = true; retry.hidden = true; delete previewHost.dataset.ready; delete previewHost.dataset.characterId; }
-      name.textContent = preview ? (thai ? preview.nameTh : preview.nameEn) : (thai ? 'ยังไม่มีตัวละครในหมวดนี้' : 'No characters in this category');
+    for (const option of classOptions) option.disabled = !available.some(c => c.classId === option.value);
+    if (!selected || !available.includes(selected)) {
+      const first = available.find(character => character.id === DEFAULT_CHARACTER_ID) ?? available[0];
+      if (first) choose(first);
+      else {
+        selected = undefined; submit.disabled = true;
+        hint.textContent = thai ? 'เลือกตัวละครหนึ่งแบบเพื่อเริ่มต้น' : 'Select a character to begin.';
+        ++previewVersion; previewCharacter = undefined; avatar?.dispose(); avatar = undefined;
+        gear.disabled = motion.disabled = true; status.hidden = true; retry.hidden = true;
+        delete previewHost.dataset.ready; delete previewHost.dataset.characterId;
+        name.textContent = thai ? 'ยังไม่มีตัวละครในหมวดนี้' : 'No characters in this category';
+      }
     }
   }));
   retry.onclick = () => { if (previewCharacter) void load(previewCharacter); };
@@ -250,6 +295,6 @@ export function mountCharacterSelection(host: HTMLElement, username: string, tha
     const button = event.currentTarget as HTMLButtonElement; button.disabled = true;
     try { await exit(); } catch { button.disabled = false; error.textContent = thai ? 'ออกจากระบบไม่สำเร็จ กรุณาลองอีกครั้ง' : 'Could not sign out. Please retry.'; }
   };
-  void load(CHARACTERS[0]);
+  choose(characterById(DEFAULT_CHARACTER_ID)!);
   return { destroy() { disposed = true; clearPreview(); if (!transferred) assets?.dispose(); } };
 }

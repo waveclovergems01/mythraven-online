@@ -10,8 +10,33 @@ test('time, celestial sky and safe right-drag orbit preserve movement and recove
   await page.route('**/src/terrain/TerrainWorld.ts*', async route => {
     const response = await route.fetch();
     let body = await response.text();
-    body = body.replace('renderer.render(scene, camera);', `
-      window.environmentMove=(x,z)=>network.move(x,z);
+    body = body.replace('daylight.update(camera, focus, network.serverNow);', `
+      const testHour = window.environmentHour ?? 9;
+      daylight.update(camera, focus, Date.parse('2026-11-24T00:00:00+07:00') + ((testHour + 18) % 24) * 450000);
+    `).replace('renderer.render(scene, camera);', `
+      window.environmentMoveToBank=()=>{
+        let nearest;
+        let distance=Infinity;
+        for(let i=0;i<data.heights.length;i++){
+          if(data.shoreDistance[i]<5.5||data.shoreDistance[i]>7.6)continue;
+          const x=i%data.side/(data.side-1)*500-250;
+          const z=Math.floor(i/data.side)/(data.side-1)*500-250;
+          const metres=Math.hypot(x-focus.x,z-focus.z);
+          if(metres<distance&&navigation.canStand({x,z})){nearest={x,z};distance=metres;}
+        }
+        if(nearest)network.move(nearest.x,nearest.z);
+        return nearest;
+      };
+      window.environmentWalkClick=()=>{
+        for (const [dx,dz] of [[12,0],[-12,0],[0,12],[0,-12],[16,12],[-16,-12]]) {
+          const x=focus.x+dx,z=focus.z+dz;
+          if(!navigation.canStand({x,z}))continue;
+          const point=new THREE.Vector3(x,terrainHeight(data,x,z),z).project(camera);
+          if(Math.abs(point.x)>.62||Math.abs(point.y)>.62)continue;
+          const rect=canvas.getBoundingClientRect();
+          return [rect.left+(point.x+1)*rect.width/2,rect.top+(1-point.y)*rect.height/2];
+        }
+      };
       window.environmentProbe=()=>{
         const end=new THREE.Vector3(...orbit.inspect().target);
         const delta=end.clone().sub(camera.position);
@@ -48,7 +73,6 @@ test('time, celestial sky and safe right-drag orbit preserve movement and recove
     await expect(page.locator('#game canvas')).not.toHaveAttribute('data-orbiting');
   };
   await page.screenshot({ path: 'test-results/terrain-environment/default.png' });
-  await openSettings(page);await page.locator('#world-time-auto').uncheck();await page.locator('#world-time').fill('9');await closeSettings(page);
   const initial = await state(), light = (await probe()).light;
   await drag(-300, 80);
   expect((await state()).orbit.yaw).toBeGreaterThan(90);
@@ -58,9 +82,12 @@ test('time, celestial sky and safe right-drag orbit preserve movement and recove
   expect((await state()).orbit.clearance).toBeGreaterThanOrEqual(2);
   await page.screenshot({ path: 'test-results/terrain-environment/orbit.png' });
   // Left-click movement still uses the rotated camera's ground ray.
-  await page.mouse.click(1000, 520);
+  const walkClick = await page.evaluate(() => (window as any).environmentWalkClick());
+  expect(walkClick).toBeTruthy();
+  await page.mouse.click(walkClick[0], walkClick[1]);
   await expect.poll(async () => (await state()).moving).toBe(true);
-  await openSettings(page); // Stops movement and releases any drag.
+  await expect.poll(async () => (await state()).moving).toBe(false);
+  await openSettings(page);
   await page.locator('#reset-camera').click();
   await closeSettings(page);
   // Low orbit dollies in without losing the avatar; reversing the same input
@@ -71,14 +98,12 @@ test('time, celestial sky and safe right-drag orbit preserve movement and recove
   await page.screenshot({ path: 'test-results/terrain-environment/close-ground-slide.png' });
   for (let i = 0; i < 4; i++) { await drag(0, 100); await visiblePlayer(); }
   (await state()).camera.forEach((value: number, i: number) => expect(value).toBeCloseTo(beforeSlide.camera[i], 5));
-  await openSettings(page);
-  await page.locator('#world-time').fill('7');
-  await expect(page.locator('[data-hour="7"]')).toHaveAttribute('aria-pressed', 'true');
-  await closeSettings(page);
-  await page.screenshot({ path: 'test-results/terrain-environment/morning.png' });
-  for (const hour of [12, 17, 22]) {
-    await openSettings(page); await page.locator(`[data-hour="${hour}"]`).click(); await closeSettings(page);
-    expect((await state()).lighting.hour).toBe(hour);
+  const setHour = async (hour: number) => {
+    await page.evaluate(h => { (window as any).environmentHour = h; }, hour);
+    await expect.poll(async () => (await state()).lighting.hour).toBe(hour);
+  };
+  for (const hour of [7, 12, 17, 22]) {
+    await setHour(hour);
     await page.screenshot({ path: `test-results/terrain-environment/time-${hour}.png` });
   }
   expect((await state()).lighting.daylight).toBe(0);
@@ -91,16 +116,20 @@ test('time, celestial sky and safe right-drag orbit preserve movement and recove
   await visiblePlayer();
   await page.screenshot({ path: 'test-results/terrain-environment/night-ground-slide.png' });
   await openSettings(page); await page.locator('#reset-camera').click();
-  await page.locator('#world-time').fill('9'); await page.locator('#sun-direction').fill('90');
+  await setHour(9);
   await page.screenshot({ path: 'test-results/terrain-environment/settings.png' }); await closeSettings(page);
-  expect((await state()).lighting.bearing).toBe(90);
+  expect((await state()).lighting.bearing).toBe(180);
   const sun = (await state()).lighting.sunDirection;
   await drag(-Math.atan2(-sun[0], -sun[2]) / .006, (-Math.asin(sun[1]) - initial.orbit.pitch * Math.PI / 180) / .004);
   await visiblePlayer();
   await page.screenshot({ path: 'test-results/terrain-environment/day-ground-slide.png' });
   // Travel to the canal's inner bank and sweep all bearings at ground level.
-  await page.evaluate(() => (window as any).environmentMove(-6, 123));
-  await expect.poll(async () => Math.abs((await state()).player.x + 6), { timeout: 20000 }).toBeLessThan(.2);
+  const bank = await page.evaluate(() => (window as any).environmentMoveToBank());
+  expect(bank).toBeTruthy();
+  await expect.poll(async () => {
+    const {player} = await state();
+    return Math.hypot(player.x - bank.x, player.z - bank.z);
+  }, {timeout: 20000}).toBeLessThan(.2);
   await expect.poll(async () => (await state()).moving).toBe(false);
   await openSettings(page); await page.locator('#reset-camera').click(); await closeSettings(page);
   await drag(0, -450);
@@ -113,9 +142,10 @@ test('time, celestial sky and safe right-drag orbit preserve movement and recove
   // Both pitch extremes remain safe, pointer cancellation cannot leave orbit latched.
   await drag(100, -600); expect((await state()).orbit.pitch).toBeCloseTo(-65);
   await visiblePlayer();
+  await openSettings(page); await page.locator('#reset-camera').click(); await closeSettings(page);
   await setWheelZoom(page,200);
   await visiblePlayer();
-  expect((await probe()).body[1][1]).toBeLessThan(0); // Torso stays just below center.
+  expect(Math.abs((await probe()).body[1][1])).toBeLessThan(.15); // Torso stays near the center.
   await page.screenshot({ path: 'test-results/terrain-environment/close-max-zoom.png' });
   await page.setViewportSize({ width: 390, height: 844 }); await visiblePlayer();
   await page.screenshot({ path: 'test-results/terrain-environment/close-mobile.png' });
@@ -127,11 +157,11 @@ test('time, celestial sky and safe right-drag orbit preserve movement and recove
   await expect(page.locator('#game canvas')).not.toHaveAttribute('data-orbiting');
   await openSettings(page); await page.locator('#reset-camera').click();
   await page.setViewportSize({ width: 390, height: 844 });
-  await page.locator('#sun-direction').scrollIntoViewIfNeeded();
+  await page.locator('#reset-camera').scrollIntoViewIfNeeded();
   await page.screenshot({ path: 'test-results/terrain-environment/mobile-settings.png' });
   await page.locator('#logout').click(); await page.locator('#guest').click(); await chooseCharacter(page);
   await expect(page.locator('#network-status')).toHaveAttribute('data-connected', 'true');
-  await expect(page.locator('#world-time')).toHaveCount(1); await expect(page.locator('#game canvas')).toHaveCount(1);
-  expect((await state()).orbit.yaw).toBe(0); await expect(page.locator('#world-time-auto')).toBeChecked();await expect(page.locator('#world-time')).toBeDisabled();
+  await expect(page.locator('#world-time, #sun-direction, #world-time-auto')).toHaveCount(0); await expect(page.locator('#game canvas')).toHaveCount(1);
+  expect((await state()).orbit.yaw).toBe(0);
   expect(errors).toEqual([]);
 });

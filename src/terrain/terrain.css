@@ -9,10 +9,7 @@
   pointer-events: none;
 }
 .terrain-status { top: 45%; }
-.game-page .game-header.player-hud{justify-content:flex-start;gap:6px;flex-wrap:wrap}
-.game-header .combat-vitals{box-sizing:border-box;width:200px;max-width:100%;display:grid;grid-template-columns:max-content minmax(0,1fr);align-items:center;gap:3px 8px;padding:7px 10px;color:#eee4cd;background:#192c28ed;border:1px solid #8d805b;border-radius:5px;font:12px/1.3 system-ui;font-variant-numeric:tabular-nums}
-.vital-heading{grid-column:1/-1;display:flex;justify-content:space-between;gap:5px;border-bottom:1px solid #8d805b70;margin-bottom:2px;padding-bottom:3px;color:#e4c887}
-.vital-heading #player-name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.game-page .game-header.player-hud{top:4px;left:4px;justify-content:flex-start;gap:6px;flex-wrap:wrap}
 .game-header .combat-controls{padding:0;background:transparent;display:grid;gap:5px;justify-items:start;pointer-events:auto}
 .combat-controls .terrain-network{position:static;max-width:none}
 .hunt-controls,.hunt-panel{
@@ -20,14 +17,22 @@
   color:#f4e8c7;background:#1c302df5;border:1px solid var(--hunt-edge);
   border-radius:6px;box-shadow:0 3px 14px #10221e55;font-size:13px;
 }
-.hunt-controls{position:absolute;z-index:4;right:76px;bottom:18px;display:flex;overflow:hidden}
+.hunt-controls{position:absolute;z-index:4;right:76px;bottom:12px;display:flex;align-items:stretch;overflow:hidden}
 .hunt-controls button{margin:0;min-height:34px;padding:5px 10px;font:inherit;color:inherit;background:transparent;border:0;cursor:pointer}
-.hunt-controls .hunt-launch{border-left:1px solid #8d805b;min-width:34px}
+.hunt-controls .hunt-launch{border-left:1px solid var(--hunt-edge);min-width:34px;padding-inline:6px;font-size:18px}
+.hunt-controls .hunt-launch:hover,.hunt-controls:has(+ .hunt-panel:popover-open) .hunt-launch{background:#30463c}
 .hunt-controls button:focus-visible{outline:2px solid #f4db9b;outline-offset:-3px}
-.auto-combat::before{content:'▶';margin-right:6px;color:#e4c887}
-.auto-combat[aria-pressed=true]{background:#40533c;color:#ffdfa1}
-.auto-combat[aria-pressed=true]::before{content:'■'}
-.hunt-panel{position:fixed;inset:auto 76px 64px auto;margin:0;padding:14px;width:min(244px,calc(100vw - 24px));max-height:calc(100dvh - 105px);overflow:auto}
+.hunt-controls .auto-combat{position:relative;display:grid;place-items:center;width:54px;height:46px;padding:2px}
+.auto-combat img{width:42px;height:42px;object-fit:contain;pointer-events:none}
+.auto-combat kbd,.hunt-state{position:absolute;pointer-events:none;border:1px solid #88784e;border-radius:4px;background:#142321;color:#fff2ce}
+.auto-combat kbd{bottom:2px;left:2px;padding:1px 3px;font:700 9px/1.15 system-ui,sans-serif}
+.hunt-state{top:2px;right:2px;display:grid;place-items:center;width:15px;height:15px;font:800 10px/1 system-ui,sans-serif}
+.hunt-state::before{content:'–'}
+.hunt-controls .auto-combat[aria-pressed=true]{background:#285349;box-shadow:inset 0 0 0 1px #83dfba}
+.auto-combat[aria-pressed=true] .hunt-state{background:#b0f2cf;color:#16382c;border-color:#cbffe0}
+.auto-combat[aria-pressed=true] .hunt-state::before{content:'✓'}
+.auto-combat:disabled img{filter:grayscale(1);opacity:.65}
+.hunt-panel{position:fixed;inset:auto 76px 72px auto;margin:0;padding:14px;width:min(244px,calc((100vw - 24px) / var(--ui-scale, 1)));max-height:calc(100dvh / var(--ui-scale, 1) - 105px);overflow:auto}
 .hunt-panel .hunt-range{display:grid;gap:6px;font-weight:bold}
 .hunt-panel input{accent-color:#dac186}
 .hunt-panel fieldset{border:0;border-top:1px solid #897b525c;margin:12px 0;padding:8px 0 0}
@@ -37,21 +42,21 @@
 .hunt-panel small[hidden]{display:none}
 .hunt-panel [hidden]{display:none}
 .hunt-controls button:disabled{opacity:.65;cursor:default}
-@media(max-width:600px){.hunt-controls{right:60px;bottom:12px}.hunt-panel{right:8px;bottom:58px}}
-.combat-vitals progress,.monster-name progress{display:block;width:100%;height:5px;border:0;appearance:none;background:#111e1a;color:#d97669;border-radius:2px;overflow:hidden}
-.combat-vitals progress::-webkit-progress-bar,.monster-name progress::-webkit-progress-bar{background:#111e1a}
-.combat-vitals progress::-webkit-progress-value,.monster-name progress::-webkit-progress-value{background:#d97669}
-.combat-vitals .exp-meter::-webkit-progress-value{background:#d6b466}
-.combat-vitals progress::-moz-progress-bar,.monster-name progress::-moz-progress-bar{background:#d97669}
-.combat-vitals .exp-meter::-moz-progress-bar{background:#d6b466}
-.monster-name progress{margin:2px 0}
- .combat-vitals .mp-meter::-webkit-progress-value{background:#76ade5}
-.combat-vitals .mp-meter::-moz-progress-bar{background:#76ade5}
-@media(max-width:600px){.game-header .combat-vitals{width:178px;font-size:10px}.game-header .combat-controls{display:flex;flex-wrap:wrap;gap:3px}.combat-controls .terrain-network,.auto-combat{font-size:10px;padding:4px 6px}}
-.combat-damage{pointer-events:none;position:absolute;z-index:2;isolation:isolate;animation:hit-rise .9s ease-out both;color:#fff;font:bold 23px/1 Georgia,serif;text-shadow:0 2px 1px #281818,-1px -1px #312320}
+@media(max-width:600px){
+  .hunt-controls{right:60px;bottom:8px}
+  .hunt-panel{right:8px;bottom:64px}
+  .hunt-controls .auto-combat{height:42px}
+  .auto-combat img{width:38px;height:38px}
+}
+.monster-name progress{display:block;width:100%;height:5px;margin:2px 0;border:0;appearance:none;background:#111e1a;color:#d97669;border-radius:2px;overflow:hidden}
+.monster-name progress::-webkit-progress-bar{background:#111e1a}
+.monster-name progress::-webkit-progress-value{background:#d97669}
+.monster-name progress::-moz-progress-bar{background:#d97669}
+@media(max-width:600px){.game-header .combat-controls{display:flex;flex-wrap:wrap;gap:3px}.combat-controls .terrain-network{font-size:10px;padding:4px 6px}}
+.combat-damage{pointer-events:none;position:absolute;z-index:2;isolation:isolate;animation:hit-rise .9s ease-out both;color:#fff;font:bold calc(23px * var(--ui-scale, 1))/1 Georgia,serif;text-shadow:0 2px 1px #281818,-1px -1px #312320}
 .combat-damage.critical::before{content:'';position:absolute;inset:-5px -11px;z-index:-1;background:#7e4214df;clip-path:polygon(0 38%,23% 37%,15% 9%,38% 27%,53% 0,59% 24%,88% 9%,77% 38%,100% 43%,81% 59%,94% 86%,66% 75%,53% 100%,43% 75%,12% 94%,24% 62%)}
 .combat-damage.incoming{color:#ff7772}
-.combat-damage.critical{z-index:3;color:#ffcd54;font-size:31px}
+.combat-damage.critical{z-index:3;color:#ffcd54;font-size:calc(31px * var(--ui-scale, 1))}
 @keyframes hit-rise{0%{transform:translate(-50%,-16px) scale(.88)}18%{transform:translate(-50%,-42px) scale(1.08)}72%{opacity:1}100%{transform:translate(-50%,-124px);opacity:0}}
 @media(prefers-reduced-motion:reduce){.combat-damage{animation:none;transform:translate(-50%,-46px)}}
 .terrain-move-hint { bottom: 60px; font-size: 12px; }
@@ -75,21 +80,29 @@
 .terrain-network button { margin-left: 10px; padding: 5px 8px; border: 1px solid #ae9d6a; border-radius: 3px; background: #30443c; color: #eee3c8; }
 .world-player-name {
   position: absolute; transform: translate(-50%, -100%); pointer-events: none;
-  white-space: nowrap; font-size: 11px; color: #e5edf1; text-shadow: 0 1px 3px #102719;
-  padding: 3px 6px; background: #243a3080; border-radius: 3px;
+  white-space: nowrap; font-size: calc(11px * var(--ui-scale, 1)); color: #e5edf1; text-shadow: 0 1px 3px #102719;
+  padding: calc(3px * var(--ui-scale, 1)) calc(6px * var(--ui-scale, 1)); background: #243a3080; border-radius: 3px;
 }
 .world-player-name[data-mine="true"] { color: #ffe5a0; }
 .world-player-name.monster-name { z-index: 1; color: #ffe9b3; background: #30291ee6; box-shadow: inset 0 0 0 1px #c79a57; }
 @media (max-width: 600px) { .terrain-network { top: 78px; left: 8px; font-size: 11px; } }
-.game-page:has(.terrain-minimap) { --terrain-minimap-size: clamp(140px, 17vw, 224px); }
+.game-page:has(.terrain-minimap) { --terrain-minimap-size: 180px; }
 .terrain-minimap {
   position: absolute; z-index: 2; top: 16px; right: 16px;
-  width: var(--terrain-minimap-size); padding: 3px;
-  border: 1px solid #ae9a67; border-radius: 6px;
-  background: #172c29ee; color: #e6dcc0; box-shadow: 0 4px 16px #162e2826;
+  width: var(--terrain-minimap-size);
+  color: #e6dcc0; filter: drop-shadow(0 3px 4px #15201980);
   user-select: none; cursor: default;
 }
-.terrain-minimap > svg { display: block; width: 100%; aspect-ratio: 1; overflow: hidden; border-radius: 2px; }
+.terrain-minimap-map { position: relative; aspect-ratio: 540 / 533; }
+.terrain-minimap-map::after {
+  content: ''; position: absolute; inset: 0; pointer-events: none;
+  background: url('/assets/ui/minimap/frame.webp') center / 100% 100%;
+}
+.terrain-minimap-map > svg {
+  position: absolute; top: 4.6%; left: 5%; width: 90%; height: 89%;
+  overflow: hidden;
+  clip-path: polygon(3% 0,97% 0,100% 3%,100% 97%,97% 100%,3% 100%,0 97%,0 3%);
+}
 .terrain-portal-travel {
   display: block; width: 100%; min-height: 34px; margin-top: 5px; padding: 6px;
   border: 1px solid #ae9a6780; border-radius: 3px; background: #263d34;
@@ -101,30 +114,23 @@
 .terrain-portal-travel[hidden] { display: none; }
 .arrival-protection { display: block; margin-top: 5px; color: #c6e5c1; font-size: 10px; }
 .arrival-protection[hidden] { display: none; }
-.terrain-minimap-city { position: absolute; top: 8px; left: 8px; max-width: calc(100% - 65px); padding: 3px 7px; border: 1px solid #ac996966; border-radius: 4px; background: #172c29d9; font-size: 11px; }
-.terrain-minimap-compass { position: absolute; top: 7px; right: 7px; width: 44px; height: 44px; pointer-events: none; }
-.terrain-minimap-compass svg { width: 100%; height: 100%; }
-.terrain-minimap-compass circle { fill: #172c29dd; stroke: #ac996999; stroke-width: .7; }
-.terrain-minimap-compass path { fill: #8fa79b; }
-.terrain-minimap-compass .north { fill: #efcf82; }
-.terrain-minimap-compass text { fill: #eee3c6; font: 8px sans-serif; text-anchor: middle; }
-.game-page:has(.terrain-minimap) .game-header { right: calc(var(--terrain-minimap-size) + 32px); }
-@media (max-width: 600px) {
-  .game-page:has(.terrain-minimap) { --terrain-minimap-size: clamp(120px, 36vw, 140px); }
-  .terrain-minimap { top: 8px; right: 8px; }
-  .terrain-minimap-city { top: 6px; left: 6px; max-width: calc(100% - 48px); padding: 2px 4px; font-size: 9px; }
-  .terrain-minimap-compass { top: 5px; right: 5px; width: 34px; height: 34px; }
-  .game-page:has(.terrain-minimap) .game-header { right: calc(var(--terrain-minimap-size) + 16px); }
-  .game-page:has(.terrain-minimap) .mini-brand { font-size: clamp(12px, 3.8vw, 18px); letter-spacing: 1.5px; }
-  .game-page:has(.terrain-minimap) .mini-brand span { display: block; font-size: 10px; }
-  .game-page:has(.terrain-minimap) .game-header p { overflow-wrap: anywhere; }
-  .terrain-network { top: 112px; }
+.terrain-minimap-city {
+  position: relative; z-index: 1; display: block; height: 23px; margin-bottom: -6px;
+  padding: 4px 20px 4px 34px;
+  background: url('/assets/ui/minimap/nameplate.webp') center / 100% 100%;
+  color: #382822; text-shadow: 0 1px 2px #fffaf2;
+  font: 800 11px/15px system-ui, sans-serif;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
+.terrain-minimap-compass { position: absolute; top: 12px; right: 13px; width: 32px; height: 32px; pointer-events: none; }
+.game-page:has(.terrain-minimap) .game-header { right: calc((var(--terrain-minimap-size) + 16px) * var(--ui-scale) + 16px); }
+/* Put the fixed-size panels on separate rows when their widths no longer fit side by side. */
+.game-page[data-ui-stacked] .terrain-minimap { top: 156px; right: 8px; }
+.game-page[data-ui-stacked] .game-header.player-hud { right: 8px; flex-direction: column; }
+.game-page[data-ui-stacked] .player-hud .combat-controls { max-width: calc((100vw - 22px) / var(--ui-scale) - var(--terrain-minimap-size)); }
+.game-page[data-ui-stacked] .combat-controls .terrain-network { max-width: 100%; overflow-wrap: anywhere; }
 
 .terrain-asset-status { position: absolute; top: 12px; left: 50%; transform: translateX(-50%); max-width: 45%; padding: 8px 12px; border-radius: 5px; background: #18332ee8; color: #eee2c2; font-size: 12px; z-index: 5; }
 .terrain-asset-status[hidden] { display: none; }
 .terrain-asset-status button { margin-left: 10px; padding: 4px 8px; background: #d2b477; color: #1c2d24; border: 0; border-radius: 3px; }
 .terrain-host canvas[data-orbiting="true"], #game canvas[data-orbiting="true"] { cursor: grabbing; }
-
-.settings-dialog .world-clock-toggle { display: flex; align-items: center; gap: 8px; }
-.settings-dialog .settings-range .world-clock-toggle input { display: inline-block; flex: 0 0 18px; width: 18px; height: 18px; margin: 0; }

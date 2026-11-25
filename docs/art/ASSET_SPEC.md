@@ -1,5 +1,9 @@
 # Asset and sprite contract — MR-ART-v1
 
+## Character selection hairstyle thumbnails
+
+The two 192 × 192 transparent WebP files under `public/assets/ui/hairstyles` are orthographic front renders of the current shared male hair GLBs in their original colors. Render only the hair mesh with a common scale for both styles. Novice, Warrior and Archer share the same two tiles. The full character preview shows the player's selected dye. The earlier head-and-shoulders renders and temporary bake outputs were removed.
+
 > The 2D runtime was retired on 2026-11-25. References in earlier entries to the Phaser scene, sprite atlases and its map layers are historical. See the repository art inventory for active sources.
 
 ## Loading-screen illustrations — 2026-11-23
@@ -676,3 +680,45 @@ Owner reference: `Animated Cyan Starburst Explosion.gif` (309×309, 16 frames, 1
 
 ### Archer bow arrow — 2026-11-24
 Code-native `energy-arrow.ts`: two double-sided crossed planes, red glow/white shaft, alpha blending, no depth write/test, no shadow casting. Normalized arrow points along +X; the draw arrow stretches from the weighted string nock to 18% past the bow grip. Nock vertices are selected once on equipment attachment by maximum `DEF-hold-tweak.L` weight (0.5 in the current bow) and evaluated through skinning as the bow draws. This preserves the actual 50/50 deformation rather than anchoring to the control bone origin. Runtime GLBs remain byte-identical. `shared/bow-projectile.json` defines draw frames 2–6, ten total frames, projectile speed 85 units/s and 0.045–0.16-second flight bounds. Existing character-relative hit effect sizes/colors remain separate. No production raster, source copy or exporter is added.
+
+### Status HUD and minimap — 2026-11-25
+
+The inventory window uses the owner's `inventory_ivory_gold_assets.zip` and its preview. `public/assets/ui/inventory` contains lossless WebP exports for the frame and controls, including the category icons, search field and gold icon. CSS slices the blank frame to preserve the title crest and bottom gem. At the default UI scale the window is 306 pixels wide, with a five-column grid and a 350-pixel scrolling area on taller screens. The page strip and expansion button occupy the top row, while the capacity indicator sits beneath the grid. The scrollbar paints the arrows from the original track at a fixed aspect ratio. Each page has 100 slots. Category filters and search apply to the active page. Capacity starts at 200 slots and expands for free in increments of 100 up to 1,000. Capacity and the gold balance are saved per character. Older capacities round up to the new page size, with a minimum of 200.
+
+The lower-right game menu uses three owner-supplied illustrations for Inventory, Character status, and Settings. The transparent 112 × 112 lossless WebP exports are in `public/assets/ui/menu`. The settings launcher reuses the same gear image. The menu shows one row of three square tiles, with localized hover and keyboard-focus tooltips. Only the active runtime exports are kept.
+
+Inventory slots retain their saved positions, including gaps. Dragging onto an occupied slot swaps the two items. Hovering a page tab while dragging makes its slots available as drop targets. The footer's Sort action compacts the entire bag by the category order and item priorities in `shared/character-master.json`. Item details are in slot tooltips, and right-click equips weapons.
+
+The minimap uses artwork from the owner's `minimap_ui_assets.zip`. The live terrain SVG sits beneath the transparent 540 × 533 frame. The 540 × 65 nameplate displays the active map name as localized text, and the 120 × 120 compass keeps north aligned with the map. Shared SVG image patterns use the cyan ring for the local player, gray dot for other players, green dot for party members, red dot for monsters and gold ring for portals. The selected monster's dot enlarges at the same center. The eight lossless WebP exports in `public/assets/ui/minimap` preserve alpha and keep the panel width at 180 CSS pixels. Only used exports ship with the game.
+
+The status HUD uses the four owner-supplied 2172 × 724 PNGs from 12:29 PM on 2026-11-25. In `public/assets/ui/status`, `frame.webp` is derived from image 1 (956 × 345). The fill exports `hp.webp`, `mp.webp`, and `exp.webp` are derived from images 2–4 (540 × 48 each). All four preserve alpha, with transparent padding cropped and the resized outputs encoded losslessly. CSS slices the fill edges to preserve the rounded caps as the bars change width. The portrait is captured from the active character model facing forward. Names and stats remain live text and progress elements. The HUD is 304 × 140 CSS pixels and the minimap is 180 CSS pixels wide. At viewport widths of 540 CSS pixels and below, the minimap moves below the HUD and both retain their dimensions. The former CSS frame and fills were removed. Only the four runtime exports are kept in the project.
+
+### Character status and equipment — 2026-11-25
+
+The Character Status window uses the owner's `character_status_ui_assets_v2.zip` and its assembled preview. The active lossless WebP crops in `public/assets/ui/character-sheet` contain the title and footer trim, alcove, slot artwork and controls. CSS extends the ivory body as the live combat stats grow. The core attributes remain a six-row column. The combat table supports a single value or a minimum–maximum pair, and the critical damage multiplier comes from the shared combat rules. The preview renders the active character and equipped weapon, with arrow buttons for rotation. Only the runtime crops ship. The temporary ZIP extracts were cleared after integration. Browser validation covered rotation, all starter weapons, and stat allocation.
+
+### Character status and inventory frame fit
+
+Both windows scale uniformly to the viewport when their preferred size would overflow. The frame slices keep the complete top and bottom ornaments at the artwork's aspect ratio, and the middle fills the available height. Inventory slot and tab scrolling stays within its own regions. The status frame now uses the original frame rails and corners with live content on top. This replaces the two former header and footer exports. The active status artwork includes the six attribute glyphs, existing combat glyphs, framed stat cards and point counter. The inventory also uses the pack's add-tab artwork and blue category state. The two rings and centered necklace are visual equipment slots.
+
+### Character status modular artwork V3
+
+The owner-supplied `character_modular_ui_assets_v3.zip` replaces the character sheet V2 artwork. The 46 lossless WebP exports under `public/assets/ui/character-sheet/v3` use the ZIP assembled preview as layout reference. The transparent menu and stat frames use the nine-slice insets from the manifest, with separate background layers, title plates, and gem. Reusable slot frames overlap empty equipment glyphs or live equipped item icons. The portrait renders the player's model over the separate alcove and pedestal artwork. Stat labels, values, and actions remain live and localized. The centered necklace and the two ring slots carry over to this layout. The V2 runtime sprites and temporary ZIP extracts were cleared after browser validation.
+
+The revised equipment layout keeps the V3 slot and portrait artwork and adds the pack's Hit glyph for the Accuracy row. The pants slot uses a CSS silhouette tinted to match the V3 placeholders. The portrait is 120 CSS pixels wide at its default scale. Equipment and Costume share eleven slot positions and the same live stat panels. The cloak placeholder uses the V3 pack's `icons/equipment/cloak.png` exported as `gear-cloak.webp`.
+
+The auto-attack control uses the owner's `auto-attack.png`. The runtime export `public/assets/ui/menu/auto-attack.webp` is a 168 × 168 lossless WebP with transparent padding. The Ctrl+A label and the on/off indicator are rendered separately in the UI.
+
+The underfoot HP/MP meter uses the owner's `hp_mp_frame.png`, `hp_green.png`, `hp_red.png`, and `mp_blue.png`. It uses four 256-pixel-wide lossless WebP exports under `public/assets/ui/status/foot-*.webp`. The 64 × 12 meter follows the local player's projected feet and scales with the UI setting. HP uses the red fill only below 30%. This meter is enabled by default and the setting is saved locally.
+
+The current class name uses the owner's `Ornate Gold-Trimmed Indigo Banner.png`, cropped to the visible border and exported as `public/assets/ui/status/job-banner.webp` (460 × 63, lossless WebP). The panel uses live class text and sits slightly behind the main HUD frame, below the EXP row.
+
+### Level-up aura
+
+The owner's `Magical Aura Burst Animation.gif` (305 × 302, 16 frames, 1.92 seconds) guides the timing, gold light, and botanical shapes. The runtime Three.js aura lasts 580 ms. Its render layers include expanding ground rings, a light column, rising gold ribbons, sparks, green leaves, and pink petals. The grass sprig layer was retired. The leaves and petals use 70% of their original horizontal travel. The GIF is a reference and the game draws the layers procedurally. The owner's MP3 is copied byte-for-byte to `public/assets/audio/combat/levelup_aura_chime.mp3` and uses the player's sound effects volume.
+
+The owner's `Golden Aura Helix Spiral.png` guides the tapered gold ribbons and fine filaments. A separate rotating base glow, 18 instanced beams inside the outer ring, and buoyant dust add light around the player. Each burst samples new positions, angles, and particle shapes. Light layers use 80–100% of the 580 ms window, while leaves and petals use 70–100%. The reference image remains external.
+
+Each burst now draws three or four gold ribbons. Each ribbon sweeps through 40–50 degrees from the player's feet to about head height. The leading edge travels upwards and the trailing edge fades behind it.
+
+The perimeter beams are wider, wave slightly around the ring, and fade upwards behind their rising tips. The center column retains its own shader.

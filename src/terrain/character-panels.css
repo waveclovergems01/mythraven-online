@@ -1,16 +1,20 @@
 .character-hud{--ink:#f2ebd8;--muted:#bcc9bc;--gold:#e2c78a;--edge:#82744f;--line:#81765466;--panel:#192b27;color:var(--ink)}
-.settings-menu .journal-launch{display:grid;border-bottom:1px solid #82744f66}
+.character-hud {
+  --sheet-width: 394px;
+  --bag-width: 306px;
+  --journal-top: clamp(12px, 15dvh, 168px);
+  /* Keep a gap between the default windows when both can fit side by side. */
+  --journal-inset: max(12px, calc((100vw - (var(--sheet-width) + var(--bag-width)) * var(--ui-scale, 1) - 24px) / 2));
+}
 .character-hud button{font:inherit;cursor:pointer}
 .adventure-journal button{color:var(--gold);border:1px solid var(--edge);border-radius:4px;background:#30433a}
-.settings-menu .journal-launch button{font:inherit;color:inherit}
-.journal-launch kbd{font:11px monospace;border:1px solid var(--line);border-radius:3px;padding:1px 4px}
-.journal-launch button[aria-expanded=true]{border-color:var(--gold)}
-.adventure-journal{position:fixed;top:clamp(12px,8vh,80px);z-index:5;box-sizing:border-box;max-height:calc(100dvh - clamp(12px,8vh,80px) - 8px);overflow:auto;overscroll-behavior:contain;background:var(--panel);border:1px solid var(--edge);border-radius:7px;box-shadow:0 12px 40px #06130f77;color:var(--ink)}
+.adventure-journal{position:fixed;top:calc(min(var(--journal-top),max(8px,100dvh - var(--journal-bottom,8px) - var(--journal-height,0px))) / var(--journal-zoom,1));z-index:5;box-sizing:border-box;color:var(--ink)}
 .adventure-journal[hidden]{display:none}
-#journal-sheet{left:clamp(10px,2vw,36px);width:min(394px,calc(100vw - 24px))}
-#journal-bag{right:clamp(10px,2vw,36px);width:min(458px,calc(100vw - 24px))}
+#journal-sheet,#journal-bag{zoom:var(--journal-zoom,var(--ui-scale,1))}
+#journal-sheet{left:calc(min(12vw,var(--journal-inset),max(8px,100vw - 8px - var(--sheet-width) * var(--journal-zoom,1))) / var(--journal-zoom,1));width:var(--sheet-width)}
+#journal-bag{right:calc(min(14vw,var(--journal-inset),max(8px,100vw - 8px - var(--bag-width) * var(--journal-zoom,1))) / var(--journal-zoom,1));width:var(--bag-width)}
 .journal-front{z-index:6}
-.adventure-journal header,.journal-section,.bag-detail,.sheet-balance,.journal-stats>div,.adventure-journal dl div{display:flex;align-items:center;justify-content:space-between;gap:6px}
+.adventure-journal header,.sheet-balance,.journal-stats>div,.adventure-journal dl div{display:flex;align-items:center;justify-content:space-between;gap:6px}
 .adventure-journal header{padding:10px 16px 9px;cursor:grab;touch-action:none;user-select:none;background:linear-gradient(110deg,#304135,#1d3029);border-bottom:1px solid var(--edge)}
 .adventure-journal header:active{cursor:grabbing}
 .adventure-journal h2{font-size:21px;margin:1px 0;line-height:1.3}
@@ -22,24 +26,14 @@
 .adventure-journal .journal-close{border:0;background:transparent;font-size:24px}
 .journal-content{padding:14px}
 .adventure-journal h3{font-size:15px;color:var(--gold);margin:0 0 7px}
-.bag-pages{display:flex;gap:3px}
-.bag-pages button{font:13px/1.6 system-ui;background:transparent;border-color:transparent}
-.bag-pages button[aria-pressed=true]{background:#35463a;border-color:var(--edge)}
-.bag-count,.sheet-balance b,.journal-stats b,.adventure-journal dd{font-variant-numeric:tabular-nums}
-.bag-count{color:var(--muted);font-size:13px}
-.bag-scroll{margin-top:10px;max-height:45dvh;overflow:auto;overscroll-behavior:contain;scrollbar-color:#8e805b #172620}
-.bag-grid{display:grid;grid-template-columns:repeat(10,minmax(0,1fr));gap:3px;padding:2px}
-.bag-cell,.gear-cell{position:relative;box-sizing:border-box;aspect-ratio:1;border:1px solid #72775b80;border-radius:3px;background:linear-gradient(145deg,#17231e,#28382d);box-shadow:inset 0 1px 4px #0d191955}
-.adventure-journal .bag-item,.adventure-journal button.gear-cell{padding:0;background:#364336;border-color:var(--edge)}
-.bag-item:is(:hover,:focus-visible,[aria-pressed=true]),.gear-cell:is(button):hover{outline:1px solid var(--gold);outline-offset:-1px}
+.sheet-balance b,.journal-stats b,.adventure-journal dd{font-variant-numeric:tabular-nums}
+.gear-cell{position:relative;box-sizing:border-box;aspect-ratio:1;border:1px solid #72775b80;border-radius:3px;background:linear-gradient(145deg,#17231e,#28382d);box-shadow:inset 0 1px 4px #0d191955}
+.adventure-journal button.gear-cell{padding:0;background:#364336;border-color:var(--edge)}
+.gear-cell:is(button):hover{outline:1px solid var(--gold);outline-offset:-1px}
 .bag-item img,.worn-icon{display:block;width:100%;height:100%;object-fit:contain}
 .item-tip{display:none;position:absolute;bottom:100%;left:0;z-index:2;white-space:nowrap;pointer-events:none;padding:5px 8px;border:1px solid var(--edge);border-radius:3px;background:#101e19;color:var(--ink);font-size:12px}
-.bag-item:nth-child(-n+10) .item-tip{top:100%;bottom:auto}
-.bag-item:nth-child(10n) .item-tip,.bag-item:nth-child(10n - 1) .item-tip,.bag-item:nth-child(10n - 2) .item-tip{left:auto;right:0}
 .bag-item:is(:hover,:focus-visible) .item-tip{display:block}
-.bag-detail,.journal-empty{min-height:40px;margin:10px 0 0;padding-top:8px;border-top:1px solid var(--line)}
-.bag-detail small,.gear-slot small{display:block}
-.journal-empty{color:var(--muted);font-size:13px}
+.gear-slot small{display:block}
 .equipment-stage{display:grid;grid-template-columns:1fr minmax(0,1.75fr) 1fr;gap:8px;align-items:center}
 .gear-rail{display:grid;gap:8px;justify-items:center}
 .gear-slot{text-align:center}
@@ -63,8 +57,7 @@
 .sheet-balance{margin-top:12px;background:#293c30;color:var(--gold);padding:5px 9px;font-size:13px}
 .journal-test{margin-top:8px;font-size:12px!important}.journal-error{padding:0 14px;color:#f0aea0}
 @media(max-width:600px){
-
-  .journal-content{padding:10px}.bag-grid{grid-template-columns:repeat(5,minmax(0,1fr))}
-  .bag-item:nth-child(5n) .item-tip,.bag-item:nth-child(5n - 1) .item-tip{left:auto;right:0}
+  .character-hud{--journal-top:clamp(12px,8dvh,80px)}
+  .journal-content{padding:10px}
   .sheet-columns{gap:10px}
 }

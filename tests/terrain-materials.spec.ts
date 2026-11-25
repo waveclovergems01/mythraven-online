@@ -1,6 +1,6 @@
 import { chooseCharacter } from './helpers/character-selection';
 import { test, expect } from '@playwright/test';
-import { closeSettings, openSettings, setWheelZoom } from './helpers/game-settings';
+import { setWheelZoom } from './helpers/game-settings';
 
 test('layered ground, clear animated river and reduced-motion surface render without shader errors', async ({ page }) => {
   const errors: string[] = [];
@@ -15,7 +15,8 @@ test('layered ground, clear animated river and reduced-motion surface render wit
     const response = await route.fetch();
     const source = await response.text();
     expect(source).toContain('renderer.render(scene, camera);');
-    const code = source.replace('renderer.render(scene, camera);', `
+    const code = source.replace('daylight.update(camera, focus, network.serverNow);',
+      "daylight.update(camera, focus, Date.parse('2026-11-24T00:45:00+07:00'));").replace('renderer.render(scene, camera);', `
       const probe=window.surfaceProbe;
       if(probe){ camera.position.set(focus.x+(probe.x||0),focus.y+45,focus.z+55+probe.offset);
         camera.lookAt(focus.x+(probe.x||0),probe.y??focus.y,focus.z+probe.offset); camera.updateMatrixWorld();
@@ -46,10 +47,6 @@ test('layered ground, clear animated river and reduced-motion surface render wit
   await expect(page.locator('#game canvas')).toHaveAttribute('data-ready', 'true');
   await expect(page.locator('#network-status')).toHaveAttribute('data-connected', 'true');
   await expect(page.locator('.world-player-name[data-player-id]')).toHaveCount(1);
-  await openSettings(page);
-  await page.locator('#world-time-auto').uncheck();
-  await page.locator('#world-time').fill('12');
-  await closeSettings(page);
   const coverage = await page.evaluate(async () => {
     const dataPath='/src/terrain/terrain-data.ts', materialPath='/src/terrain/terrain-materials.ts';
     const {loadTerrainData}=await import(dataPath), {terrainGrassCoverage}=await import(materialPath);

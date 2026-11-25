@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import type {CombatHit} from '../network/terrain-client';
 import sounds from '../../shared/combat-effects.json';
 import behavior from '../../shared/monster-behavior.json';
+import {audioSettings, type EffectChannel} from '../audio-settings';
 
 export function combatVolume(distance:number){
   return .28*Math.max(0,1-Math.max(0,distance-3)/15)**2;
@@ -76,14 +77,14 @@ export function createCombatImpact(scene:THREE.Scene){
   });
   let cursor=0,context:AudioContext|undefined,master:DynamicsCompressorNode|undefined,disposed=false;
   const listenerPosition=new THREE.Vector3();
-  const buffers=new Map<string,AudioBuffer>(),voices=new Map<AudioBufferSourceNode,{gain:GainNode;position:THREE.Vector3;volumeScale:number;step:boolean}>();
+  const buffers=new Map<string,AudioBuffer>(),voices=new Map<AudioBufferSourceNode,{gain:GainNode;position:THREE.Vector3;volumeScale:number;step:boolean;channel:EffectChannel}>();
   let loading:Promise<void>|undefined,stepVariant=0;
   function unlock(){
     if(disposed)return;
     context??=new AudioContext();
     if(!master){master=context.createDynamicsCompressor();master.threshold.value=-12;master.ratio.value=8;master.connect(context.destination);}
     void context.resume().catch(()=>{});
-    loading??=Promise.all([...Object.values(sounds.dagger),...Object.values(sounds.bow),sounds.critical,sounds.monster,...Object.values(behavior.footsteps).flat()].map(async path=>{
+    loading??=Promise.all([...Object.values(sounds.dagger),...Object.values(sounds.bow),sounds.critical,sounds.monster,sounds.levelUp,...Object.values(behavior.footsteps).flat()].map(async path=>{
       const response=await fetch(path);
       if(!response.ok)throw new Error('Could not load combat sound '+path);
       const buffer=await context!.decodeAudioData(await response.arrayBuffer());
@@ -98,28 +99,41 @@ export function createCombatImpact(scene:THREE.Scene){
     for(const hit of pool){hit.start=-Infinity;hit.mesh.visible=false;}
   }
   document.addEventListener('visibilitychange',silence);
-  function play(path:string,position:THREE.Vector3,step=false){
+  function soundVolume(position: THREE.Vector3, scale: number, channel: EffectChannel) {
+    return document.hidden ? 0 : scale * combatVolume(position.distanceTo(listenerPosition)) * audioSettings.gain(channel);
+  }
+  const updateVoiceGains = () => {
+    for (const {gain,position,volumeScale,channel} of voices.values()) {
+      gain.gain.value = soundVolume(position, volumeScale, channel);
+    }
+  };
+  const unsubscribeAudio = audioSettings.subscribe(updateVoiceGains);
+  function play(path:string,position:THREE.Vector3,channel:EffectChannel,step=false){
     const volumeScale=step?.45:1;
     if(step && [...voices.values()].filter(voice=>voice.step).length>=6)return;
     const buffer=buffers.get(path);
-    const volume=volumeScale*combatVolume(position.distanceTo(listenerPosition));
-    if(document.hidden || volume<=0 || !context || context.state!=='running' || !buffer || !master)return;
+    const volume=soundVolume(position,volumeScale,channel);
+    if(volume<=0 || !context || context.state!=='running' || !buffer || !master)return;
     if(voices.size>=24){
       const oldest=voices.keys().next().value!;
       oldest.stop();voices.delete(oldest);
     }
     const source=context.createBufferSource(),gain=context.createGain();
     source.buffer=buffer;gain.gain.value=volume;source.connect(gain);gain.connect(master);
-    voices.set(source,{gain,position:position.clone(),volumeScale,step});source.onended=()=>{voices.delete(source);source.disconnect();gain.disconnect();};
+    voices.set(source,{gain,position:position.clone(),volumeScale,step,channel});source.onended=()=>{voices.delete(source);source.disconnect();gain.disconnect();};
     source.start();
   }
   return {
+    levelUp(position:THREE.Vector3){
+      listenerPosition.copy(position);
+      play(sounds.levelUp,position,'self');
+    },
     step(kind:'rabbit'|'wolf',position:THREE.Vector3,listener:THREE.Vector3){
       listenerPosition.copy(listener);
       const variants=behavior.footsteps[kind];
-      play(variants[kind==='rabbit'?stepVariant++%variants.length:0],position,true);
+      play(variants[kind==='rabbit'?stepVariant++%variants.length:0],position,'others',true);
     },
-    show(event:CombatHit,position:THREE.Vector3,height:number,listener:THREE.Vector3,model?:THREE.Object3D){
+    show(event:CombatHit,position:THREE.Vector3,height:number,listener:THREE.Vector3,model?:THREE.Object3D,channel:EffectChannel='others'){
       if(document.hidden || event.dodged || event.damage<=0 || position.distanceToSquared(listener)>45**2)return;
       listenerPosition.copy(listener);
       const hit=pool[cursor++%pool.length],incoming=event.to==='player';
@@ -143,11 +157,11 @@ export function createCombatImpact(scene:THREE.Scene){
       hit.mesh.material.uniforms.seed.value=Math.random()*6.28;
       hit.mesh.material.uniforms.variant.value=Math.floor(Math.random()*3);
       const path=event.critical?sounds.critical:incoming?sounds.monster:event.weapon==='dagger'?sounds.dagger.normal:event.weapon==='bow'?sounds.bow.normal:undefined;
-      if(path)play(path,position);
+      if(path)play(path,position,channel);
     },
     update(camera:THREE.Camera,listener?:THREE.Vector3){
       if(listener)listenerPosition.copy(listener);
-      for(const {gain,position,volumeScale} of voices.values())gain.gain.value=document.hidden?0:volumeScale*combatVolume(position.distanceTo(listenerPosition));
+      updateVoiceGains();
       const now=performance.now();
       for(const hit of pool){
         const age=(now-hit.start)/(hit.duration*1000);hit.mesh.visible=age>=0 && age<1;
@@ -160,6 +174,7 @@ export function createCombatImpact(scene:THREE.Scene){
       }
     },
     destroy(){
+      unsubscribeAudio();
       disposed=true;document.removeEventListener('pointerdown',unlock,true);document.removeEventListener('keydown',unlock,true);
       document.removeEventListener('visibilitychange',silence);
       for(const voice of voices.keys())voice.stop();if(context)void context.close().catch(()=>{});

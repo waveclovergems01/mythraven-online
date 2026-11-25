@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { chooseCharacter } from './helpers/character-selection';
+import { chooseCharacter, selectAppearance } from './helpers/character-selection';
 import { openSettings } from './helpers/game-settings';
 
 test('guest chooses a model before joining; previews share assets with the city and sync to peers', async ({ page, browser }) => {
@@ -17,10 +17,12 @@ test('guest chooses a model before joining; previews share assets with the city 
   await hook(page); await page.setViewportSize({ width: 1440, height: 960 });
   await page.goto('/'); await page.locator('#guest').click();
   await expect(page.locator('#character-title')).toBeVisible();
-  await expect(page.locator('#enter-city')).toBeDisabled();
-  await expect(page.locator('input[name="character"]:checked')).toHaveCount(0);
+  await expect(page.locator('input[name="character-class"]:checked')).toHaveValue('novice');
+  await expect(page.locator('input[name="character-hair"]:checked')).toHaveValue('1');
   await expect(page.locator('#game')).toHaveCount(0);
   await expect(page.locator('#character-preview')).toHaveAttribute('data-ready', 'true', { timeout: 30000 });
+  await expect(page.locator('#enter-city')).toBeEnabled();
+  await page.locator('#character-preview').screenshot({path:'test-results/character-selection/default-front.png'});
   const menuPrevented = await page.locator('#character-preview canvas').evaluate(canvas =>
     !canvas.dispatchEvent(new MouseEvent('contextmenu', { bubbles: true, cancelable: true, button: 2 })));
   expect(menuPrevented).toBe(true);
@@ -31,9 +33,16 @@ test('guest chooses a model before joining; previews share assets with the city 
   await page.mouse.down();
   await page.mouse.move(bounds.x + bounds.width - 1, y, { steps: 5 });
   await page.mouse.up();
-  expect(await page.evaluate(() => getSelection()?.toString().trim())).toBe('Novice');
+  expect(await page.evaluate(() => getSelection()?.toString().trim())).toBe(await caption.textContent());
   expect(sockets).toHaveLength(0);
-  await page.locator('input[value="novice-male-02"]').check();
+  const portraits = page.locator('.hairstyle-thumbnail');
+  await expect(portraits).toHaveCount(2);
+  await expect.poll(() => portraits.evaluateAll(images => images.every(image =>
+    (image as HTMLImageElement).complete && (image as HTMLImageElement).naturalWidth === 192))).toBe(true);
+  const style2 = page.locator('.hairstyle-tile:has(input[value="2"]) .hairstyle-thumbnail');
+  const portraitBounds = (await style2.boundingBox())!;
+  await page.mouse.click(portraitBounds.x + portraitBounds.width / 2, portraitBounds.y + portraitBounds.height / 2);
+  await expect(page.locator('input[name="character-hair"][value="2"]')).toBeChecked();
   await expect(page.locator('#character-preview-name')).toContainText('2');
   await page.locator('[data-hair-color="#d4dbe8"]').click();
   await expect(page.locator('#hair-color')).toHaveValue('#d4dbe8');
@@ -61,7 +70,10 @@ test('guest chooses a model before joining; previews share assets with the city 
   try {
     await other.goto('/'); await other.locator('#guest').click();
     await other.locator('[data-hair-color="#c93244"]').click();
-    await chooseCharacter(other);
+    await expect(other.locator('input[name="character-class"]:checked')).toHaveValue('novice');
+    await expect(other.locator('input[name="character-hair"]:checked')).toHaveValue('1');
+    await other.locator('#enter-city').click();
+    await expect(other.locator('.scene-loading')).toBeHidden({timeout:60000});
     await expect.poll(async () => (await state()).renderedPlayers,{timeout:60000}).toBe(2);
     const peer = await other.evaluate(() => (window as any).selectionWorld.inspect());
     expect(peer.players[mine].characterId).toBe('novice-male-02'); expect(peer.avatars[mine].hairStyle).toBe(2);
@@ -74,13 +86,18 @@ test('guest chooses a model before joining; previews share assets with the city 
     await expect(page.locator('#network-status')).toHaveAttribute('data-connected','true',{timeout:60000});
     const rejoined = await state(); expect(rejoined.players[rejoined.id].characterId).toBe('novice-male-02');
     expect(rejoined.players[rejoined.id].hairColor).toBe('#36a2e8');
+    await page.evaluate(() => {
+      const session = JSON.parse(sessionStorage.getItem('mr.demo.session.v1')!);
+      localStorage.setItem('mythraven.hair-color.' + session.id, '#d4dbe8');
+    });
     await page.reload();
     await expect(page.locator('#character-title')).toBeVisible();
-    await expect(page.locator('#hair-color')).toHaveValue('#36a2e8');
-    await expect(page.locator('#enter-city')).toBeDisabled();
+    await expect(page.locator('[data-hair-color=""]')).toHaveAttribute('aria-pressed', 'true');
+    await expect(page.locator('output[for=hair-color]')).toBeEmpty();
+    await expect(page.locator('input[name="character-class"]:checked')).toHaveValue('novice');
+    await expect(page.locator('input[name="character-hair"]:checked')).toHaveValue('1');
     await expect(page.locator('#game')).toHaveCount(0);
     await page.setViewportSize({width:390,height:844});
-    await page.locator('input[value="novice-male-01"]').check();
     await expect(page.locator('#enter-city')).toBeEnabled({timeout:30000});
     expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
     await page.screenshot({path:'test-results/character-selection/mobile.png',fullPage:true});
@@ -98,6 +115,7 @@ test('selection can sign out while assets load and retry a failed model download
   await page.route('**/assets/models/characters/bodies/novice.glb',async route=>{await pending;await route.continue();});
   await page.goto('/');await page.locator('#guest').click();
   await expect(page.locator('#character-title')).toBeVisible();
+  await expect(page.locator('#enter-city')).toBeDisabled();
   await page.locator('#character-logout').click(); release();
   await expect(page.locator('#guest')).toBeVisible();await page.waitForTimeout(500);
   await expect(page.locator('canvas')).toHaveCount(0);
@@ -106,7 +124,7 @@ test('selection can sign out while assets load and retry a failed model download
   await page.route('**/assets/models/characters/bodies/novice.glb',route=>fail?route.abort():route.continue());
   await page.locator('#guest').click();
   await expect(page.locator('#character-retry')).toBeVisible();
-  await page.locator('input[value="novice-male-02"]').check();
+  await selectAppearance(page, 'novice-male-02');
   await expect(page.locator('#enter-city')).toBeDisabled();
   fail=false; await page.locator('#character-retry').click();
   await expect(page.locator('#enter-city')).toBeEnabled({timeout:30000});

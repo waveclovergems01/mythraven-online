@@ -59,6 +59,14 @@ test('independent players share the 3D city, authoritative clicks, late joins, d
     expect(a.id).not.toBe(b.id); expect(a.room).toBe(b.room);
     expect(Math.hypot(a.player.x - b.player.x, a.player.z - b.player.z)).toBeGreaterThan(2);
     await expect(page.locator('.world-player-name[data-mine="false"]')).toHaveCount(1);
+    for(const [client,state] of [[page,a],[other,b]] as const){
+      const foot=client.locator('.foot-vitals');
+      await expect(foot).toHaveCount(1);
+      await expect(foot).toBeVisible();
+      const box=(await foot.boundingBox())!;
+      expect(box.x+box.width/2).toBeCloseTo(state.screen[0],0);
+      expect(box.y-state.screen[1]).toBeCloseTo(10,0);
+    }
     await expect(page.locator('.terrain-minimap-player')).toHaveCount(2);
     await expect(other.locator('.terrain-minimap-player')).toHaveCount(2);
     const ownDot = page.locator('.terrain-minimap-player[data-mine="true"]');
@@ -114,13 +122,22 @@ test('independent players share the 3D city, authoritative clicks, late joins, d
     const rejoined = await snapshot(other); expect(rejoined.id).not.toBe(b.id); expect(rejoined.room).toBe(a.room);
     await expect.poll(async () => Object.keys((await snapshot(page)).players).length).toBe(2);
     await expect(other.locator('.terrain-minimap-player')).toHaveCount(2);
-    for (const width of [390, 320]) {
+    const minimap = other.locator('.terrain-minimap');
+    const hud = other.locator('.game-header .combat-vitals');
+    const desktopMap = (await minimap.boundingBox())!;
+    const desktopHud = (await hud.boundingBox())!;
+    expect(desktopHud.x + desktopHud.width).toBeLessThanOrEqual(desktopMap.x);
+    for (const width of [560, 390, 320]) {
       await other.setViewportSize({ width, height: 844 });
-      const map = (await other.locator('.terrain-minimap').boundingBox())!;
-      const vitals = (await other.locator('.game-header .combat-vitals').boundingBox())!;
+      const map = (await minimap.boundingBox())!;
+      const vitals = (await hud.boundingBox())!;
       const leave = (await other.locator('#settings-toggle').boundingBox())!;
+      expect([map.width,map.height]).toEqual([desktopMap.width,desktopMap.height]);
+      expect([vitals.width,vitals.height]).toEqual([desktopHud.width,desktopHud.height]);
       expect(map.x + map.width).toBeLessThanOrEqual(width);
-      expect(vitals.x + vitals.width).toBeLessThanOrEqual(map.x);
+      expect(vitals.x + vitals.width).toBeLessThanOrEqual(width);
+      if (width > 540) expect(vitals.x + vitals.width).toBeLessThanOrEqual(map.x);
+      else expect(vitals.y + vitals.height).toBeLessThanOrEqual(map.y);
       expect(leave.y + leave.height).toBeLessThanOrEqual(844);
       expect(leave.y).toBeGreaterThan(780);
       await other.screenshot({ path: 'test-results/terrain-online/minimap-mobile-' + width + '.png' });

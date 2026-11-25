@@ -105,9 +105,15 @@ test('a frontier kill awards EXP once, carries the remainder and grants five sta
   });
   await page.goto('/');await page.locator('#guest').click();await chooseCharacter(page);
   await page.waitForFunction(()=>(window as any).battleQA?.ready);
-  await expect(page.locator('.mp-caption')).toContainText('MP');
+  await expect(page.getByRole('progressbar',{name:'MP',exact:true})).toHaveAttribute('aria-valuetext',/\d+ \/ \d+/);
   await expect(page.locator('.auto-combat')).toBeVisible();
   await expect(page.locator('.auto-combat')).toBeDisabled();
+  await expect(page.locator('.auto-combat kbd')).toHaveText('Ctrl+A');
+  await expect(page.locator('.auto-combat')).toHaveAttribute('aria-keyshortcuts','Control+A');
+  await expect(page.locator('.auto-combat img')).toHaveJSProperty('naturalWidth',168);
+  await page.locator('.hunt-launch').click();
+  await expect(page.locator('.hunt-panel .hunt-range input')).toBeEnabled();
+  await page.locator('.hunt-launch').click();
   await page.evaluate(()=>(window as any).battleQA.walk());
   await page.waitForFunction(()=>(window as any).battleQA.guide);
   await page.keyboard.press('i');await page.keyboard.press('c');
@@ -115,7 +121,7 @@ test('a frontier kill awards EXP once, carries the remainder and grants five sta
   expect(await page.evaluate(()=>(window as any).battleQA.moving)).toBe(true);
   await page.keyboard.press('c');
   await page.locator('[data-item=dagger]').click({button:'right'});
-  await expect(page.locator('.journal-empty')).toBeVisible();
+  await expect(page.locator('#journal-bag .bag-count')).toHaveText('0 / 200');
   await page.evaluate(async()=>{
     const q=(window as any).battleQA;
     await q.trainAgility(6);
@@ -138,6 +144,8 @@ test('a frontier kill awards EXP once, carries the remainder and grants five sta
   expect(Math.max(...centers)-Math.min(...centers)).toBeLessThan(1);
   expect(layers[1]).toBeGreaterThan(Math.max(layers[0],layers[2],layers[3]));
   await expect(page.locator('.exp-caption')).toContainText('87.5%');
+  await expect.poll(()=>page.locator('.vital-exp .vital-fill').evaluate(fill=>
+    fill.getBoundingClientRect().width/fill.parentElement!.getBoundingClientRect().width)).toBeCloseTo(.875,2);
   await expect(page.locator('.arrival-protection')).toBeHidden({timeout:20000});
   const {id,x,y}=await page.waitForFunction(()=>(window as any).battleQA.rabbit()).then(handle=>handle.jsonValue());
   await page.mouse.click(x,y);
@@ -148,12 +156,12 @@ test('a frontier kill awards EXP once, carries the remainder and grants five sta
   await page.screenshot({path:'test-results/combat/encounter.png'});
   await expect(page.locator('.combat-vitals strong')).toHaveText('Lv. 3',{timeout:45000});
   await expect(page.locator('.exp-caption')).toContainText('15 / 240');
-  await expect(page.locator('.hp-caption')).toHaveText('HP 110 / 110');
-  await expect(page.locator('.mp-caption')).toHaveText('MP 34 / 34');
+  await expect(page.locator('.hp-caption')).toHaveText('110 / 110');
+  await expect(page.locator('.mp-caption')).toHaveText('34 / 34');
   await page.waitForFunction(id=>(window as any).battleQA.dissolving(id),id);
   await page.screenshot({path:'test-results/combat/dissolve.png'});
   await expect(page.locator('[data-monster="'+id+'"]')).toBeHidden();
-  await page.keyboard.press('c');await expect(page.locator('[data-points]')).toHaveText('5');
+  await page.keyboard.press('c');await expect(page.locator('[data-points]')).toHaveText('15');
   await page.keyboard.press('c');
   await expect(page.locator('[data-monster]')).toHaveCount(560);
   await openSettings(page);
@@ -172,6 +180,7 @@ test('a frontier kill awards EXP once, carries the remainder and grants five sta
   await launcher.click();
   await action.click();
   await expect(page.locator('.auto-combat')).toHaveAttribute('aria-pressed','true');
+  await expect(action).toHaveCSS('background-color','rgb(40, 83, 73)');
   await expect(page.locator('.monster-name')).toContainText(/Ashfur|แอชเฟอร์/);
   const pin=await page.evaluate(()=>(window as any).battleQA.anchor);
   await expect(page.locator('.combat-damage.outgoing,.combat-damage.critical').first()).toBeVisible({timeout:25000});
@@ -186,7 +195,13 @@ test('a frontier kill awards EXP once, carries the remainder and grants five sta
   await page.keyboard.press('c');
   await launcher.click();await expect(action).toBeDisabled();
   await expect(page.locator('.hunt-panel small')).toContainText(/สวมอาวุธ|Equip a weapon/);
+  await expect(range).toBeEnabled();
+  await range.fill('70');
+  await expect(range).toHaveAttribute('aria-valuetext',/70/);
+  await expect(page.locator('.hunt-panel input[value=wolf]')).toBeEnabled();
   await launcher.click();
+  await page.keyboard.press('Control+a');
+  await expect(action).toHaveAttribute('aria-pressed','false');
   await page.keyboard.press('i');await page.locator('[data-item=dagger]').click({button:'right'});await page.keyboard.press('i');
   await launcher.click();await range.fill('110');
   await launcher.click();
@@ -197,7 +212,7 @@ test('a frontier kill awards EXP once, carries the remainder and grants five sta
   await page.keyboard.press('Control+a');
   await expect(action).toHaveAttribute('aria-pressed','false');
   await page.waitForFunction(()=>!(window as any).battleQA.guide);
-  for(const [agi,rate] of [[99,15],[198,1+197/7]]){
+  for(const [agi,rate] of [[90,1+89/7],[99,15]]){
     await page.evaluate(value=>(window as any).battleQA.trainAgility(value),agi);
     await page.keyboard.press('Control+a');
     await page.waitForFunction(rate=>Math.abs((window as any).battleQA.attackRate-rate)<.001,rate,{timeout:30000});
@@ -210,6 +225,6 @@ test('a frontier kill awards EXP once, carries the remainder and grants five sta
   await page.locator('[data-action=level]').click();
   await page.locator('[data-action=reset-level]').click();
   await expect(page.locator('.combat-vitals strong')).toHaveText('Lv. 1');
-  await expect(page.locator('[data-points]')).toHaveText('0');
+  await expect(page.locator('[data-points]')).toHaveText('10');
   expect(errors).toEqual([]);
 });

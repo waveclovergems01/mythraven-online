@@ -1,4 +1,5 @@
 import {test,expect} from '@playwright/test';
+import {selectAppearance} from './helpers/character-selection';
 
 test('preview shares two hairstyles across the three rigs and equips class weapons',async({page})=>{
   test.setTimeout(120000);
@@ -36,9 +37,14 @@ test('preview shares two hairstyles across the three rigs and equips class weapo
   await page.mouse.up();
   expect(await yaw()).toBeCloseTo(0);
   for(const [job,weapon,attack] of [['novice','dagger','n_dagger_attack1'],['warrior','longsword','n_sword_attack1'],['archer','bow','n_bow_attack']]){
+    if(job!=='novice'){
+      await page.locator(`input[name="character-class"][value="${job}"]`).check();
+      await expect(page.locator('input[name="character-hair"]:checked')).toHaveValue('2');
+      await expect(preview).toHaveAttribute('data-character-id',job+'-male-02');
+    }
     for(const style of [1,2]){
       const id=job+'-male-0'+style;
-      await page.locator('input[value="'+id+'"]').check();
+      await selectAppearance(page,id);
       await expect(page.locator('#character-preview')).toHaveAttribute('data-character-id',id);
       await page.locator('#preview-weapon').selectOption(weapon);
       await expect(page.locator('#preview-motion')).toBeEnabled();

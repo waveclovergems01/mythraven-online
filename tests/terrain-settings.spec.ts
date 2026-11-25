@@ -2,6 +2,78 @@ import { chooseCharacter } from './helpers/character-selection';
 import { test, expect } from '@playwright/test';
 import { openSettings, closeSettings } from './helpers/game-settings';
 
+test('UI scale resizes controls live, fits a narrow screen, and survives reload',async({page})=>{
+  test.setTimeout(90000);
+  await page.setViewportSize({width:1440,height:900});
+  await page.goto('/'); await page.locator('#guest').click(); await chooseCharacter(page);
+  const footVitals=page.locator('#game .foot-vitals');
+  await expect(footVitals).toBeVisible();
+  await expect(footVitals.locator('i').first()).toHaveCSS('background-image',/foot-hp-green\.webp/);
+  const sampled=await page.evaluate(async()=>{
+    const module='/src/terrain/player-vitals.ts';
+    const bar=(await import(module)).createFootVitals();
+    return [31,30,29].map(hp=>{
+      bar.update(hp,100,12,30);
+      const [hpFill,mpFill]=Array.from(bar.element.children) as HTMLElement[];
+      return [bar.element.hasAttribute('data-low-hp'),hpFill.style.width,mpFill.style.width];
+    });
+  });
+  expect(sampled).toEqual([[false,'31%','40%'],[false,'30%','40%'],[true,'29%','40%']]);
+  const ui=page.locator('.combat-vitals, .terrain-minimap, #settings-toggle, .hunt-controls');
+  const widths=()=>ui.evaluateAll(nodes=>nodes.map(node=>node.getBoundingClientRect().width));
+  const baseline=await widths();
+  const world=page.locator('#game');
+  const viewport=await world.boundingBox();
+  await openSettings(page);
+  const scale=page.locator('#ui-scale');
+  const footVitalsToggle=page.locator('#show-foot-vitals');
+  await expect(footVitalsToggle).toBeChecked();
+  await footVitalsToggle.uncheck();
+  await expect(footVitals).toBeHidden();
+  const dialog=page.locator('#settings-dialog');
+  const dialogWidth=(await dialog.boundingBox())!.width;
+  await expect(scale).toHaveValue('100');
+  for(const [key,percent] of [['Home',85],['End',125]] as const){
+    await scale.press(key);
+    await expect(scale).toHaveValue(String(percent));
+    (await widths()).forEach((width,index)=>expect(Math.abs(width-baseline[index]*percent/100)).toBeLessThan(2));
+    expect(Math.abs((await dialog.boundingBox())!.width-dialogWidth*percent/100)).toBeLessThan(2);
+  }
+  expect(await world.boundingBox()).toEqual(viewport);
+  await closeSettings(page);
+  await page.keyboard.press('i');
+  const bag=page.locator('#journal-bag');
+  await expect(bag).toBeVisible();
+  const before=(await bag.boundingBox())!;
+  await page.mouse.move(before.x+140,before.y+16);
+  await page.mouse.down();
+  await page.mouse.move(before.x+40,before.y+56,{steps:4});
+  await page.mouse.up();
+  const moved=(await bag.boundingBox())!;
+  expect(moved.x).toBeCloseTo(before.x-100,0);
+  expect(moved.y).toBeCloseTo(before.y+40,0);
+  await page.reload(); await chooseCharacter(page);
+  await page.setViewportSize({width:320,height:800});
+  await openSettings(page);
+  await expect(footVitalsToggle).not.toBeChecked();
+  await expect(footVitals).toBeHidden();
+  await footVitalsToggle.check();
+  await expect(footVitals).toBeVisible();
+  await expect(scale).toHaveValue('125');
+  await expect(page.locator('#ui-scale-fit')).toBeVisible();
+  const hud=(await page.locator('.combat-vitals').boundingBox())!;
+  const map=(await page.locator('.terrain-minimap').boundingBox())!;
+  expect(hud.x+hud.width).toBeLessThanOrEqual(320);
+  expect(hud.y+hud.height).toBeLessThan(map.y);
+  const mobileDialog=(await dialog.boundingBox())!;
+  expect(mobileDialog.x).toBeGreaterThanOrEqual(15);
+  expect(mobileDialog.x+mobileDialog.width).toBeLessThanOrEqual(305);
+  await page.screenshot({path:'test-results/terrain-settings/ui-scale-mobile.png'});
+  await page.locator('#reset-ui-scale').click();
+  await expect(scale).toHaveValue('100');
+  await expect(page.locator('#ui-scale-fit')).toBeHidden();
+});
+
 test('gear settings isolate input, start at level five and keep minimap badges inside the map', async ({ page }) => {
   const errors: string[] = []; page.on('pageerror', error => errors.push(error.message));
   await page.route('**/src/terrain/TerrainWorld.ts*', async route => {
@@ -16,7 +88,47 @@ test('gear settings isolate input, start at level five and keep minimap badges i
   const state = () => page.evaluate(() => (window as any).settingsWorld.inspect());
   await expect.poll(async () => (await state()).players[(await state()).id]?.speedLevel).toBe(5);
   await expect(page.locator('.terrain-minimap-legend')).toHaveCount(0);
-  await expect(page.locator('.terrain-minimap-compass text')).toHaveText(['N', 'S', 'E', 'W']);
+  await expect(page.locator('.terrain-minimap-compass')).toHaveAttribute('src','/assets/ui/minimap/compass.webp');
+  await page.locator('#settings-toggle').click();
+  const menu=page.locator('#settings-menu');
+  const buttons=menu.getByRole('button');
+  await expect(buttons).toHaveCount(3);
+  const tiles=await buttons.evaluateAll(nodes=>nodes.map(node=>{
+    const {x,y,width,height}=node.getBoundingClientRect();
+    const img=node.querySelector('img')!;
+    return {x,y,width,height,loaded:img.complete&&img.naturalWidth>0};
+  }));
+  expect(tiles.every(tile=>tile.loaded&&tile.y===tiles[0].y&&tile.width===tile.height)).toBe(true);
+  expect(tiles[2].x).toBeGreaterThan(tiles[1].x);
+  await page.mouse.move(1000,450);
+  const bag=menu.locator('[data-toggle=bag]');
+  const shortcuts=menu.locator('.menu-shortcut');
+  await expect(shortcuts).toHaveText(['I','C']);
+  await expect(shortcuts.first()).toBeVisible();
+  await expect(shortcuts.last()).toBeVisible();
+  await expect(bag.locator('.menu-tooltip')).toBeHidden();
+  await bag.hover();
+  await expect(bag.locator('.menu-tooltip')).toBeVisible();
+  await page.screenshot({path:'test-results/terrain-settings/icon-menu.png'});
+  await bag.click();
+  const bagPanel=page.locator('#journal-bag');
+  const sheetPanel=page.locator('#journal-sheet');
+  await expect(bagPanel).toBeVisible();
+  await expect(menu).toBeVisible();
+  await menu.locator('[data-toggle=sheet]').click();
+  await expect(sheetPanel).toBeVisible();
+  await expect(bagPanel).toBeVisible();
+  await sheetPanel.getByRole('heading',{level:2}).click();
+  await expect(menu).toBeVisible();
+  await page.mouse.click(700,500);
+  await expect(menu).toBeHidden();
+  await expect(bagPanel).toBeVisible();
+  await expect(sheetPanel).toBeVisible();
+  await sheetPanel.locator('.journal-close').click();
+  await bagPanel.locator('.journal-close').click();
+  await page.locator('#settings-toggle').click();
+  await page.keyboard.press('Escape');
+  await expect(menu).toBeHidden();
   await page.screenshot({ path: 'test-results/terrain-settings/hud.png' });
   await page.mouse.click(1000, 450);
   await expect.poll(async () => (await state()).moving).toBe(true);
@@ -31,11 +143,14 @@ test('gear settings isolate input, start at level five and keep minimap badges i
   expect((await state()).player).toEqual(stopped);
   await page.screenshot({ path: 'test-results/terrain-settings/panel-desktop.png' });
   await page.keyboard.press('Escape'); await expect(dialog).toBeHidden();
+  await expect(menu).toBeVisible();
   await expect(page.locator('#settings-toggle')).toBeFocused();
   for (const width of [390, 320]) {
     await page.setViewportSize({ width, height: 844 });
-    const map = (await page.locator('.terrain-minimap > svg').boundingBox())!;
-    for (const selector of ['.terrain-minimap-city', '.terrain-minimap-compass']) {
+    const map = (await page.locator('.terrain-minimap-map > svg').boundingBox())!;
+    const nameplate=(await page.locator('.terrain-minimap-city').boundingBox())!;
+    expect(nameplate.y+nameplate.height).toBeLessThanOrEqual(map.y);
+    for (const selector of ['.terrain-minimap-compass']) {
       const badge = (await page.locator(selector).boundingBox())!;
       expect(badge.x).toBeGreaterThanOrEqual(map.x); expect(badge.y).toBeGreaterThanOrEqual(map.y);
       expect(badge.x + badge.width).toBeLessThanOrEqual(map.x + map.width);

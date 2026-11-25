@@ -1,5 +1,6 @@
 /* The map owns the viewport; HUD sits above it without reducing canvas size. */
 .game-page {
+  --ui-scale: 1;
   position: fixed;
   inset: 0;
   width: 100%;
@@ -8,6 +9,10 @@
   margin: 0;
   padding: 0;
   overflow: hidden;
+}
+.game-page :is(.combat-vitals,.combat-controls,.terrain-minimap,.settings-gear,.settings-menu,.settings-dialog,
+  .hunt-controls,.hunt-panel,.adventure-journal,.terrain-status,.terrain-move-hint,.terrain-asset-status,.scene-loading-bottom) {
+  zoom: var(--ui-scale);
 }
 .game-page #game {
   position: absolute;

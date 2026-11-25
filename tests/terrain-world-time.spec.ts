@@ -3,15 +3,14 @@ import {chooseCharacter} from './helpers/character-selection';
 import {openSettings,closeSettings} from './helpers/game-settings';
 import {worldHour} from '../shared/world-time.mjs';
 
-test('server world time agrees across tabs, survives local clock changes and can preview lighting explicitly',async({page,context})=>{
+test('server world time agrees across tabs, survives local clock changes and always uses a shared light bearing',async({page,context})=>{
   test.setTimeout(120000);
   const errors:string[]=[];
   await context.route('**/src/terrain/TerrainWorld.ts*',async route=>{
     const response=await route.fetch();
     const body=(await response.text()).replace('renderer.render(scene, camera);',`
       window.timeQA={ready:revealed,clockReady:network.clockReady,server:network.serverNow,
-        light:daylight.inspect(),automatic:environmentSettings.automatic,
-        frameHour:h=>{daylight.configure(h,180);daylight.update(camera,focus);buildings.update(camera,focus,daylight.paintedBrightness,0);renderer.render(scene,camera);},
+        light:daylight.inspect(),
         resume:()=>document.dispatchEvent(new Event('visibilitychange'))};
       renderer.render(scene, camera);`);
     await route.fulfill({response,body});
@@ -23,10 +22,9 @@ test('server world time agrees across tabs, survives local clock changes and can
     await p.goto('/');
     const guest=p.locator('#guest');if(await guest.isVisible())await guest.click();
     await chooseCharacter(p);await p.waitForFunction(()=>(window as any).timeQA?.ready);
-    await expect(p.locator('#world-time-auto')).toBeChecked();
-    await expect(p.locator('#world-time')).toBeDisabled();
+    await expect(p.locator('#world-time-auto, #world-time, #sun-direction, .time-presets')).toHaveCount(0);
   }
-  await openSettings(page);await expect(page.locator('#world-time-auto')).toBeVisible();
+  await openSettings(page);await expect(page.locator('#reset-camera')).toBeVisible();
   await page.screenshot({path:'test-results/world-time/settings.png'});await closeSettings(page);
   const info=()=>page.evaluate(()=>(window as any).timeQA);
   const a=await info(),b=await second.evaluate(()=>(window as any).timeQA);
@@ -37,17 +35,9 @@ test('server world time agrees across tabs, survives local clock changes and can
   await page.evaluate(()=>{const original=Date.now;Date.now=()=>original()+6*3600000;(window as any).timeQA.resume();});
   await page.waitForTimeout(300);
   expect(Math.abs((await info()).server-Date.now())).toBeLessThan(2500);
-  // Local preview remains opt-in; changing it must not affect the other client.
-  await page.locator('#world-time-auto').evaluate((input:HTMLInputElement)=>{input.checked=false;input.dispatchEvent(new Event('change'));});
-  await page.locator('#world-time').evaluate((input:HTMLInputElement)=>{input.value='22';input.dispatchEvent(new Event('input'));});
-  await expect.poll(async()=>(await info()).light.hour).toBe(22);
-  expect((await second.evaluate(()=>(window as any).timeQA)).automatic).toBe(true);
-  for(const h of [7,12,17,22]){
-    await page.locator('#world-time').evaluate((input:HTMLInputElement,h)=>{input.value=String(h);input.dispatchEvent(new Event('input'));},h);
-    await page.screenshot({path:'test-results/world-time/hour-'+h+'.png'});
-  }
-  await page.locator('#world-time-auto').evaluate((input:HTMLInputElement)=>{input.checked=true;input.dispatchEvent(new Event('change'));});
-  await expect.poll(async()=>{const q=await info();return Math.abs(q.light.hour-worldHour(q.server));}).toBeLessThan(.001);
+  expect((await info()).light.bearing).toBe(b.light.bearing);
+  const remaining = await info();
+  expect(remaining.light.hour).toBeCloseTo(worldHour(remaining.server), 2);
   expect(errors).toEqual([]);await second.close();
 });
 

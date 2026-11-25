@@ -209,7 +209,7 @@ test('server auto hunting travels, kills and retargets without client frames or 
     const point=route.spawn,nav=room.movers.get(client.sessionId);
     Object.assign(nav.position,point);room.sync(client.sessionId);
     handlers.get('weapon')(client,'dagger');
-    room.setBuild(client.sessionId,{level:100,stats:{STR:101,AGI:99,DEX:1,INT:1,VIT:100,LUK:1}});
+    room.setBuild(client.sessionId,{level:100,stats:{STR:99,AGI:99,DEX:1,INT:1,VIT:99,LUK:1}});
     handlers.get('auto-hunt')(client,{enabled:true,radius:null,kinds:[kind]});
   };
   place(a,'rabbit');place(b,'wolf');
@@ -241,7 +241,7 @@ test('server hunt preserves a pinned radius and rejects invalid settings or unar
   assert.equal(room.state.players.get('a').autoHunt,false);
   const nav=room.movers.get('a'),f=room.fighters.get('a');
   Object.assign(nav.position,room.patrols.get('rabbit-0').route.spawn);room.sync('a');
-  room.setBuild('a',{level:100,stats:{STR:101,AGI:99,DEX:1,INT:1,VIT:100,LUK:1}});
+  room.setBuild('a',{level:100,stats:{STR:99,AGI:99,DEX:1,INT:1,VIT:99,LUK:1}});
   handlers.get('auto-hunt')(a,{enabled:true,radius:10,kinds:['rabbit']});
   const anchor={...f.hunt.anchor};
   for(let i=0;i<200;i++){
@@ -257,7 +257,9 @@ for(const [agi,hits] of [[1,5],[99,75],[198,146],[1021,733]])test(`AGI ${agi} la
   const time=2000; // Already in range and facing a resting target.
   t.mock.method(Math,'random',()=>.07);
   handlers.get('weapon')(a,'dagger');
-  room.setBuild('a',{level:205,stats:{...room.fighters.get('a').stats,AGI:agi}});
+  const build={level:205,stats:{...room.fighters.get('a').stats,AGI:agi}};
+  if(agi<=99)room.setBuild('a',build);
+  else room.fighters.get('a').stats=build.stats; // Stress future effective bonuses above the allocation cap.
   handlers.get('fight')(a,id);
   mob.hp=10000;
   Object.assign(room.movers.get('a').position,route.spawn);room.sync('a');
@@ -345,11 +347,11 @@ for(const release of ['stop','death','disconnect'])test(`a wounded abandoned mon
   if(release==='death'){room.state.players.get('a').hp=0;room.fighters.get('a').reviveAt=Infinity;}
   if(release==='disconnect')room.onLeave(a);
   assert.equal(room.canAttack('b',key,now+.6),true);
-  // A finishing blow must receive credit for 94 HP, not its nominal 1000 damage.
-  room.setBuild('b',{level:101,stats:{STR:498,AGI:1,DEX:1,INT:1,VIT:1,LUK:1}});
+  // A finishing blow receives credit for only the remaining 94 HP.
+  room.setBuild('b',{level:101,stats:{STR:99,AGI:1,DEX:1,INT:1,VIT:1,LUK:1}});
   handlers.get('fight')(b,key);room.combatTick(now+.6);room.combatTick(now+.91);
   assert.equal(health.hp,0);assert.equal(mob.damage.get('a'),6);assert.equal(mob.damage.get('b'),94);
-  assert.equal(room.events.at(-1).data.damage,1000);
+  assert.equal(room.events.at(-1).data.damage,202);
   assert.equal(b.messages.find(event=>event.message==='combat-reward').data.amount,33);
   if(release!=='disconnect')assert.equal(a.messages.find(event=>event.message==='combat-reward').data.amount,2);
 });
@@ -780,12 +782,51 @@ test('critical chance starts at 5%, reaches 60% at LUK 99 and caps at 100%',asyn
 test('100% critical chance produces a critical bow impact even on the highest random roll',t=>{
   const {room,health}=bowFixture(t);health.hp=1000;
   t.mock.method(Math,'random',()=>.999999);
-  room.setBuild('archer',{level:35,stats:{STR:1,AGI:1,DEX:1,INT:1,VIT:1,LUK:171}});
+  // Mock an effective build with a future critical bonus beyond allocatable LUK.
+  Object.assign(room.fighters.get('archer').stats,{DEX:99,LUK:171});
   room.combatTick(1000);room.combatTick(1000.25);
   const shot=room.arrows[0];room.combatTick(shot.impactAt);
   const hit=room.events.filter(e=>e.name==='combat-hit').at(-1).data;
   assert.equal(hit.critical,true);assert.equal(hit.weapon,'bow');
   assert.equal(health.hp,1000-hit.damage);
+});
+
+test('level one accepts ten starting points and rejects overspending',()=>{
+  const {room}=createRoom();
+  const fighter=room.fighters.get('a');
+  const stats={...fighter.stats,DEX:11};
+  room.setBuild('a',{level:1,stats});
+  assert.equal(fighter.stats.DEX,11);
+  room.setBuild('a',{level:1,stats:{...stats,DEX:12}});
+  assert.equal(fighter.stats.DEX,11);
+});
+
+test('HIT and FLEE start at 100 and hit probability depends on both ratings',async()=>{
+  const {deriveCombatStats,chanceToHit}=await import('../shared/battle-stats.mjs');
+  const stats={STR:1,AGI:1,DEX:1,INT:1,VIT:1,LUK:1};
+  const base=deriveCombatStats(1,stats);
+  assert.equal(base.hit,100);
+  assert.equal(base.flee,100);
+  const raised=deriveCombatStats(1,{...stats,DEX:2,AGI:2});
+  assert.equal(raised.hit,105);
+  assert.equal(raised.flee,101);
+  assert.equal(chanceToHit(150,100),1);
+  assert.ok(chanceToHit(150,160)<1);
+});
+
+test('bows can miss against a monster, and allocation caps each core stat at 99',t=>{
+  const {room,health}=bowFixture(t);
+  t.mock.method(Math,'random',()=>.99);
+  const fighter=room.fighters.get('archer');
+  room.setBuild('archer',{level:40,stats:{...fighter.stats,DEX:100}});
+  assert.equal(fighter.stats.DEX,1);
+  room.combatTick(1000);room.combatTick(1000.25);
+  const shot=room.arrows[0],before=health.hp;
+  room.combatTick(shot.impactAt);
+  assert.equal(health.hp,before);
+  assert.equal(room.events.find(e=>e.name==='combat-hit' && e.data.shotId===shot.id).data.missed,true);
+  room.setBuild('archer',{level:40,stats:{...fighter.stats,DEX:99}});
+  assert.equal(fighter.stats.DEX,99);
 });
 
 test('level gains fully restore HP and MP, while repeated builds and stat allocation preserve missing resources',()=>{

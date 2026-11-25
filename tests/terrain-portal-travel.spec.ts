@@ -21,7 +21,7 @@ test('minimap travel walks to the portal, can cancel, and warps both ways',async
   await page.goto('/');await page.locator('#guest').click();await chooseCharacter(page);
   const button=page.locator('.terrain-portal-travel');
   await expect(button).toBeEnabled({timeout:60000});
-  const map=await page.locator('.terrain-minimap > svg').boundingBox();
+  const map=await page.locator('.terrain-minimap-map > svg').boundingBox();
   const bounds=await button.boundingBox();
   expect(bounds!.y).toBeGreaterThanOrEqual(map!.y+map!.height);
   const start=await page.evaluate(()=>(window as any).portalQA.read().position);
@@ -53,7 +53,7 @@ test('minimap travel walks to the portal, can cancel, and warps both ways',async
   await expect(button).toHaveAttribute('aria-pressed','false');
   await expect(button).toBeEnabled();
   await page.setViewportSize({width:390,height:844});
-  const mobileButton=await button.boundingBox(),mobileMap=await page.locator('.terrain-minimap > svg').boundingBox();
+  const mobileButton=await button.boundingBox(),mobileMap=await page.locator('.terrain-minimap-map > svg').boundingBox();
   expect(mobileButton!.x).toBeGreaterThanOrEqual(0);
   expect(mobileButton!.x+mobileButton!.width).toBeLessThanOrEqual(390);
   expect(mobileButton!.y).toBeGreaterThanOrEqual(mobileMap!.y+mobileMap!.height);

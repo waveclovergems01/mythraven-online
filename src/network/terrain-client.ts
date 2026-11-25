@@ -7,7 +7,7 @@ import type {Area} from '../../shared/west-march.mjs';
 import type {Profile} from '../terrain/character-profile';
 type Build=Pick<Profile,'level'|'stats'>;
 export interface BowShot {id:number;player:string;mob:string;releaseAt:number;impactAt:number;from:{x:number;y:number;z:number}}
-export interface CombatHit {shotId?:number;mob:string;player:string;to:'monster'|'player';weapon?:string;damage:number;dodged?:boolean;critical:boolean;lethal:boolean}
+export interface CombatHit {shotId?:number;mob:string;player:string;to:'monster'|'player';weapon?:string;damage:number;dodged?:boolean;missed?:boolean;critical:boolean;lethal:boolean}
 export interface MonsterState {hp:number;engaged:boolean;x:number;z:number;heading:number;moving:boolean}
 export interface TerrainPlayer { name: string; x: number; y: number; z: number; heading: number;
   moving: boolean; turning: boolean; path: string; pathIndex: number; targetX: number; targetZ: number; speedLevel: number; inputSeq: number; hairStyle: number; hairColor?: string; characterId: string; weapon:string; sceneReady?:boolean;protectedUntil?:number;autoHunt?:boolean;huntTarget?:string;hp?:number;maxHp?:number;mp?:number;maxMp?:number;swing?:number;hitTarget?:string;attackInterval?:number;swingStartedAt?:number }

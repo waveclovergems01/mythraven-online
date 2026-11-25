@@ -103,6 +103,7 @@ export function createDaylight(scene: THREE.Scene) {
     },
     // Imported painted characters use emission: dim it as well as ordinary lights.
     get paintedBrightness() { return THREE.MathUtils.lerp(.28, 1, day); },
+    get lanternStrength() { return 1 - THREE.MathUtils.smoothstep(direction.y, -.21, -.015); },
     inspect: () => ({ hour, bearing, daylight: day, shadowExtent:SHADOW_CAMERA_EXTENT, sunDirection: direction.toArray(), moonDirection: moonDirection.toArray() }),
     dispose() { scene.remove(ambient, sun, sun.target, sky); sky.geometry.dispose(); material.dispose(); sun.shadow.dispose(); scene.fog = null; },
   };

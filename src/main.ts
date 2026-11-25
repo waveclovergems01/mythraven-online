@@ -19,11 +19,13 @@ let game: { destroy: (removeCanvas: boolean) => void } | null = null;
 let viewVersion = 0;
 let authenticating = false;
 let stopFittingAuth: (() => void) | undefined;
+let stopGameSettings: (() => void) | undefined;
 let selection: { destroy(): void } | undefined;
 setLocale(locale());
 const brand = '<img class="brand-logo" src="/assets/ui/mythraven-logo.webp" width="640" height="320" alt="Mythraven Online" fetchpriority="high">';
 
 function renderAuth(): void {
+  stopGameSettings?.(); stopGameSettings=undefined;
   music.setPlaylist();
   selection?.destroy(); selection = undefined;
   stopFittingAuth?.();
@@ -138,6 +140,7 @@ async function afterAuthentication(session: Session): Promise<void> {
   await showCharacterSelection(session);
 }
 async function showCharacterSelection(session: Session, message?: string): Promise<void> {
+  stopGameSettings?.(); stopGameSettings=undefined;
   stopFittingAuth?.(); stopFittingAuth=undefined;
   selection?.destroy(); selection=undefined;
   game?.destroy(true); game=null;
@@ -145,29 +148,22 @@ async function showCharacterSelection(session: Session, message?: string): Promi
   const {mountCharacterSelection}=await import('./character-selection');
   if(version!==viewVersion) return;
   music.setPlaylist('town');
-  const hairColorKey = 'mythraven.hair-color.' + session.id;
-  let savedHairColor = '';
-  try {
-    savedHairColor = localStorage.getItem(hairColorKey) ?? '';
-  } catch { /* Storage is optional. */ }
   selection=mountCharacterSelection(app,session.username,locale()==='th',async(character,assets,hairColor)=>{
     const enteringVersion=viewVersion+1;
-    try {
-      localStorage.setItem(hairColorKey, hairColor);
-    } catch { /* Keep the color for this session. */ }
     try { await showGame(session,character,assets,'city',false,hairColor); }
     catch {
       assets.dispose();
       if(viewVersion!==enteringVersion) return;
       await showCharacterSelection(session,locale()==='th'?'เข้าเมืองไม่สำเร็จ กรุณาลองอีกครั้ง':'Could not enter the city. Please try again.');
     }
-  },()=>signOut(session),savedHairColor);
+  },()=>signOut(session));
   if(message) app.querySelector('#character-error')!.textContent=message;
 }
 async function showGame(session: Session, character: CharacterDefinition, assets: PreparedCharacters | undefined,
   area: import('../shared/west-march.mjs').Area = 'city', fromWest = false, hairColor = ''): Promise<void> {
   stopFittingAuth?.();
   stopFittingAuth = undefined;
+  stopGameSettings?.();
   const version=++viewVersion;
   music.setPlaylist(area === 'west-march' ? 'battle' : 'town');
   app.innerHTML=`<main class="game-page"><header class="game-header"><div><div class="mini-brand">MYTHRAVEN <span>ONLINE</span></div><p>${t('city')} · <span id="player-name"></span></p></div></header><div id="game" aria-label="${t('city')}"><p class="loading">${t('loading')}</p></div><button class="leave" id="logout">${t('logout')}</button><p id="game-error" class="error" role="alert"></p></main>`;
@@ -178,7 +174,7 @@ async function showGame(session: Session, character: CharacterDefinition, assets
     app.querySelector('#game')!.setAttribute('aria-label',name);
     app.querySelector('.loading')!.textContent=locale()==='th'?'กำลังเข้าสู่ทุ่งชายแดน…':'Entering West March…';
   }
-  mountGameSettings(app.querySelector<HTMLElement>('.game-page')!,locale()==='th',music);
+  stopGameSettings=mountGameSettings(app.querySelector<HTMLElement>('.game-page')!,locale()==='th');
   app.querySelector('#logout')!.addEventListener('click',async()=>{
     const button=app.querySelector<HTMLButtonElement>('#logout')!; button.disabled=true;
     try {

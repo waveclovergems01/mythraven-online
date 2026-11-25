@@ -1,11 +1,12 @@
 import * as THREE from 'three';
+import type {SurfaceShader} from './lantern-spill';
 export const VIEW_DISTANCE=250;
 export const FOG_START=150;
 export const SHADOW_FULL_DISTANCE=FOG_START;
 export const SHADOW_FADE_END=VIEW_DISTANCE;
 export const SHADOW_CAMERA_EXTENT=280;
 /** Player-centred fog agrees with the distance culler regardless of camera orbit/zoom. */
-export function createViewDistance(scene:THREE.Scene){
+export function createViewDistance(scene:THREE.Scene,installSpill?: (shader:SurfaceShader)=>void){
   const focus={value:new THREE.Vector2()},seen=new WeakSet<THREE.Material>();
   const entries:{object:THREE.Object3D;box:THREE.Box3}[]=[];
   const box=new THREE.Box3();
@@ -16,25 +17,27 @@ export function createViewDistance(scene:THREE.Scene){
       if(seen.has(material) || !('fog' in material) || !material.fog)continue;
       seen.add(material);
       const compile=material.onBeforeCompile,key=material.customProgramCacheKey();
-      material.customProgramCacheKey=()=>key+'-player-distance-shadow-v2';
+      const spill=material instanceof THREE.MeshStandardMaterial && installSpill;
+      material.customProgramCacheKey=()=>key+'-player-distance-shadow-v3'+(spill?'-lantern-spill':'');
       material.onBeforeCompile=(shader:Parameters<THREE.Material['onBeforeCompile']>[0],renderer:THREE.WebGLRenderer)=>{
         compile.call(material,shader,renderer);shader.uniforms.distanceFocus=focus;
-        shader.vertexShader='varying vec2 distanceWorld;\n'+shader.vertexShader;
+        shader.vertexShader='varying vec3 distanceWorld;\n'+shader.vertexShader;
         shader.vertexShader=shader.vertexShader.replace('#include <project_vertex>',`#include <project_vertex>
           vec4 distancePosition=vec4(transformed,1.0);
           #ifdef USE_INSTANCING
           distancePosition=instanceMatrix*distancePosition;
           #endif
-          distanceWorld=(modelMatrix*distancePosition).xz;`);
-        shader.fragmentShader='varying vec2 distanceWorld;uniform vec2 distanceFocus;\n'+shader.fragmentShader;
-        const shadowStrength='directionalLightShadow.shadowIntensity * (1.0-smoothstep('+SHADOW_FULL_DISTANCE.toFixed(1)+','+SHADOW_FADE_END.toFixed(1)+',length(distanceWorld-distanceFocus)))';
+          distanceWorld=(modelMatrix*distancePosition).xyz;`);
+        shader.fragmentShader='varying vec3 distanceWorld;uniform vec2 distanceFocus;\n'+shader.fragmentShader;
+        const shadowStrength='directionalLightShadow.shadowIntensity * (1.0-smoothstep('+SHADOW_FULL_DISTANCE.toFixed(1)+','+SHADOW_FADE_END.toFixed(1)+',length(distanceWorld.xz-distanceFocus)))';
         shader.fragmentShader=shader.fragmentShader.replace('#include <lights_fragment_begin>',
           THREE.ShaderChunk.lights_fragment_begin.replace('directionalLightShadow.shadowIntensity,',shadowStrength+','));
         shader.fragmentShader=shader.fragmentShader.replace('#include <fog_fragment>',`
           #ifdef USE_FOG
-          float distanceFog=smoothstep(${FOG_START.toFixed(1)},${VIEW_DISTANCE.toFixed(1)},length(distanceWorld-distanceFocus));
+          float distanceFog=smoothstep(${FOG_START.toFixed(1)},${VIEW_DISTANCE.toFixed(1)},length(distanceWorld.xz-distanceFocus));
           gl_FragColor.rgb=mix(gl_FragColor.rgb,fogColor,distanceFog);
           #endif`);
+        if(spill)spill(shader);
       };
       material.needsUpdate=true;
     }

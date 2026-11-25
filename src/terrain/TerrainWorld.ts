@@ -5,6 +5,7 @@ import {createCombatFeedback} from './combat-feedback';
 import {createRouteLights} from './route-lights';
 import {attackInterval,swingDuration,weaponRange} from '../../shared/battle-stats.mjs';
 import {createCombatImpact} from './combat-impact';
+import {createLevelUpAura} from './level-up-aura';
 import {ELRA_ID,loadElra} from './elra';
 import {buildWestMarch, mapPortal, PORTAL_RADIUS, type Area} from '../../shared/west-march.mjs';
 import {loadFrontierWildlife} from './frontier-wildlife';
@@ -13,6 +14,8 @@ import monsters from '../../shared/monster-master.json';
 import {openCharacterProfile,combatStats,expRequired,type Job,type Weapon} from './character-profile';
 import {mountCharacterPanels} from './character-panels';
 import {createEquipmentPortrait} from './equipment-portrait';
+import {createStatusPortrait} from './status-portrait';
+import {createFootVitals,createPlayerVitals} from './player-vitals';
 import {weaponsFor} from './skinned-player';
 import * as THREE from 'three';
 import { locale } from '../i18n';
@@ -33,7 +36,6 @@ import { loadCityFortifications } from './city-fortifications';
 import {loadCityBuildings} from './city-buildings';
 import { createOrbitCamera } from './orbit-camera';
 import { createDaylight } from './daylight';
-import { mountEnvironmentSettings } from './environment-settings';
 import { MAX_SPEED_LEVEL, DEFAULT_SPEED_LEVEL, speedMultiplier, turnTowards } from '../../shared/terrain-movement.mjs';
 import './terrain.css';
 import type {LoadStep} from '../scene-loading';
@@ -104,7 +106,7 @@ export async function mountTerrainWorld(host: HTMLElement, displayName = '', cha
   sun.shadow.mapSize.setScalar(Math.min(4096,renderer.capabilities.maxTextureSize));
   scene.add(groves.group);
   scene.add(fortifications.group);
-  scene.add(buildings.group);
+  scene.add(buildings.group, buildings.lanternGroup);
   // Beside the southeast provisions stall, facing west towards the plaza.
   if (elra) {
   elra.group.position.set(29,terrainHeight(data,29,20),20);
@@ -138,7 +140,7 @@ export async function mountTerrainWorld(host: HTMLElement, displayName = '', cha
   const surroundings=createWorldSurroundings(data,tiles,(ground as THREE.Mesh).geometry);scene.add(surroundings);
   const water = createWater(data); scene.add(water.mesh);
   const bankGrass = createBankGrass(data); scene.add(bankGrass.group);
-  const viewDistance=createViewDistance(scene);
+  const viewDistance=createViewDistance(scene,buildings.installLanternSpill);
   for(const root of [terrain,surroundings,groves.group,fortifications.group,buildings.group,bankGrass.group,water.mesh])viewDistance.addStatic(root);
   if(elra)viewDistance.materials(elra.group);
   const marker = new THREE.Mesh(new THREE.RingGeometry(.42, .56, 32),
@@ -205,7 +207,9 @@ export async function mountTerrainWorld(host: HTMLElement, displayName = '', cha
   const speedHeading = document.createElement('span'); speedHeading.className = 'terrain-speed-heading';
   speedHeading.append(speedText, speedValue); speedControl.append(speedHeading, speedSlider);
   const settingsControls = host.parentElement!.querySelector('#settings-controls')!;
-  settingsControls.append(speedControl);
+  settingsControls.prepend(speedControl);
+  const resetCamera = settingsControls.querySelector<HTMLButtonElement>('#reset-camera')!;
+  resetCamera.onclick = () => { orbit.reset(); minimapUpdatedAt = -Infinity; };
   const wheelZoom = (event:WheelEvent) => {
     event.preventDefault();
     const unit=event.deltaMode===1 ? 16 : event.deltaMode===2 ? canvas.clientHeight : 1;
@@ -214,8 +218,6 @@ export async function mountTerrainWorld(host: HTMLElement, displayName = '', cha
     minimapUpdatedAt = -Infinity;
   };
   canvas.addEventListener('wheel',wheelZoom,{passive:false});
-  const environmentSettings = mountEnvironmentSettings(settingsControls, thai,
-    (hour, bearing) => daylight.configure(hour, bearing), () => { orbit.reset(); minimapUpdatedAt = -Infinity; });
   const showSpeed = () => {
     const level = Number(speedSlider.value), multiplier = speedMultiplier(level).toFixed(2).replace(/\.00$/, '');
     speedValue.textContent = `${level}/10 · ${multiplier}×`;
@@ -232,6 +234,7 @@ export async function mountTerrainWorld(host: HTMLElement, displayName = '', cha
   };
   const feedback=createCombatFeedback(host);
   const impacts=createCombatImpact(scene);
+  const levelUpAura=createLevelUpAura(scene);
   const projectiles=createBowProjectiles(scene);
   const network = new TerrainClient(displayName, state => {
     if (disposed) return;
@@ -257,9 +260,10 @@ export async function mountTerrainWorld(host: HTMLElement, displayName = '', cha
     if(!animal)return;
     if(event.to==='monster'){
       projectiles.impact(event.shotId);
-      animal.react(event.lethal?'n_die':'n_take_attack');
+      if(!event.missed)animal.react(event.lethal?'n_die':'n_take_attack');
       feedback.show(event,animal.position,animal.height+.3);
-      impacts.show({...event,weapon:event.weapon??network.players.get(event.player)?.weapon},animal.position,animal.height,focus,animal.model);
+      const channel = event.player === network.room?.sessionId ? 'self' : 'others';
+      impacts.show({...event,weapon:event.weapon??network.players.get(event.player)?.weapon},animal.position,animal.height,focus,animal.model,channel);
     }else{
       // The monster's attack clip started with the server wind-up.
       const victim=views.get(event.player);
@@ -286,19 +290,16 @@ export async function mountTerrainWorld(host: HTMLElement, displayName = '', cha
   host.dataset.area=area;
   const pendingModels = new Set<string>(), failedModels = new Set<string>();
   const weaponAssets=new Map<Weapon,Awaited<ReturnType<CharacterAssets['loadWeapon']>>>();
-  const job=characterById(characterId)!.classId as Job;
+  const character=characterById(characterId)!;
+  const job=character.classId as Job;
   const profile=openCharacterProfile(ownerId,job);
-  const vitals=document.createElement('div');
-  vitals.className='combat-vitals';
-  vitals.innerHTML='<strong></strong><span class="hp-caption"></span><progress class="hp-meter" aria-label="HP"></progress><span class="exp-caption"></span><progress class="exp-meter" aria-label="EXP"></progress>';
   const header=host.parentElement!.querySelector<HTMLElement>('.game-header')!;
   const playerName=header.querySelector<HTMLElement>('#player-name')!;
-  const heading=document.createElement('div');heading.className='vital-heading';
-  heading.append(playerName,vitals.querySelector('strong')!);vitals.prepend(heading);
-  const hp=vitals.querySelector('.hp-meter')!;
-  hp.insertAdjacentHTML('afterend','<span class="mp-caption"></span><progress class="mp-meter" aria-label="MP"></progress>');
-  const mpText=vitals.querySelector('.mp-caption')!,mpMeter=vitals.querySelector<HTMLProgressElement>('.mp-meter')!;
-  const protection=document.createElement('small');protection.className='arrival-protection';protection.hidden=true;vitals.append(protection);
+  const playerVitals=createPlayerVitals(playerName,job[0].toUpperCase()+job.slice(1));
+  const {element:vitals,protection}=playerVitals;
+  const footVitals=createFootVitals(),footScreen=new THREE.Vector3();
+  host.append(footVitals.element);
+  playerVitals.portrait.append(createStatusPortrait(character,characters.get(character)!,hairColor,thai));
   const controls=document.createElement('div');controls.className='combat-controls';controls.append(panel);
   const autoButton=document.createElement('button');
   autoButton.className='auto-combat';autoButton.type='button';autoButton.setAttribute('aria-pressed','false');
@@ -306,8 +307,11 @@ export async function mountTerrainWorld(host: HTMLElement, displayName = '', cha
   huntButton.type='button';huntButton.className='hunt-launch';
   const huntTitle=thai?'โจมตีอัตโนมัติ':'Auto attack';
   const huntControls=document.createElement('div');huntControls.className='hunt-controls';
+  autoButton.setAttribute('aria-label',huntTitle);
   autoButton.setAttribute('aria-keyshortcuts','Control+A');
-  huntButton.textContent='▾';
+  autoButton.innerHTML=`<img src="/assets/ui/menu/auto-attack.webp" alt="" width="42" height="42" draggable="false">
+    <kbd aria-hidden="true">Ctrl+A</kbd><span class="hunt-state" aria-hidden="true"></span>`;
+  huntButton.textContent='⚙';
   huntButton.title=thai?'ตั้งค่าการโจมตีอัตโนมัติ':'Auto attack settings';
   huntButton.setAttribute('aria-label',huntButton.title);
   huntPanel.id='auto-hunt-panel';huntPanel.className='hunt-panel';huntPanel.popover='auto';
@@ -343,15 +347,15 @@ export async function mountTerrainWorld(host: HTMLElement, displayName = '', cha
     };
   }
   const huntHint=document.createElement('small');huntHint.setAttribute('role','status');
-  rangeControl.hidden=!field;speciesField.hidden=!field;
+  speciesField.hidden=!field;
   huntPanel.append(rangeControl,speciesField,huntHint);
   const weaponHint=thai?'สวมอาวุธก่อนโจมตี':'Equip a weapon to attack';
   function updateHuntButton(){
     const reason=!field?(thai?'เมืองนี้ไม่มีมอนสเตอร์ให้ล่า':'No monsters to hunt in town'):!profile.value.weapon?weaponHint:!selectedKinds.size?(thai?'เลือกมอนสเตอร์อย่างน้อยหนึ่งชนิด':'Select at least one monster'):'';
     autoButton.disabled=!!reason && !auto;
     huntHint.hidden=!reason;huntHint.textContent=reason;
-    autoButton.textContent=auto?(thai?'หยุดล่า':'Stop hunting'):huntTitle;
-    autoButton.title=reason || autoButton.textContent+' (Ctrl+A)';
+    const state=auto?(thai?'เปิด':'On'):(thai?'ปิด':'Off');
+    autoButton.title=reason || `${huntTitle} · ${state} (Ctrl+A)`;
   }
   const radius=()=>rangeInput.valueAsNumber===110?Infinity:rangeInput.valueAsNumber;
   const withinHunt=(p:{x:number;z:number})=>!auto || Math.hypot(p.x-anchor.x,p.z-anchor.y)<=radius();
@@ -388,6 +392,7 @@ export async function mountTerrainWorld(host: HTMLElement, displayName = '', cha
     network.hunt(value,radius(),[...selectedKinds]);
   }
   autoButton.onclick=()=>{
+    if(autoButton.disabled)return;
     stopMovement();selectedPlayer=undefined;
     setAuto(!auto);
   };
@@ -395,13 +400,21 @@ export async function mountTerrainWorld(host: HTMLElement, displayName = '', cha
     if(!event.ctrlKey || event.code!=='KeyA' || event.altKey || event.metaKey || event.shiftKey || event.isComposing ||
       document.querySelector('dialog[open]') || (event.target as HTMLElement)?.closest?.('input,textarea,select,[contenteditable]:not([contenteditable=false])'))return;
     event.preventDefault();
-    if(!event.repeat)autoButton.click();
+    if(!event.repeat && !autoButton.disabled)autoButton.click();
   };
   window.addEventListener('keydown',huntShortcut);
   let sheetStats=combatStats(profile.value);
-  profile.subscribe(()=>{sheetStats=combatStats(profile.value);});
-  const rank=vitals.querySelector('strong')!,hpText=vitals.querySelector('.hp-caption')!,xpText=vitals.querySelector('.exp-caption')!;
-  const hpMeter=vitals.querySelector<HTMLProgressElement>('.hp-meter')!,xpMeter=vitals.querySelector<HTMLProgressElement>('.exp-meter')!;
+  let previousLevel=profile.value.level;
+  profile.subscribe(()=>{
+    const current=profile.value;
+    sheetStats=combatStats(current);
+    const leveledUp=current.level>previousLevel;
+    previousLevel=current.level;
+    if(leveledUp && revealed && network.connected && !document.hidden){
+      levelUpAura.play();
+      impacts.levelUp(focus);
+    }
+  });
   let lastVitals='';
   const updateVitals=(mine?:TerrainPlayer)=>{
     const remaining=Math.max(0,Math.ceil((mine?.protectedUntil??0)-(Date.now()/1000+network.clockOffset)));
@@ -412,12 +425,8 @@ export async function mountTerrainWorld(host: HTMLElement, displayName = '', cha
     const key=[p.level,p.exp,hp,max,mp,maxMp].join('/');
     if(key===lastVitals)return;
     lastVitals=key;
-    rank.textContent='Lv. '+p.level;
-    hpText.textContent='HP '+hp+' / '+max;hpMeter.max=max;hpMeter.value=hp;
-    mpText.textContent='MP '+mp+' / '+maxMp;mpMeter.max=maxMp;mpMeter.value=mp;
-    const needed=expRequired(p.level);
-    xpText.textContent='EXP '+p.exp+' / '+needed+' · '+(Math.floor(1000*p.exp/needed)/10)+'%';
-    xpMeter.max=needed;xpMeter.value=p.exp;
+    playerVitals.update(p.level,hp,max,mp,maxMp,p.exp,expRequired(p.level));
+    footVitals.update(hp,max,mp,maxMp);
     if(hp===0)notice(thai?'หมดสติ · กำลังกลับจุดเกิด':'Defeated · Returning to the landing');
   };
   const syncEquipment=()=>{
@@ -545,8 +554,20 @@ export async function mountTerrainWorld(host: HTMLElement, displayName = '', cha
       elraLabel.style.top = ((1-elraScreen.y)*height/2)+'px';
     }
     }
-    const mine=network.players.get(network.room?.sessionId??'');
+    const localId=network.room?.sessionId??'';
+    const mine=network.players.get(localId);
     updateVitals(mine);
+    const footBar=footVitals.element;
+    footBar.hidden=!revealed || !network.connected || !mine || !views.has(localId) ||
+      !!host.parentElement?.hasAttribute('data-hide-foot-vitals');
+    if(!footBar.hidden){
+      footScreen.copy(focus).project(camera);
+      footBar.hidden=Math.max(Math.abs(footScreen.x),Math.abs(footScreen.y),Math.abs(footScreen.z))>1;
+      if(!footBar.hidden){
+        footBar.style.left=((footScreen.x+1)*width/2)+'px';
+        footBar.style.top=((1-footScreen.y)*height/2)+'px';
+      }
+    }
     if(wildlife && network.monsters){
       for(const [id,animal] of wildlife.targets){
         animal.combat=network.monsters.get(id);animal.alive=(animal.combat?.hp??1)>0;
@@ -840,10 +861,10 @@ export async function mountTerrainWorld(host: HTMLElement, displayName = '', cha
     bankGrass.update(camera, network.connected ? focus : undefined, reducedMotion.matches ? 0 : (now - startedAt) / 1000);
     groves.update(camera, network.connected ? focus : undefined, reducedMotion.matches ? 0 : (now - startedAt) / 1000);
     if(network.connected)fortifications.update(camera,focus,reducedMotion.matches ? 0 : (now-startedAt)/1000);
-    daylight.update(camera, focus,environmentSettings.automatic?network.serverNow:undefined);
-    environmentSettings.update(daylight.inspect().hour);
-    if(network.connected)buildings.update(camera,focus,daylight.paintedBrightness,reducedMotion.matches ? 0 : (now-startedAt)/1000);
+    daylight.update(camera, focus, network.serverNow);
+    if(network.connected)buildings.update(camera,focus,daylight.paintedBrightness,reducedMotion.matches ? 0 : (now-startedAt)/1000,daylight.lanternStrength);
     viewDistance.update(focus);
+    levelUpAura.update(now,focus,camera,reducedMotion.matches);
     renderer.render(scene, camera); canvas.dataset.ready = 'true'; frame = requestAnimationFrame(animate);
     if(network.connected && network.clockReady && !readySent){
       onLoad('session');
@@ -881,7 +902,7 @@ export async function mountTerrainWorld(host: HTMLElement, displayName = '', cha
     }
   };
   const blur = () => { cancelPress(); pointerleave(); };
-  const portrait=createEquipmentPortrait(characterById(characterId)!,characters,thai,hairColor);
+  const portrait=createEquipmentPortrait(character,characters,thai,hairColor);
   const journal=mountCharacterPanels(host.parentElement!,profile,job,thai,portrait);
   host.addEventListener('mythraven:settings-open', blur);
   canvas.addEventListener('webglcontextlost', contextLost); canvas.addEventListener('webglcontextrestored', contextRestored);
@@ -896,11 +917,12 @@ export async function mountTerrainWorld(host: HTMLElement, displayName = '', cha
     canvas.removeEventListener('contextmenu', contextmenu);
     canvas.removeEventListener('webglcontextlost', contextLost); canvas.removeEventListener('webglcontextrestored', contextRestored);
     document.removeEventListener('visibilitychange', visibility); window.removeEventListener('blur', blur); window.removeEventListener('pagehide', pagehide);
-    host.removeEventListener('mythraven:settings-open', blur); speedControl.remove(); canvas.removeEventListener('wheel',wheelZoom); environmentSettings.destroy();
+    host.removeEventListener('mythraven:settings-open', blur); speedControl.remove(); canvas.removeEventListener('wheel',wheelZoom);
+    resetCamera.onclick = null;
     window.removeEventListener('keydown',huntShortcut);
     routeLights.dispose();huntRing.removeFromParent();ringGeometry.dispose();huntRing.material.dispose();huntControls.remove();huntPanel.remove();
-    projectiles.destroy();impacts.destroy();feedback.destroy();controls.remove();vitals.remove();targetLabel.remove(); warpLabel.remove(); wildlife?.dispose(); elraLabel.remove(); elra?.dispose(); removeViews(); characters.dispose(); minimap.destroy(); bankGrass.dispose(); buildings.dispose(); fortifications.dispose(); groves.dispose(); daylight.dispose(); disposeObject(scene); tiles.dispose(); renderer.dispose(); renderer.forceContextLoss();
-    canvas.remove(); modelStatus.remove(); status.remove(); hint.remove(); panel.remove(); delete host.dataset.renderer; delete host.dataset.terrainSize;
+    projectiles.destroy();impacts.destroy();levelUpAura.destroy();feedback.destroy();controls.remove();vitals.remove();targetLabel.remove(); warpLabel.remove(); wildlife?.dispose(); elraLabel.remove(); elra?.dispose(); removeViews(); characters.dispose(); minimap.destroy(); bankGrass.dispose(); buildings.dispose(); fortifications.dispose(); groves.dispose(); daylight.dispose(); disposeObject(scene); tiles.dispose(); renderer.dispose(); renderer.forceContextLoss();
+    canvas.remove(); footVitals.element.remove(); modelStatus.remove(); status.remove(); hint.remove(); panel.remove(); delete host.dataset.renderer; delete host.dataset.terrainSize;
   };
   const pagehide = (event: PageTransitionEvent) => { if (!event.persisted) destroy(); };
   window.addEventListener('pagehide', pagehide);onLoad('scene'); animate(); void network.connect();

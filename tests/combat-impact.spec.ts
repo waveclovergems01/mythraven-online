@@ -4,11 +4,19 @@ test('chest flashes follow posed rigs, render through occluders, and retain thei
   const errors:string[]=[];
   await page.addInitScript(()=>{
     const original=AudioBufferSourceNode.prototype.start;
+    const connect = AudioBufferSourceNode.prototype.connect;
+    const gainNodes = new WeakMap<AudioBufferSourceNode, GainNode>();
+    AudioBufferSourceNode.prototype.connect = function(destination: AudioNode | AudioParam, ...indices: number[]) {
+      if (destination instanceof GainNode) gainNodes.set(this, destination);
+      return Reflect.apply(connect, this, [destination, ...indices]);
+    } as typeof connect;
     (window as any).soundStarts=0;
+    (window as any).soundGains=[];
     const ids=new WeakMap<AudioBuffer,number>();let nextId=0;
     (window as any).soundBuffers=[];
     AudioBufferSourceNode.prototype.start=function(...args:Parameters<typeof original>){
       (window as any).soundStarts++;
+      (window as any).soundGains.push(gainNodes.get(this)?.gain.value);
       if(this.buffer){if(!ids.has(this.buffer))ids.set(this.buffer,++nextId);(window as any).soundBuffers.push(ids.get(this.buffer));}
       return original.apply(this,args);
     };
@@ -23,6 +31,7 @@ test('chest flashes follow posed rigs, render through occluders, and retain thei
       import * as THREE from '/node_modules/three/build/three.module.js';
       import {GLTFLoader} from '/node_modules/three/examples/jsm/loaders/GLTFLoader.js';
       import {createCombatImpact} from '/src/terrain/combat-impact.ts';
+      import {audioSettings} from '/src/audio-settings.ts';
       const scene=new THREE.Scene();scene.background=new THREE.Color('#172529');
       const camera=new THREE.PerspectiveCamera(40,1200/720,.1,100);
       const renderer=new THREE.WebGLRenderer({antialias:true,preserveDrawingBuffer:true});
@@ -78,6 +87,20 @@ test('chest flashes follow posed rigs, render through occluders, and retain thei
           const listener=new THREE.Vector3(distance,0,0),point=new THREE.Vector3();
           impacts.show({to:incoming?'player':'monster',weapon:'dagger',damage:6,critical:false},point,2.8,listener);
           return window.soundStarts;
+        },
+        mixedAudio(){
+          audioSettings.setVolume('master', .1);
+          audioSettings.setVolume('self', .5);
+          audioSettings.setVolume('others', .2);
+          const before=window.soundStarts;
+          const event={to:'monster',weapon:'dagger',damage:6,critical:false};
+          impacts.show(event,focus,2.8,focus,undefined,'self');
+          impacts.show(event,focus,2.8,focus,undefined,'others');
+          const gains=window.soundGains.slice(before);
+          audioSettings.setEnabled('effectsEnabled',false);
+          impacts.show(event,focus,2.8,focus,undefined,'self');
+          impacts.show(event,focus,2.8,focus,undefined,'others');
+          return {gains,count:window.soundStarts-before};
         },
         hidden(value){Object.defineProperty(document,'hidden',{configurable:true,value});document.dispatchEvent(new Event('visibilitychange'));},
         sample(){hit();clock+=80;draw();return actors.map(a=>!!a.bone);},
@@ -152,5 +175,10 @@ test('chest flashes follow posed rigs, render through occluders, and retain thei
   expect(await page.evaluate(()=>(window as any).impactQA.step('wolf',18))).toBe(footstepStart+3);
   await page.evaluate(()=>(window as any).impactQA.hidden(true));
   expect(await page.evaluate(()=>(window as any).impactQA.step('rabbit',0))).toBe(footstepStart+3);
+  await page.evaluate(()=>(window as any).impactQA.hidden(false));
+  const mixed = await page.evaluate(()=>(window as any).impactQA.mixedAudio());
+  expect(mixed.count).toBe(2);
+  expect(mixed.gains[0]).toBeCloseTo(.28 * .05, 6);
+  expect(mixed.gains[1]).toBeCloseTo(.28 * .02, 6);
   expect(errors).toEqual([]);
 });

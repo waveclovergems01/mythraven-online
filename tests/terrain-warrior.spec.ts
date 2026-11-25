@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
 import { Client } from '@colyseus/sdk';
-import { chooseCharacter } from './helpers/character-selection';
+import { chooseCharacter, selectAppearance } from './helpers/character-selection';
 import { setWheelZoom } from './helpers/game-settings';
 
 test('Warrior previews, both hairstyles and class-specific animations coexist with Novice', async ({page,browser}) => {
@@ -16,7 +16,7 @@ test('Warrior previews, both hairstyles and class-specific animations coexist wi
   await hook(page);await page.setViewportSize({width:1440,height:960});
   await page.goto('/');await page.locator('#guest').click();
   for(const id of ['warrior-male-01','warrior-male-02']) {
-    await page.locator(`input[value="${id}"]`).check();
+    await selectAppearance(page, id);
     await expect(page.locator('#character-preview')).toHaveAttribute('data-character-id',id,{timeout:45000});
     expect(await page.evaluate(()=>{const a=(window as any).warInstances.find((a:any)=>a.group.parent);return a.inspect().clip;})).toBe('n_idle');
     await page.screenshot({path:`test-results/terrain-warrior/${id}-preview.png`});
@@ -71,9 +71,9 @@ test('switching class during a slow or failed load cannot display or enter the s
   let release!:()=>void;const gate=new Promise<void>(resolve=>{release=resolve;});
   await page.route('**/assets/models/characters/bodies/warrior.glb',async route=>{await gate;await route.continue();});
   await page.goto('/');await page.locator('#guest').click();
-  await page.locator('input[value="warrior-male-01"]').check();
+  await selectAppearance(page, 'warrior-male-01');
   await expect(page.locator('#enter-city')).toBeDisabled();
-  await page.locator('input[value="novice-male-02"]').check();
+  await selectAppearance(page, 'novice-male-02');
   await expect(page.locator('#character-preview')).toHaveAttribute('data-character-id','novice-male-02',{timeout:45000});
   release();await page.waitForTimeout(1500);
   await expect(page.locator('#character-preview')).toHaveAttribute('data-character-id','novice-male-02');
@@ -81,7 +81,7 @@ test('switching class during a slow or failed load cannot display or enter the s
   await page.locator('#character-logout').click();
   await page.unroute('**/assets/models/characters/bodies/warrior.glb');
   let fail=true;await page.route('**/assets/models/characters/bodies/warrior.glb',route=>fail?route.abort():route.continue());
-  await page.locator('#guest').click();await page.locator('input[value="warrior-male-02"]').check();
+  await page.locator('#guest').click();await selectAppearance(page, 'warrior-male-02');
   await expect(page.locator('#character-retry')).toBeVisible();await expect(page.locator('#enter-city')).toBeDisabled();
   fail=false;await page.locator('#character-retry').click();
   await expect(page.locator('#character-preview')).toHaveAttribute('data-character-id','warrior-male-02',{timeout:45000});

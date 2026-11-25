@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test';
 import { Client } from '@colyseus/sdk';
 import sharp from 'sharp';
 import { chooseCharacter } from './helpers/character-selection';
-import { openSettings,closeSettings,setWheelZoom } from './helpers/game-settings';
+import { setWheelZoom } from './helpers/game-settings';
 
 test('front sunlight casts animated rear shadows for both classes and follows the visible map', async ({page}) => {
   test.setTimeout(120000);
@@ -11,9 +11,11 @@ test('front sunlight casts animated rear shadows for both classes and follows th
   page.on('console',m=>{if(m.type()==='error' && /THREE|WebGL|shader|GL_INVALID/.test(m.text()))errors.push(m.text());});
   await page.route('**/src/terrain/TerrainWorld.ts*',async route=>{
     const response=await route.fetch();
-    const body=(await response.text()).replace('renderer.render(scene, camera);',`
+    const body=(await response.text()).replace('daylight.update(camera, focus, network.serverNow);',
+      "daylight.update(camera, focus, Date.parse('2026-11-24T00:22:30+07:00'));").replace('renderer.render(scene, camera);',`
+      if (window.shadowEnabled !== undefined) sun.shadow.intensity = window.shadowEnabled ? 1 : 0;
       window.shadowProbe={
-        enabled:value=>sun.shadow.intensity=value?1:0,
+        enabled:value=>window.shadowEnabled=value,
         go:(x,z)=>network.move(x,z),
         info:()=>({focus:focus.toArray(),light:sun.position.toArray(),target:sun.target.position.toArray(),
           live:sun.shadow.autoUpdate,halfWidth:sun.shadow.camera.right,
@@ -25,7 +27,6 @@ test('front sunlight casts animated rear shadows for both classes and follows th
   await page.setViewportSize({width:1440,height:960});await page.goto('/');await page.locator('#guest').click();
   await chooseCharacter(page,'warrior-male-02');await expect(page.locator('#network-status')).toHaveAttribute('data-connected','true');
   await expect(page.locator('.world-player-name[data-player-id]')).toHaveCount(1);
-  await openSettings(page);await page.locator('#world-time-auto').uncheck();await page.locator('#world-time').fill('9');await closeSettings(page);
   await setWheelZoom(page,200);
   const info=()=>page.evaluate(()=>(window as any).shadowProbe.info());
   const lighting=await info();expect(lighting.live).toBe(true);expect(lighting.halfWidth).toBeGreaterThanOrEqual(250);

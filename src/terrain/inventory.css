@@ -1,0 +1,142 @@
+#journal-bag {
+  --ink: #422c24;
+  --edge: #98765e;
+  --line: #98765e63;
+  --muted: #624c42;
+  border: 0;
+  /* The full-width trim scales uniformly with the art. Only the straight middle changes height. */
+  border-image: url('/assets/ui/inventory/frame.webp') 96 0 82 0 fill / 62.37px 0 53.27px stretch;
+  background: transparent;
+  box-shadow: none;
+  filter: drop-shadow(0 10px 18px #100b0980);
+}
+
+#journal-bag header {
+  display: grid;
+  grid-template-columns: 22px minmax(0,1fr) 22px;
+  gap: 0;
+  height: 40px;
+  padding: 5px 14px 0;
+  border: 0;
+  background: none;
+}
+
+#journal-bag header > div { grid-column: 2; display: flex; justify-content: center; align-items: center; gap: 5px; min-width: 0; }
+.bag-title-icon { width: 19px; height: 19px; object-fit: contain; flex: none; }
+#journal-bag h2 { color: #472c21; font-size: 15px; font-weight: 800; }
+#journal-bag .journal-close {
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  background: url('/assets/ui/inventory/close-normal.webp') center / contain no-repeat;
+}
+#journal-bag .journal-close:is(:hover,:focus-visible) {
+  filter: brightness(1.13);
+}
+
+#journal-bag .journal-content { padding: 6px 14px 33px; }
+.bag-toolbar {
+  display: grid; grid-template-columns: minmax(0,1fr) auto; align-items: start; gap: 5px;
+  padding: 0 0 4px; border-bottom: 1px solid var(--line);
+}
+.bag-pages {
+  display: flex; align-items: flex-start; gap: 4px; height: 38px;
+  overflow-x: auto; overflow-y: hidden; overscroll-behavior: contain; touch-action: pan-x;
+  scrollbar-width: thin; scrollbar-color: #a78158 #e6d7ce;
+}
+#journal-bag .bag-pages button {
+  flex: 1 0 75px; height: 24px; padding: 1px 10px;
+  border: 0; border-radius: 0;
+  border-image: url('/assets/ui/inventory/page-normal.webp') 0 28 0 28 fill / 0 12px stretch;
+  background: none;
+  color: #fff0ce;
+  font: 700 11px/1.3 system-ui, sans-serif;
+}
+#journal-bag .bag-pages button[aria-pressed=true] {
+  border-image-source: url('/assets/ui/inventory/page-active.webp');
+  color: #fff8ed;
+}
+#journal-bag .bag-pages button:not(:disabled):active { transform: none; }
+
+#journal-bag .bag-expand {
+  width: 33px; height: 24px; padding: 0; border: 0;
+  background: url('/assets/ui/inventory/page-add.webp') center / contain no-repeat;
+}
+.bag-categories { display: grid; grid-template-columns: 1.55fr repeat(4,1fr); gap: 4px; margin-top: 5px; }
+#journal-bag .bag-categories button {
+  min-width: 0; height: 25px; padding: 2px 3px; display: flex; align-items: center; justify-content: center; gap: 3px;
+  border: 0; background: transparent; color: #553724; font: 700 11px/1 system-ui, sans-serif;
+  border-image: url('/assets/ui/inventory/action.webp') 0 21 fill / 0 10px stretch;
+}
+#journal-bag .bag-categories button[aria-pressed=true] {
+  border-image: url('/assets/ui/inventory/category-active.webp') 0 24 fill / 0 11px stretch;
+  color: #fff7e7;
+}
+.bag-categories img { width: 16px; height: 16px; object-fit: contain; }
+
+.bag-scroll {
+  margin-top: 5px;
+  height: 350px;
+  border: 1px solid var(--line); border-radius: 7px;
+  background: #aa8e862a;
+  overflow-y: auto; overflow-x: hidden; overscroll-behavior: contain; scrollbar-gutter: stable;
+}
+.bag-scroll::-webkit-scrollbar { width: 12px; }
+/* Paint each arrow from the end of the original track at its natural aspect ratio. */
+.bag-scroll::-webkit-scrollbar-button:vertical:single-button {
+  display: block; height: 12px;
+  background: url('/assets/ui/inventory/track.webp') center top / 100% auto no-repeat;
+}
+.bag-scroll::-webkit-scrollbar-button:vertical:single-button:increment { background-position: center bottom; }
+.bag-scroll::-webkit-scrollbar-track {
+  background: linear-gradient(90deg,#e8d7d2 0 24%,#baaaaf 24% 76%,#e8d7d2 76%);
+}
+.bag-scroll::-webkit-scrollbar-thumb {
+  border: 1px solid transparent;
+  border-image: url('/assets/ui/inventory/thumb.webp') 10 6 10 6 fill / 7px 2px stretch;
+}
+.bag-grid { display: grid; grid-template-columns: repeat(5,minmax(0,51px)); justify-content: center; gap: 3px; padding: 2px; }
+#journal-bag .bag-cell {
+  position: relative; aspect-ratio: 1; min-width: 0; padding: 2px; border: 0;
+  background: url('/assets/ui/inventory/slot-normal.webp') center / 100% 100% no-repeat;
+}
+#journal-bag .bag-cell.vacant { background-image: url('/assets/ui/inventory/slot-empty.webp'); }
+#journal-bag .bag-item:is(:hover,:focus-visible) { background-image: url('/assets/ui/inventory/slot-hover.webp'); }
+#journal-bag .bag-item[aria-pressed=true] { background-image: url('/assets/ui/inventory/slot-selected.webp'); }
+#journal-bag .item-tip { background: #fff0d9; color: #422c24; }
+.bag-item:nth-child(-n+5) .item-tip { top: 100%; bottom: auto; }
+.bag-item:nth-child(5n) .item-tip,.bag-item:nth-child(5n - 1) .item-tip { left: auto; right: 0; }
+
+.bag-summary {
+  display: grid; grid-template-columns: auto minmax(0,1fr) auto; align-items: center; gap: 6px;
+  min-height: 27px; margin-top: 4px; padding-top: 4px; border-top: 1px solid var(--line);
+}
+.bag-count {
+  display: grid; place-items: center; flex: none;
+  width: 85px; height: 23px; padding-left: 20px;
+  background: url('/assets/ui/inventory/capacity.webp') center / 100% 100% no-repeat;
+  color: #44291d; font-size: 10px; font-weight: 700; font-variant-numeric: tabular-nums;
+}
+#journal-bag .bag-sort {
+  grid-column: 3; min-height: 23px; padding: 3px 9px; border: 0;
+  color: #57331f; font-weight: 700;
+  background: url('/assets/ui/inventory/action.webp') center / 100% 100% no-repeat;
+}
+.bag-no-results { margin: 0; color: var(--muted); font-size: 11px; }
+.bag-footer { display: grid; grid-template-columns: minmax(0,1fr) minmax(65px,auto); gap: 5px; margin-top: 6px; }
+.bag-search {
+  display: flex; min-width: 0; height: 25px;
+  border-image: url('/assets/ui/inventory/search.webp') 0 54 0 54 fill / 0 23px stretch;
+}
+.bag-search input {
+  min-width: 0; flex: 1; padding: 0 0 0 25px; border: 0; border-radius: 12px;
+  background: none; color: var(--ink); font: 11px system-ui, sans-serif;
+}
+.bag-search input::-webkit-search-cancel-button { display: none; }
+#journal-bag .bag-search button { flex: 0 0 27px; padding: 0; border: 0; background: transparent; }
+.bag-gold {
+  display: flex; align-items: center; justify-content: flex-end; gap: 4px; max-width: 104px;
+  padding: 0 8px 0 4px; border: 1px solid #b7975b; border-radius: 13px;
+  background: #3d3239; color: #fff0ce; font: 700 11px system-ui, sans-serif;
+}
+.bag-gold img { width: 19px; height: 16px; object-fit: contain; margin-right: auto; }

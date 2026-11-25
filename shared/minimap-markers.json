@@ -1,18 +1,22 @@
 {
   "monster": {
-    "color": "#ff313d",
-    "radius": 2.8
+    "image": "dot-red",
+    "radius": 4.2
   },
   "self": {
-    "color": "#36ddff",
-    "radius": 6
+    "image": "ring-cyan",
+    "radius": 9
   },
   "other": {
-    "color": "#a1b4ce",
-    "radius": 3.5
+    "image": "dot-gray",
+    "radius": 5
   },
   "party": {
-    "color": "#60ff83",
-    "radius": 4.8
+    "image": "dot-green",
+    "radius": 6.5
+  },
+  "portal": {
+    "image": "ring-gold",
+    "radius": 8
   }
 }

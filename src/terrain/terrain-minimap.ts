@@ -13,7 +13,7 @@ let mapSerial=0;
 const NO_PARTY:ReadonlySet<string>=new Set();
 const mapCoordinate = (value: number) => (value / TERRAIN.size + .5) * SIZE;
 
-/** Code-native map of the same heightfield; no second renderer or image asset. */
+/** Live heightfield map framed with the supplied UI artwork. */
 export function createTerrainMinimap(host: HTMLElement, data: TerrainData, thai: boolean) {
   const panel = document.createElement('aside'); panel.className = 'terrain-minimap';
   panel.setAttribute('aria-label', thai ? 'มินิแมพเมือง' : 'City minimap');
@@ -21,22 +21,24 @@ export function createTerrainMinimap(host: HTMLElement, data: TerrainData, thai:
   const field = data.area === 'west-march';
   title.textContent = field ? (thai ? 'ทุ่งชายแดนตะวันตก' : 'West March') : (thai ? 'เมืองหลัก' : 'Main city');
   panel.setAttribute('aria-label',title.textContent);
-  const compass = document.createElement('div'); compass.className = 'terrain-minimap-compass';
-  compass.setAttribute('role', 'img');
-  compass.setAttribute('aria-label', thai ? 'ทิศเหนือ ใต้ ตะวันออก ตะวันตก' : 'North, south, east and west');
-  compass.innerHTML = '<svg viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="23"/><path d="M24 12 28 24 24 36 20 24Z"/><path class="north" d="M24 12 28 24 20 24Z"/><text x="24" y="10">N</text><text x="24" y="45">S</text><text x="43" y="27">E</text><text x="5" y="27">W</text></svg>';
+  const compass = document.createElement('img'); compass.className = 'terrain-minimap-compass';
+  compass.src='/assets/ui/minimap/compass.webp';
+  compass.alt=thai?'ทิศเหนือ ใต้ ตะวันออก ตะวันตก':'North, south, east and west';
+  const map = document.createElement('div'); map.className='terrain-minimap-map';
   const svg = document.createElementNS(SVG, 'svg'); svg.setAttribute('viewBox', '0 0 256 256');
-  // Shared radial gradients give every point a bright core and soft halo, without 500 blur filters.
+  svg.setAttribute('preserveAspectRatio','none');
   const markerPrefix='radar-'+(++mapSerial)+'-';
   const defs=document.createElementNS(SVG,'defs');
   for(const [kind,style] of Object.entries(markerStyles)){
-    const glow=document.createElementNS(SVG,'radialGradient');glow.id=markerPrefix+kind;
-    for(const [offset,color,opacity] of [[0,'#fffafa',1],[.16,style.color,1],[.4,style.color,.65],[1,style.color,0]] as const){
-      const stop=document.createElementNS(SVG,'stop');stop.setAttribute('offset',String(offset));
-      stop.setAttribute('stop-color',color);stop.setAttribute('stop-opacity',String(opacity));glow.append(stop);
-    }
-    defs.append(glow);
+    const pattern=document.createElementNS(SVG,'pattern');pattern.id=markerPrefix+kind;
+    pattern.setAttribute('width','1');pattern.setAttribute('height','1');
+    pattern.setAttribute('patternContentUnits','objectBoundingBox');
+    const image=document.createElementNS(SVG,'image');
+    image.setAttribute('href','/assets/ui/minimap/'+style.image+'.webp');
+    image.setAttribute('width','1');image.setAttribute('height','1');
+    pattern.append(image);defs.append(pattern);
   }
+  const markerFill=(kind:keyof typeof markerStyles)=>'url(#'+markerPrefix+kind+')';
   svg.append(defs);
   svg.setAttribute('role', 'img'); svg.setAttribute('aria-label', thai ? 'แผนที่พื้นดิน ร่องน้ำ และตำแหน่งผู้เล่น' : 'Terrain, river and player locations');
   const base = document.createElementNS(SVG, 'rect');
@@ -110,7 +112,8 @@ export function createTerrainMinimap(host: HTMLElement, data: TerrainData, thai:
   svg.append(fortMarkers);
   const destination = mapPortal(data), warp = document.createElementNS(SVG,'circle');
   warp.setAttribute('cx',String(mapCoordinate(destination.x))); warp.setAttribute('cy',String(mapCoordinate(destination.z)));
-  warp.setAttribute('r','3.5'); warp.setAttribute('fill','#94efe2'); warp.setAttribute('stroke','#24565a');
+  warp.setAttribute('r',String(markerStyles.portal.radius)); warp.setAttribute('fill',markerFill('portal'));
+  warp.dataset.markerType='portal';
   const warpTitle = document.createElementNS(SVG,'title');
   warpTitle.textContent = field ? (thai ? 'กลับเมือง' : 'To the city') : (thai ? 'ไปทุ่งชายแดนตะวันตก' : 'To West March');
   warp.append(warpTitle); svg.append(warp);
@@ -127,21 +130,8 @@ export function createTerrainMinimap(host: HTMLElement, data: TerrainData, thai:
   travelButton.type='button';travelButton.className='terrain-portal-travel';travelButton.disabled=true;
   travelButton.textContent=field?(thai?'เดินกลับเมืองหลัก':'Walk to the city'):(thai?'เดินไปทุ่งชายแดนตะวันตก':'Walk to West March');
   travelButton.title=thai?'เดินไปยังวาร์ปและเปลี่ยนแมพอัตโนมัติ':'Walk to the portal and enter the next map';
-  panel.append(svg, title, compass,travelButton); host.append(panel);
+  map.append(svg,compass); panel.append(title,map,travelButton); host.append(panel);
   const markers = new Map<string, SVGCircleElement>();
-  const flares=new WeakMap<SVGCircleElement,SVGPathElement>();
-  function flare(dot:SVGCircleElement,kind:keyof typeof markerStyles,x:string,y:string,radius:number){
-    let rays=flares.get(dot);
-    if(!rays){
-      rays=document.createElementNS(SVG,'path');
-      rays.setAttribute('d','M-1 0 L-.12 -.1 L0 -1 L.12 -.1 L1 0 L.12 .1 L0 1 L-.12 .1Z');
-      rays.setAttribute('pointer-events','none');dot.before(rays);flares.set(dot,rays);
-    }
-    rays.setAttribute('fill',markerStyles[kind].color);rays.setAttribute('opacity',kind==='other'?'.35':'.65');
-    const transform=`translate(${x} ${y}) scale(${radius})`;
-    if(rays.getAttribute('transform')!==transform)rays.setAttribute('transform',transform);
-    rays.style.display=dot.style.display;
-  }
   return {
     travelButton,
     huntingRange(center:{x:number;z:number},radius:number){
@@ -156,22 +146,21 @@ export function createTerrainMinimap(host: HTMLElement, data: TerrainData, thai:
         let dot=animalMarkers.get(id);
         if(!dot){
           dot=document.createElementNS(SVG,'circle'); dot.dataset.monster=id;
-          dot.setAttribute('fill',`url(#${markerPrefix}monster)`);
+          dot.setAttribute('fill',markerFill('monster'));
           dot.dataset.markerType='monster';
           const tooltip=document.createElementNS(SVG,'title');tooltip.textContent=thai?animal.th:animal.en;
           dot.append(tooltip);wildlifeDots.append(dot);animalMarkers.set(id,dot);
         }
         const display=animal.alive?'':'none';
         if(dot.style.display!==display)dot.style.display=display;
-        if(!animal.alive){const rays=flares.get(dot);if(rays)rays.style.display='none';continue;}
+        if(!animal.alive)continue;
         const radius=String(markerStyles.monster.radius*(selected===id?1.5:1));
         if(dot.getAttribute('r')!==radius)dot.setAttribute('r',radius);
         const x=mapCoordinate(animal.position.x).toFixed(1),y=mapCoordinate(animal.position.z).toFixed(1);
         if(dot.getAttribute('cx')!==x)dot.setAttribute('cx',x);
         if(dot.getAttribute('cy')!==y)dot.setAttribute('cy',y);
-        flare(dot,'monster',x,y,Number(radius)*.85);
       }
-      for (const [id, dot] of markers) if (!players.has(id)) { flares.get(dot)?.remove();dot.remove(); markers.delete(id); }
+      for (const [id, dot] of markers) if (!players.has(id)) { dot.remove(); markers.delete(id); }
       for (const [id, player] of players) {
         let dot = markers.get(id);
         if (!dot) {
@@ -183,12 +172,11 @@ export function createTerrainMinimap(host: HTMLElement, data: TerrainData, thai:
         const kind=mine?'self':partyMembers.has(id)?'party':'other';
         dot.dataset.mine = String(mine);dot.dataset.markerType=kind;
         dot.setAttribute('r',String(markerStyles[kind].radius));
-        dot.setAttribute('fill',`url(#${markerPrefix}${kind})`);
+        dot.setAttribute('fill',markerFill(kind));
         dot.setAttribute('cx', String(mapCoordinate(player.x))); dot.setAttribute('cy', String(mapCoordinate(player.z)));
-        flare(dot,kind,dot.getAttribute('cx')!,dot.getAttribute('cy')!,markerStyles[kind].radius);
       }
       const own = ownId ? markers.get(ownId) : undefined;
-      if (own) {dots.append(flares.get(own)!,own);} // Local marker stays readable in a group.
+      if (own && dots.lastElementChild!==own) dots.append(own); // Keep the local marker on top.
       footprint.style.display = own ? '' : 'none';
       footprint.setAttribute('points', view.map(point => `${mapCoordinate(point.x)},${mapCoordinate(point.z)}`).join(' '));
     },

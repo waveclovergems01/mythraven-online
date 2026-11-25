@@ -32,6 +32,12 @@ test('forest HUD, glowing radar types and server-driven roaming stay usable on d
   await expect(page.locator('[data-marker-type=self]')).toHaveCount(1);
   await expect(page.locator('[data-marker-type=party]')).toHaveCount(1);
   await expect(page.locator('[data-marker-type=other]')).toHaveCount(1);
+  for(const [kind,asset] of Object.entries({self:'ring-cyan',other:'dot-gray',party:'dot-green',monster:'dot-red',portal:'ring-gold'})){
+    const fill=await page.locator(`[data-marker-type=${kind}]`).first().getAttribute('fill');
+    const pattern=fill?.match(/^url\(#(.+)\)$/)?.[1];
+    expect(pattern).toBeTruthy();
+    await expect(page.locator(`[id="${pattern}"] image`)).toHaveAttribute('href',`/assets/ui/minimap/${asset}.webp`);
+  }
   for(const [name,width,height] of [['desktop',1440,900],['mobile',390,844]] as const){
     await page.setViewportSize({width,height});
     await expect(page.locator('.hunt-controls')).toBeVisible();

@@ -1,8 +1,16 @@
 {
   "startingLevel": 1,
+  "startingStatPoints": 10,
   "pointsPerLevel": 5,
+  "statCap": 99,
+  "accuracy": {"baseHit": 100, "baseFlee": 100, "hitPerDex": 5, "fleePerAgi": 1, "equalRatingChance": 0.95, "chancePerRating": 0.001},
   "criticalRate": {"baseChance": 0.05, "referenceLuck": 99, "referenceChance": 0.60, "maxChance": 1},
-  "inventory": {"capacity": 100, "slotsPerPage": 50},
+  "inventory": {
+    "capacity": 200,
+    "slotsPerPage": 100,
+    "maxCapacity": 1000,
+    "categoryOrder": ["consumables", "equipment", "materials", "ammo"]
+  },
   "baseStats": {"STR": 1, "AGI": 1, "DEX": 1, "INT": 1, "VIT": 1, "LUK": 1},
   "slots": ["weapon", "head", "body", "arms"],
   "classes": {
@@ -11,8 +19,8 @@
     "archer": {"starter": "bow", "weapons": ["bow"]}
   },
   "items": {
-    "dagger": {"en": "Training Dagger", "th": "มีดสั้นฝึกหัด", "slot": "weapon", "attack": 4, "stat": "STR", "model": "/assets/models/characters/weapons/dagger.glb", "icon": "/assets/items/training-dagger.png"},
-    "longsword": {"en": "Training Longsword", "th": "ดาบยาวฝึกหัด", "slot": "weapon", "attack": 7, "stat": "STR", "model": "/assets/models/characters/weapons/longsword.glb", "icon": "/assets/items/training-longsword.png"},
-    "bow": {"en": "Training Bow", "th": "ธนูฝึกหัด", "slot": "weapon", "attack": 5, "stat": "DEX", "model": "/assets/models/characters/weapons/bow.glb", "icon": "/assets/items/training-bow.png"}
+    "dagger": {"en": "Training Dagger", "th": "มีดสั้นฝึกหัด", "category": "equipment", "sortPriority": 10, "slot": "weapon", "attack": 4, "stat": "STR", "model": "/assets/models/characters/weapons/dagger.glb", "icon": "/assets/items/training-dagger.png"},
+    "longsword": {"en": "Training Longsword", "th": "ดาบยาวฝึกหัด", "category": "equipment", "sortPriority": 20, "slot": "weapon", "attack": 7, "stat": "STR", "model": "/assets/models/characters/weapons/longsword.glb", "icon": "/assets/items/training-longsword.png"},
+    "bow": {"en": "Training Bow", "th": "ธนูฝึกหัด", "category": "equipment", "sortPriority": 30, "slot": "weapon", "attack": 5, "stat": "DEX", "model": "/assets/models/characters/weapons/bow.glb", "icon": "/assets/items/training-bow.png"}
   }
 }

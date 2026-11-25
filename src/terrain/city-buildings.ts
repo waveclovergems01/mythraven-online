@@ -5,6 +5,7 @@ import {BUILDING_ASSETS,createCityLayout} from '../../shared/city-layout.mjs';
 import type {TerrainData} from './terrain-data';
 import {createFountainWater} from './fountain-water';
 import {softenPaintedLighting} from './painted-lighting';
+import {createCityLanterns, lanternSockets, type CityLantern} from './city-lanterns';
 
 export async function loadCityBuildings(data:TerrainData){
   const layout=createCityLayout(data),group=new THREE.Group();group.name='city-buildings';
@@ -12,7 +13,10 @@ export async function loadCityBuildings(data:TerrainData){
   const resources=new Set<THREE.BufferGeometry|THREE.Material|THREE.Texture>();
   const materials:THREE.MeshStandardMaterial[]=[];
   const fountains:ReturnType<typeof createFountainWater>[]=[];
-  const dispose=()=>{group.removeFromParent();fountains.forEach(f=>f.dispose());group.children.forEach(o=>{if(o instanceof THREE.InstancedMesh)o.dispose();});resources.forEach(r=>{
+  const lanternPoints: CityLantern[] = [];
+  const lanternNight = {value: 0};
+  let lanterns: ReturnType<typeof createCityLanterns> | undefined;
+  const dispose=()=>{group.removeFromParent();lanterns?.dispose();fountains.forEach(f=>f.dispose());group.children.forEach(o=>{if(o instanceof THREE.InstancedMesh)o.dispose();});resources.forEach(r=>{
     r.dispose();if(r instanceof THREE.Texture&&typeof ImageBitmap!=='undefined'&&r.image instanceof ImageBitmap)r.image.close();
   });};
   const entries=Object.entries(BUILDING_ASSETS).filter(([id])=>layout.buildings.some(b=>b.model===id));
@@ -27,10 +31,12 @@ export async function loadCityBuildings(data:TerrainData){
     if(result.status!=='fulfilled')return;
     let source!:THREE.Mesh<THREE.BufferGeometry,THREE.MeshStandardMaterial>;
     result.value.scene.traverse(o=>{if(o instanceof THREE.Mesh)source=o;});
+    const id = entries[index][0];
+    const sockets = lanternSockets[id] ?? [];
     const material=source.material;materials.push(material);material.transparent=true;material.forceSinglePass=true;
     material.normalScale.multiplyScalar(.65);material.emissiveIntensity=.25;
     for(const value of Object.values(material))if(value instanceof THREE.Texture)value.anisotropy=4;
-    material.customProgramCacheKey=()=> 'city-building-toon-player-fade-v1';
+    material.customProgramCacheKey=()=> 'city-building-toon-player-fade-v1' + (sockets.length ? '-' + id : '');
     material.onBeforeCompile=shader=>{
       softenPaintedLighting(shader);Object.assign(shader.uniforms,{buildingFeet:feet,buildingHead:head,buildingDepth:depth,buildingRadius:radius,buildingAspect:aspect});
       shader.vertexShader='varying vec4 buildingClip;\n'+shader.vertexShader;
@@ -42,19 +48,40 @@ export async function loadCityBuildings(data:TerrainData){
         float silhouette=1.-smoothstep(buildingRadius*.8,buildingRadius*1.8,length(p-(buildingFeet+segment*along)));
         float inFront=smoothstep(-.35,.25,mix(buildingDepth.x,buildingDepth.y,along)-vViewPosition.z);
         diffuseColor.a*=1.-.95*silhouette*inFront;`);
+      if (sockets.length && material.emissiveMap) {
+        shader.uniforms.lanternNight = lanternNight;
+        shader.vertexShader = 'varying vec3 lanternLocal;\n' + shader.vertexShader.replace(
+          '#include <begin_vertex>', '#include <begin_vertex>\nlanternLocal = position;');
+        const masks = sockets.map(([x,y,z,r]) =>
+          `lampMask = max(lampMask, 1. - smoothstep(${(r*1.25).toFixed(3)}, ${(r*1.55).toFixed(3)}, distance(lanternLocal, vec3(${x.toFixed(3)}, ${y.toFixed(3)}, ${z.toFixed(3)}))));`);
+        shader.fragmentShader = 'varying vec3 lanternLocal; uniform float lanternNight;\n' + shader.fragmentShader
+          .replace('#include <emissivemap_fragment>', `#include <emissivemap_fragment>
+            float lampMask = 0.;
+            ${masks.join('\n')}
+            totalEmissiveRadiance *= mix(1., lanternNight * 1.35, lampMask);`);
+      }
     };
-    const placements=layout.buildings.filter(b=>b.model===entries[index][0]);
-    const mesh=new THREE.InstancedMesh(source.geometry,material,placements.length);mesh.name=entries[index][0];mesh.castShadow=mesh.receiveShadow=true;
+    const placements=layout.buildings.filter(b=>b.model===id);
+    const mesh=new THREE.InstancedMesh(source.geometry,material,placements.length);mesh.name=id;mesh.castShadow=mesh.receiveShadow=true;
     const flagDepth=installFlagWind(mesh,mesh.name,flagClock);
     if(flagDepth)resources.add(flagDepth);
-    placements.forEach((p,i)=>{dummy.position.set(p.x,p.y,p.z);dummy.rotation.set(0,p.yaw,0);dummy.scale.setScalar(p.scale);dummy.updateMatrix();mesh.setMatrixAt(i,dummy.matrix);});
+    placements.forEach((p,i)=>{
+      dummy.position.set(p.x,p.y,p.z);dummy.rotation.set(0,p.yaw,0);dummy.scale.setScalar(p.scale);dummy.updateMatrix();
+      mesh.setMatrixAt(i,dummy.matrix);
+      for (const [x,y,z,radius] of sockets) lanternPoints.push({
+        center:new THREE.Vector3(x,y,z).applyMatrix4(dummy.matrix), radius:radius*p.scale, scale:p.scale,
+      });
+    });
     mesh.computeBoundingBox();mesh.computeBoundingSphere();group.add(mesh);
-    if(entries[index][0]==='plaza-angel-fountain')for(const p of placements){
+    if(id==='plaza-angel-fountain')for(const p of placements){
       const fountain=createFountainWater(source.geometry);fountain.group.position.set(p.x,p.y,p.z);fountain.group.rotation.y=p.yaw;fountain.group.scale.setScalar(p.scale);group.add(fountain.group);fountains.push(fountain);
     }
   });
-  return {group,dispose,inspect:()=>layout,update(camera:THREE.PerspectiveCamera,player:THREE.Vector3,brightness:number,seconds:number){
+  const lampLighting = lanterns = createCityLanterns(lanternPoints);
+  return {group,lanternGroup:lampLighting.group,installLanternSpill:lampLighting.installSpill,dispose,inspect:()=>layout,update(camera:THREE.PerspectiveCamera,player:THREE.Vector3,brightness:number,seconds:number,night:number){
     flagClock.value=seconds;
+    lanternNight.value=night;
+    lampLighting.update(player,night);
     fountains.forEach(f=>f.update(seconds));
     for(const m of materials)if(m.emissiveMap)m.emissiveIntensity=1.15-brightness*.9;
     aspect.value=camera.aspect;

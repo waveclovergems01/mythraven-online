@@ -1,4 +1,4 @@
-import { chooseCharacter } from './helpers/character-selection';
+import { chooseCharacter, selectAppearance } from './helpers/character-selection';
 import { openSettings, closeSettings } from './helpers/game-settings';
 import { test, expect } from '@playwright/test';
 
@@ -131,7 +131,7 @@ test('logout while terrain data loads does not mount a stale renderer', async ({
   const pending = new Promise<void>(resolve => { release = resolve; });
   await page.route('**/assets/maps/mythraven-land.png', async route => { await pending; await route.continue(); });
   await page.goto('/'); await page.locator('#guest').click();
-  await page.locator('input[name="character"][value="novice-male-01"]').check();
+  await selectAppearance(page, 'novice-male-01');
   const shoreline = page.waitForRequest('**/assets/maps/mythraven-land.png');
   await page.locator('#enter-city').click();
   await shoreline;
