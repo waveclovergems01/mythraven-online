@@ -1,8 +1,6 @@
 export const messages = {
   th: {
-    minimap: 'แผนที่เมืองทั้งหมด', minimapLegend: 'เหลือง = คุณ · เทา = ผู้เล่นอื่น · กรอบ = พื้นที่กล้อง', minimapVisible: 'มองเห็น (กว้าง × สูง)',
-    mapLoadError: 'โหลดแผนที่ไม่สำเร็จ กรุณารีเฟรชหน้าเว็บ',
-    city: 'Mythraven · เมืองหลัก', cityControls: 'WASD / ลูกศร หรือคลิกช่องสีเขียวเพื่อเดิน', cityNote: 'เมืองหลวงล้อมแม่น้ำ · ประตูและสะพาน: ซ้าย ขวา ด้านล่าง',
+    city: 'Mythraven · เมืองหลัก',
     googleSetup: 'ต้องตั้งค่า Google Client ID ก่อน ดูคู่มือ GOOGLE_AUTH_SETUP.md',
     googleOffline: 'ติดต่อเซิร์ฟเวอร์บัญชีไม่ได้ กรุณาเปิดด้วย npm run dev',
     googleScript: 'โหลด Google ไม่สำเร็จ ตรวจอินเทอร์เน็ตหรือตัวบล็อกเนื้อหา',
@@ -25,14 +23,11 @@ export const messages = {
     duplicate: 'ชื่อผู้ใช้นี้มีแล้วบนเบราว์เซอร์นี้', credentials: 'ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง',
     storage: 'บันทึกข้อมูลไม่ได้ กรุณาอนุญาตพื้นที่จัดเก็บของเบราว์เซอร์',
     unavailable: 'เบราว์เซอร์นี้ไม่รองรับการเข้ารหัส กรุณาเปิดผ่าน localhost หรือ HTTPS',
-    generic: 'เกิดข้อผิดพลาด กรุณาลองอีกครั้ง', logout: 'ออกจากเกม', training: 'ลานฝึกซ้อม',
-    player: 'ผู้เล่น', controls: 'WASD / ลูกศร หรือคลิกและแตะพื้นเพื่อเดิน', placeholder: 'ฉากทดลอง · ภาพชั่วคราว',
-    loading: 'กำลังเปิดโลก…', worldTitle: 'MYTHRAVEN / ลานฝึกซ้อม', session: 'เล่นบนเครื่อง · ผู้เล่นคนเดียว',
+    generic: 'เกิดข้อผิดพลาด กรุณาลองอีกครั้ง', logout: 'ออกจากเกม',
+    loading: 'กำลังเปิดโลก…',
   },
   en: {
-    minimap: 'Full city map', minimapLegend: 'Yellow = you · Gray = other players · Frame = camera view', minimapVisible: 'Visible (width × height)',
-    mapLoadError: 'Map could not load. Please refresh the page.',
-    city: 'Mythraven · Main city', cityControls: 'WASD / arrows, or click a green tile to move', cityNote: 'River-ringed capital · Gates and bridges: west, east, south',
+    city: 'Mythraven · Main city',
     googleSetup: 'Set your Google Client ID first. See GOOGLE_AUTH_SETUP.md.',
     googleOffline: 'Auth server unavailable. Start the app with npm run dev.',
     googleScript: 'Could not load Google. Check your connection or content blocker.',
@@ -55,9 +50,8 @@ export const messages = {
     duplicate: 'This username already exists in this browser', credentials: 'Incorrect username or password',
     storage: 'Unable to save data. Allow browser storage and try again.',
     unavailable: 'Encryption unavailable. Open this page on localhost or HTTPS.',
-    generic: 'Something went wrong. Please try again.', logout: 'Leave game', training: 'Training grounds',
-    player: 'Player', controls: 'WASD / arrows, or click and tap the ground to move', placeholder: 'Prototype scene · Placeholder art',
-    loading: 'Opening the world…', worldTitle: 'MYTHRAVEN / TRAINING GROUNDS', session: 'LOCAL SESSION · SINGLE PLAYER',
+    generic: 'Something went wrong. Please try again.', logout: 'Leave game',
+    loading: 'Opening the world…',
   },
 } as const;
 export type Locale = keyof typeof messages;

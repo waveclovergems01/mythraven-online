@@ -11,7 +11,7 @@
     "test:e2e": "playwright test",
     "dev:client": "vite",
     "dev:server": "node server/index.mjs",
-    "test:server": "node --test server/auth.test.mjs server/world.test.mjs server/pathfinding.test.mjs server/terrain-room.test.mjs server/world-time.test.mjs",
+    "test:server": "node --test server/auth.test.mjs server/pathfinding.test.mjs server/terrain-room.test.mjs server/world-time.test.mjs",
     "dev:game": "node server/game.mjs"
   },
   "dependencies": {
@@ -23,7 +23,6 @@
     "express": "^5.3.0",
     "express-rate-limit": "^8.7.1",
     "google-auth-library": "^11.2.0",
-    "phaser": "3.90.0",
     "three": "^0.187.0"
   },
   "devDependencies": {

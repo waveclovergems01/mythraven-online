@@ -1,8 +1,6 @@
 # Mythraven Online
 
-ล่าสุด 2026-11-12: ฉากเมือง 3D เชื่อม Multiplayer ผ่าน Colyseus แล้ว เปิดสองหน้าต่างเข้า Guest เพื่อเห็นกันและเดินร่วมกัน คลิกซ้ายเดิน กล้องมุมเฉียงคงที่ตามตัวเอง เซิร์ฟเวอร์คุมตำแหน่ง ความเร็ว และร่องน้ำ มีป้ายชื่อ จำนวนคนออนไลน์ และเชื่อมต่อใหม่ เมืองหนึ่งตั้งเพดาน 64 คน (ทดสอบการเชื่อมต่อครบ 64 คนแล้ว); เมื่อเต็มจะเปิดอีก instance ยังรันบนเครื่องและยังไม่มีตัวละครถาวร ดู [วิธีทดสอบออนไลน์](docs/MULTIPLAYER_LOCAL.md) และ [สเกล terrain](docs/TERRAIN_3D.md) เมือง Phaser เดิมยังเปิดเทียบได้ที่ `/?view=2d`
-
-ต้นแบบเกมเว็บ TypeScript + Vite สำหรับรันบนเครื่อง ใช้ Three.js สำหรับพื้นเมือง 3D และเก็บเมือง Phaser เป็นฉากเทียบระหว่างย้ายระบบ หน้าล็อกอินยังใช้ภาพแฟนตาซีเดิม
+เกมเว็บ TypeScript + Vite ใช้ Three.js แสดงโลก 3D และ Colyseus สำหรับเล่นหลายคนบนเครื่องเดียวกัน ดู [วิธีทดสอบออนไลน์](docs/MULTIPLAYER_LOCAL.md) และ [สเกล terrain](docs/TERRAIN_3D.md)
 
 ## เริ่มเล่นบน local
 
@@ -20,12 +18,9 @@ npm.cmd run dev
 
 ## การควบคุม
 
-- WASD / ลูกศรเพื่อเดิน หรือคลิก/แตะพื้นเพื่อเดินไปจุดนั้น
-- กดคีย์เพื่อยกเลิกจุดหมายจากการคลิก
-- เดินหน้า/หลังต้นไม้เพื่อดูการเรียงภาพตามตำแหน่งเท้า
-- ต้นไม้เป็นของตกแต่ง ยังไม่มี collision หรือ pathfinding
-- รีเฟรชแล้วกลับจุดเริ่มต้น ยังไม่มีระบบบันทึกหรือ multiplayer
-- ภาพนี้เป็นฉากทดสอบ ไม่ใช่คุณภาพภาพเป้าหมายหรือ sprite animation ชุดจริง
+- เลือกตัวละครหลังล็อกอิน แล้วคลิกหรือแตะพื้นเพื่อเดิน
+- ลากเมาส์ขวาเพื่อหมุนกล้อง และหมุนล้อเมาส์เพื่อซูม
+- เปิดสองแท็บเข้า Guest แล้วเลือกตัวละครในแต่ละแท็บเพื่อทดลองเล่นพร้อมกัน
 
 ## ตรวจสอบและ build
 
@@ -48,13 +43,12 @@ npm.cmd run dev -- --host 0.0.0.0
 
 ## โครงสร้าง
 
-- src/main.ts — ตั้งค่าเกมและ canvas
-- src/scenes/WorldScene.ts — ฉากทดลอง ตัวละคร input และ depth sorting
+- src/main.ts — หน้าล็อกอิน หน้าเลือกตัวละคร และการเปลี่ยนฉาก
+- src/terrain/TerrainWorld.ts — ฉาก Three.js และการควบคุม
 - src/style.css — หน้าจอรอบเกม
 - index.html — ข้อความ UI ภาษาไทย
 - public/assets/ — ที่เก็บภาพและเสียงภายหลัง อ้าง URL ด้วย /assets/...
 
-เลือก Phaser 3.90 แบบระบุเวอร์ชันเพื่อให้ฐาน API คงที่ ไม่ใช่ Phaser รุ่นล่าสุด
 มีบัญชีทดลองและ Guest ที่เก็บบนเบราว์เซอร์แล้ว ยังไม่รวมบัญชีบนเซิร์ฟเวอร์ multiplayer ฐานข้อมูล gem skill tree Electron หรือ deploy
 เก็บ package-lock.json ใน Git เมื่อต้องการนำโปรเจกต์ขึ้น repository
 
@@ -62,7 +56,7 @@ npm.cmd run dev -- --host 0.0.0.0
 
 ก่อน generate หรือเพิ่มภาพในเกม ให้อ่าน [Art Bible](docs/art/ART_BIBLE.md), [Asset / Sprite Spec](docs/art/ASSET_SPEC.md) และ [Prompt Templates](docs/art/PROMPT_TEMPLATES.md)
 ทุกประเภทใช้ style ID MR-ART-v1 เดียวกัน คำแนะนำอัตโนมัติของโปรเจกต์อยู่ใน [AGENTS.md](AGENTS.md)
-ภาพอ้างอิงทิศทางภาพเดิมอธิบายไว้ใน [visual references](docs/art/references/README.md) ตัวละครที่อนุมัติแล้วให้ใช้ภาพ idle และ walk จาก public/assets/characters เป็นหลัก ดูรายการต้นฉบับที่ยังจำเป็นใน [art](art/README.md)
+ภาพอ้างอิงทิศทางภาพเดิมอธิบายไว้ใน [visual references](docs/art/references/README.md) ตัวละครในเกมใช้โมเดลจาก public/assets/models/characters ดูรายการต้นฉบับที่ยังจำเป็นใน [art](art/README.md)
 ## หน้าเข้าสู่ระบบ
 
 เมาส์ใช้ภาพ PNG แฟนตาซี 40×40: ลูกศรปกติและมือเกราะเมื่อชี้ปุ่ม รองรับเมาส์บนหน้าเว็บและ canvas เกม ช่องข้อความคง text cursor และปุ่ม disabled คง not-allowed; ปุ่ม Google ใน iframe และหน้าต่างเลือกบัญชีใช้ cursor ของ Google

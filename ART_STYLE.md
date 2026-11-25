@@ -1,5 +1,7 @@
 # ART_STYLE.md — Asset Style Guide & Generation Template
 
+> The 2D runtime was retired on 2026-11-25. References in earlier entries to the Phaser scene, sprite atlases and its map layers are historical. See the repository art inventory for active sources.
+
 ## Archer energy arrow · 2026-11-24
 
 Owner supplies Blender draw-pose screenshots and `Luminous Energy Arrow.png` as direction for a red luminous magical arrow, scoped to Archer/bow attacks. Use code-native crossed shader planes with a bright shaft, pointed head and tail fins; do not modify the GLBs or import the screenshot as a texture. During authored frames 2–6 of the ten-frame bow clip, the tail follows the actual weighted string nock and the tip extends slightly through `DEF-hold.L`. The string's vertices blend hold/tweak bones; the distant control-bone origin is not the nock. Release after frame six and render a fast targeted projectile, with the established impact flash/damage only on arrival. Preserve the supplied raster files as external references; no generated art or broader appearance approval is implied.

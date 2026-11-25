@@ -1,5 +1,7 @@
 # Mythraven Art Bible
 
+> The 2D runtime was retired on 2026-11-25. References in earlier entries to the Phaser scene, sprite atlases and its map layers are historical. See the repository art inventory for active sources.
+
 Current plaza fountain revision: place the 9-unit source model at 2.5 uniform scale (22.5 high, about 38.4 across). Its circular collision and plaza inlay follow the enlarged footprint. Clear sea-blue water shows the stone beneath. Shallow traveling waves and ripples from the urn impact deform the surface, replacing the earlier bright caustic spots and separate ripple rings.
 
 > Owner angel-fountain follow-up, 2026-11-15: the supplied winged-statue fountain fills the former central reserve. Preserve its proportions, painted PBR and exact paired emissive texture. Add subdued blue-green water confined to the modeled basin, one curved urn-to-basin stream and gentle impact ripples. Respect scene day/night light and reduced motion. This supersedes the earlier empty-center instruction below.

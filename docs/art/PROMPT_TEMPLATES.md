@@ -1,5 +1,7 @@
 # Image generation templates — MR-ART-v1
 
+> The 2D runtime was retired on 2026-11-25. References in earlier entries to the Phaser scene, sprite atlases and its map layers are historical. See the repository art inventory for active sources.
+
 > Angel fountain water, 2026-11-15: supplied GLB and paired emissive are integrated directly. Basin contour, curved stream and ripples use code-native geometry/materials; no raster generation prompt applies. Preserve original source maps.
 
 > City streets, 2026-11-15 supersedes bridge-atlas reuse below: use built-in image generation with the actual rendered owner-building contact sheet attached as a palette/style reference. Generate only seamless top-down warm-grey limestone cobblestones, narrow taupe mortar, staggered small rectangles, soft painted low-contrast albedo, flat illumination, no perspective/objects/text/borders/vignette. Runtime scale is 8 metres per image. Preserve owner GLB textures and emissive pairs; no generative changes to buildings.

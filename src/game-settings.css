@@ -37,6 +37,5 @@
 .settings-footer .leave { width: 100%; padding: 12px; color: #e9c0a3; background: #392d26; border: 1px solid #987258; border-radius: 5px; }
 .settings-footer .leave:hover { background: #50372c; }
 .settings-dialog #game-error:not(:empty) { position: static; padding: 8px; margin-bottom: 10px; }
-.game-page:has(.game-settings) .game-footer { right: 80px; }
 .game-settings button:focus-visible, .settings-dialog input:focus-visible { outline: 2px solid var(--settings-gold); outline-offset: 3px; }
-@media(max-width:600px) { .settings-gear { right: 8px; bottom: 8px; width: 44px; height: 44px; } .settings-menu { right: 8px; bottom: 62px; } .game-page:has(.game-settings) .game-footer { right: 66px; } }
+@media(max-width:600px) { .settings-gear { right: 8px; bottom: 8px; width: 44px; height: 44px; } .settings-menu { right: 8px; bottom: 62px; } }

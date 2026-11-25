@@ -1,8 +1,10 @@
 # Current art integration
 
+> The 2D runtime was retired on 2026-11-25. References in earlier entries to the Phaser scene, sprite atlases and its map layers are historical. See the repository art inventory for active sources.
+
 ## City ground moves to 3D — 2026-11-11
 
-The owner requested a ground-only 3D version of the existing town, approximately 500 × 500 units, with river channels. The default scene now uses real heightfield geometry and water; the old plan is preserved without stretching. Warm muted materials and an elevated orthographic camera carry the visual direction forward. Character, prop and login assets keep their existing classifications. No raster approval or complete 3D asset library is implied. The legacy town remains an active `?view=2d` comparison. See [terrain contract and cleanup audit](../TERRAIN_3D.md).
+The owner requested a ground-only 3D version of the existing town, approximately 500 × 500 units, with river channels. The default scene now uses real heightfield geometry and water; the old plan is preserved without stretching. Warm muted materials and an elevated orthographic camera carry the visual direction forward. Character, prop and login assets keep their existing classifications. No raster approval or complete 3D asset library is implied. The former 2D comparison was retired in November 2026. See [terrain contract and cleanup audit](../TERRAIN_3D.md).
 
 ART_STYLE.md is authoritative; the latest owner corrections override old checker and version-retention defaults.
 

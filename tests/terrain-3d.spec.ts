@@ -26,7 +26,7 @@ test('novice appears at login, walks on left click and follows with a resettable
   expect(start.screen[0]).toBeCloseTo(720, 0);
   expect(start.screen[1]).toBeGreaterThan(460);
   await expect(page.locator('.terrain-toolbar')).toHaveCount(0);
-  await expect(page.locator('.game-footer')).toContainText('Left-click');
+  await expect(page.locator('.game-footer')).toHaveCount(0);
   await page.screenshot({ path: 'test-results/terrain-3d/player-spawn.png' });
 
   await page.mouse.click(start.screen[0] + 190, start.screen[1] + 45);
@@ -130,8 +130,14 @@ test('logout while terrain data loads does not mount a stale renderer', async ({
   let release: (() => void) | undefined;
   const pending = new Promise<void>(resolve => { release = resolve; });
   await page.route('**/assets/maps/mythraven-land.png', async route => { await pending; await route.continue(); });
-  await page.goto('/'); await page.locator('#guest').click(); await chooseCharacter(page);
-  await openSettings(page); await page.locator('#logout').click(); release!();
+  await page.goto('/'); await page.locator('#guest').click();
+  await page.locator('input[name="character"][value="novice-male-01"]').check();
+  const shoreline = page.waitForRequest('**/assets/maps/mythraven-land.png');
+  await page.locator('#enter-city').click();
+  await shoreline;
+  // The loading screen covers the settings controls. Exercise the logout handler directly.
+  await page.locator('#logout').evaluate((button: HTMLButtonElement) => button.click());
+  release!();
   await expect(page.locator('#guest')).toBeVisible(); await page.waitForTimeout(500);
   await expect(page.locator('canvas')).toHaveCount(0);
 });

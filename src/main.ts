@@ -130,14 +130,11 @@ async function runAuth(action:()=>Promise<Session>): Promise<void> {
 async function signOut(session: Session): Promise<void> {
   if(session.kind==='google') await googleLogout();
   try { logout(); } catch(error) { if(session.kind!=='google') throw error; }
-  window.dispatchEvent(new Event('mythraven:leave'));
   game?.destroy(true); game=null; selection?.destroy(); selection=undefined; errorKey=null;
   if(session.kind==='google') { window.location.reload(); return; }
   renderAuth();
 }
 async function afterAuthentication(session: Session): Promise<void> {
-  // The explicit legacy comparison keeps its original sprite workflow.
-  if(new URLSearchParams(location.search).get('view')==='2d') return showGame(session);
   await showCharacterSelection(session);
 }
 async function showCharacterSelection(session: Session, message?: string): Promise<void> {
@@ -167,13 +164,13 @@ async function showCharacterSelection(session: Session, message?: string): Promi
   },()=>signOut(session),savedHairColor);
   if(message) app.querySelector('#character-error')!.textContent=message;
 }
-async function showGame(session: Session, character?: CharacterDefinition, assets?: PreparedCharacters,
+async function showGame(session: Session, character: CharacterDefinition, assets: PreparedCharacters | undefined,
   area: import('../shared/west-march.mjs').Area = 'city', fromWest = false, hairColor = ''): Promise<void> {
   stopFittingAuth?.();
   stopFittingAuth = undefined;
   const version=++viewVersion;
   music.setPlaylist(area === 'west-march' ? 'battle' : 'town');
-  app.innerHTML=`<main class="game-page"><header class="game-header"><div><div class="mini-brand">MYTHRAVEN <span>ONLINE</span></div><p>${t('city')} · <span id="player-name"></span></p></div></header><div id="game" aria-label="${t('city')}"><p class="loading">${t('loading')}</p></div><footer class="game-footer"><span>${t('cityControls')}</span><span>${t('cityNote')}</span></footer><button class="leave" id="logout">${t('logout')}</button><p id="game-error" class="error" role="alert"></p></main>`;
+  app.innerHTML=`<main class="game-page"><header class="game-header"><div><div class="mini-brand">MYTHRAVEN <span>ONLINE</span></div><p>${t('city')} · <span id="player-name"></span></p></div></header><div id="game" aria-label="${t('city')}"><p class="loading">${t('loading')}</p></div><button class="leave" id="logout">${t('logout')}</button><p id="game-error" class="error" role="alert"></p></main>`;
   app.querySelector('#player-name')!.textContent=session.username;
   if(area==='west-march'){
     const name=locale()==='th'?'ทุ่งชายแดนตะวันตก':'West March';
@@ -181,9 +178,7 @@ async function showGame(session: Session, character?: CharacterDefinition, asset
     app.querySelector('#game')!.setAttribute('aria-label',name);
     app.querySelector('.loading')!.textContent=locale()==='th'?'กำลังเข้าสู่ทุ่งชายแดน…':'Entering West March…';
   }
-  if(new URLSearchParams(location.search).get('view')!=='2d') {
-    mountGameSettings(app.querySelector<HTMLElement>('.game-page')!,locale()==='th',music);
-  }
+  mountGameSettings(app.querySelector<HTMLElement>('.game-page')!,locale()==='th',music);
   app.querySelector('#logout')!.addEventListener('click',async()=>{
     const button=app.querySelector<HTMLButtonElement>('#logout')!; button.disabled=true;
     try {
@@ -193,15 +188,13 @@ async function showGame(session: Session, character?: CharacterDefinition, asset
       app.querySelector('#game-error')!.textContent=t(error instanceof GoogleAuthError?error.code:'storage');
     }
   });
-  // The old town remains an explicit comparison route during the terrain migration.
-  if(new URLSearchParams(location.search).get('view')!=='2d') {
-    const loading=mountSceneLoading(app.querySelector<HTMLElement>('.game-page')!,locale()==='th',area==='west-march');
-    try {
+  const loading=mountSceneLoading(app.querySelector<HTMLElement>('.game-page')!,locale()==='th',area==='west-march');
+  try {
     await loading.artworkReady;
     const {mountTerrainWorld}=await import('./terrain/TerrainWorld');
     loading.complete('module');
     if(version!==viewVersion) { assets?.dispose(); loading.finish();return; }
-    const terrain=await mountTerrainWorld(app.querySelector<HTMLElement>('#game')!,session.username,character?.id,assets,area,fromWest,next=>{
+    const terrain=await mountTerrainWorld(app.querySelector<HTMLElement>('#game')!,session.username,character.id,assets,area,fromWest,next=>{
       if(version!==viewVersion) return;
       game?.destroy(true); game=null;
       void showGame(session,character,undefined,next,next==='city',hairColor).catch(()=>{
@@ -213,16 +206,9 @@ async function showGame(session: Session, character?: CharacterDefinition, asset
     try { await terrain.ready; }
     catch(error){terrain.destroy();if(game===terrain)game=null;throw error;}
     loading.finish();
-    } catch(error){loading.finish();throw error;}
-    return;
-  }
-  const [{default:Phaser},{WorldScene}]=await Promise.all([import('phaser'),import('./scenes/WorldScene')]);
-  if(version!==viewVersion) return;
-  app.querySelector('.loading')?.remove();
-  game=new Phaser.Game({type:Phaser.AUTO,parent:'game',backgroundColor:'#243b36',
-    scale:{mode:Phaser.Scale.RESIZE,width:app.querySelector<HTMLElement>('#game')!.clientWidth,height:app.querySelector<HTMLElement>('#game')!.clientHeight},
-    scene:[WorldScene],render:{antialias:true}});
+  } catch(error){loading.finish();throw error;}
 }
+
 async function start():Promise<void> {
   // Verify the server cookie before considering any untrusted demo-browser session.
   let verified:Session|null=null;

@@ -1,13 +1,13 @@
 # Multiplayer local — Mythraven Online
 
-สถานะ 2026-11-12: ฉาก 3D เริ่มเป็นโลกออนไลน์ร่วมกันแล้ว เป็นฐานสำหรับต่อระบบ MMO ต่อไป ค่าเริ่มต้นคือ `mythraven-world`; ฉาก Phaser เก่าแยกอยู่ที่ `?view=2d` และ room `mythraven-town`.
+สถานะ 2026-11-12: ฉาก 3D เริ่มเป็นโลกออนไลน์ร่วมกันแล้ว เป็นฐานสำหรับต่อระบบ MMO ต่อไป เมืองใช้ room `mythraven-world` และทุ่งชายแดนใช้ `mythraven-west-march`.
 
 ## ทดลองสองจอ
 
 ใช้ `npm run dev` เพื่อเปิด Vite (5273), auth (5274) และ Colyseus (5275) พร้อมกัน หากมี dev เดิมอยู่ ให้หยุดชุดเดิมก่อนเริ่มใหม่ ห้ามเปิดเซิร์ฟเวอร์พอร์ตเดียวกันซ้ำ
 
 1. เปิด http://127.0.0.1:5273/ สองแท็บหรือสองหน้าต่าง Chrome/Edge
-2. กด Guest ในแต่ละหน้าต่าง แต่ละ connection จะได้ sessionId ของตัวเองจากเซิร์ฟเวอร์
+2. กด Guest แล้วเลือกตัวละครในแต่ละหน้าต่าง แต่ละ connection จะได้ sessionId ของตัวเองจากเซิร์ฟเวอร์
 3. ดูแถบออนไลน์: ทั้งสองจอต้องอยู่ห้องเดียวกันและเห็น 2 คน
 4. คลิกซ้ายบนพื้นเพื่อเดิน แล้วดูตัวละครขยับในอีกหน้าต่าง กล้องมุมเฉียงตามตัวเอง ปิดแพน/หมุน/คลิกขวา
 5. กดออกจากเกม ตัวละครนั้นจะถูกลบจากห้องและอีกหน้าต่าง
@@ -36,7 +36,7 @@ terrain กลางขนาด 500 × 500 หน่วย ใช้กริ�
 
 ข้อมูล guest/login demo ใช้ sessionStorage เพื่อแยกแท็บ (บัญชี demo ยังเก็บใน localStorage). เซิร์ฟเวอร์ไม่ใช้ข้อมูลเหล่านี้เป็นหลักฐานยืนยันบัญชี ทุก connection มี sessionId ชั่วคราวจากเซิร์ฟเวอร์ แม้เข้าเว็บผ่าน Google ก็ยังไม่ได้โหลดตัวละครถาวร ชื่อที่ส่งมาถูกจำกัดความยาวและแสดงเป็นข้อความเท่านั้น เป็น display label ที่ไม่ให้สิทธิ์หรือยืนยันเจ้าของบัญชี
 
-เมือง 3D จำกัด 64 connections ต่อ room; เมื่อเต็ม matchmaking เปิด instance แยก ผู้เล่นข้าม instance ยังไม่เห็นกัน ทดสอบ 64 connections พร้อมการเดินและคนที่ 65 แยกห้องผ่านแล้ว เป็น capacity smoke test ไม่ใช่ benchmark MMO ขนาดใหญ่ ยังไม่บันทึกตำแหน่ง/เลเวล/ไอเทม; reconnect กลับเป็น session ใหม่ และปิดเซิร์ฟเวอร์ข้อมูลห้องหาย เมือง 2D เก่ายังจำกัด 32 คนตามเดิม
+เมือง 3D จำกัด 64 connections ต่อ room; เมื่อเต็ม matchmaking เปิด instance แยก ผู้เล่นข้าม instance ยังไม่เห็นกัน ทดสอบ 64 connections พร้อมการเดินและคนที่ 65 แยกห้องผ่านแล้ว เป็น capacity smoke test ไม่ใช่ benchmark MMO ขนาดใหญ่ ยังไม่บันทึกตำแหน่ง/เลเวล/ไอเทม; reconnect กลับเป็น session ใหม่ และปิดเซิร์ฟเวอร์ข้อมูลห้องหาย
 
 ## แนะนำฐานข้อมูล
 
@@ -68,16 +68,6 @@ Cloudflare Git integration สามารถ build/deploy จาก GitHub ไ�
 - `tests/terrain-multiplayer.spec.ts`: สอง browser contexts, late join, disconnect/reconnect, 64 connections และ overflow
 
 ผลตรวจ 2026-11-12: build/typecheck ผ่าน, server tests 26 ข้อผ่าน, auth 6 ข้อ, terrain/control 3 ข้อ และ multiplayer 2 ข้อผ่านในชุดทดสอบที่เลือก ภาพจากสองมุมมองอยู่ใน `test-results/terrain-online` ไม่มีการ deploy หรือเปิดพอร์ตออก LAN/Internet
-
-ฉาก Phaser ที่เก็บไว้เทียบ:
-
-- server/game.mjs: เริ่ม Colyseus และอ่าน navigation mask
-- server/town-room.mjs: room, schema, movement simulation, join/leave
-- shared/: กริด พิกัด และพื้นที่ชนร่วม
-- src/network/town-client.ts: connection และ snapshots
-- src/world/player-view.ts: ภาพผู้เล่น
-- src/scenes/WorldScene.ts: แสดงสถานะเซิร์ฟเวอร์และรับ input
-- npm run test:server / npm run build / npx playwright test
 
 แหล่งข้อมูลทางการ ตรวจ 2026-10-14:
 - https://docs.colyseus.io/server

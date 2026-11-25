@@ -284,7 +284,6 @@ export async function mountTerrainWorld(host: HTMLElement, displayName = '', cha
   host.querySelector('.loading')?.remove(); host.append(canvas, status, hint, panel);
   host.dataset.renderer = 'three'; host.dataset.terrainSize = String(TERRAIN.size);
   host.dataset.area=area;
-  host.parentElement?.querySelector('.game-footer')?.remove();
   const pendingModels = new Set<string>(), failedModels = new Set<string>();
   const weaponAssets=new Map<Weapon,Awaited<ReturnType<CharacterAssets['loadWeapon']>>>();
   const job=characterById(characterId)!.classId as Job;

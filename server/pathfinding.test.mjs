@@ -1,8 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {shortestPath,canStep} from '../shared/pathfinding.mjs';
-import {TownRoom} from './town-room.mjs';
-import {configureNavigation,centerOf} from '../shared/town-grid.mjs';
 const options=(blocked=[])=>({columns:12,rows:12,width:64,height:56,walkable:c=>!blocked.some(b=>b.x===c.x&&b.y===c.y)});
 const length=(from,path)=>path.reduce((sum,p)=>{const d=Math.hypot((p.x-from.x)*64,(p.y-from.y)*56);from=p;return sum+d;},0);
 test('0,0 to 9,9 takes nine diagonal steps, not an L',()=>{
@@ -32,16 +30,5 @@ test('A* gives minimum world-distance cost around obstacles',()=>{
   }
   const route=shortestPath(start,end,o);
   if(!Number.isFinite(expected))assert.equal(route.length,0);else assert.ok(Math.abs(length(start,route)-expected)<1e-6);
- }
-});
-test('server movement consumes the same distance budget in straight and diagonal directions',()=>{
- configureNavigation({width:1,height:1,data:new Uint8Array([255,255,255,255])});
- for(const direction of [{x:1,y:0},{x:1,y:1}]){
-  // The southern court has a full 420-unit run in both directions. The spawn
-  // approach now borders enlarged gardens, so it cannot isolate movement speed.
-  const cell={x:122,y:132},start=centerOf(cell),p={...start},m={cell,path:[],target:null,direction,directionUntil:Infinity};
-  const room={movers:new Map([['p',m]]),state:{players:new Map([['p',p]])}};
-  for(let i=0;i<20;i++)TownRoom.prototype.tick.call(room,50);
-  assert.ok(Math.abs(Math.hypot(p.x-start.x,p.y-start.y)-420)<1e-5);
  }
 });

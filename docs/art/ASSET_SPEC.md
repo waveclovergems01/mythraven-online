@@ -1,5 +1,7 @@
 # Asset and sprite contract — MR-ART-v1
 
+> The 2D runtime was retired on 2026-11-25. References in earlier entries to the Phaser scene, sprite atlases and its map layers are historical. See the repository art inventory for active sources.
+
 ## Loading-screen illustrations — 2026-11-23
 
 Owner-supplied backgrounds live in `public/assets/loading/*.png`. `shared/loading-art.json` is the runtime registry of seven original filenames, normalized runtime paths and exact dimensions (1671/1672 × 941). Copies are hash-verified against the supplied Downloads files with no pixel changes. All seven are used by the loading-screen rotation; none supersedes existing login or character imagery. Desktop/mobile CSS uses centered cover cropping and a dark lower gradient for readable real text and progress. QA screenshots belong in `test-results/loading`. No generated candidates, extra source copies or exporters are retained, and no obsolete image was replaced.
