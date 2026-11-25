@@ -56,7 +56,7 @@ npm.cmd run dev -- --host 0.0.0.0
 
 ก่อน generate หรือเพิ่มภาพในเกม ให้อ่าน [Art Bible](docs/art/ART_BIBLE.md), [Asset / Sprite Spec](docs/art/ASSET_SPEC.md) และ [Prompt Templates](docs/art/PROMPT_TEMPLATES.md)
 ทุกประเภทใช้ style ID MR-ART-v1 เดียวกัน คำแนะนำอัตโนมัติของโปรเจกต์อยู่ใน [AGENTS.md](AGENTS.md)
-ภาพอ้างอิงทิศทางภาพเดิมอธิบายไว้ใน [visual references](docs/art/references/README.md) ตัวละครในเกมใช้โมเดลจาก public/assets/models/characters ดูรายการต้นฉบับที่ยังจำเป็นใน [art](art/README.md)
+ตัวละครในเกมใช้โมเดลจาก public/assets/models/characters ดูรายการต้นฉบับที่ยังจำเป็นใน [art](art/README.md)
 ## หน้าเข้าสู่ระบบ
 
 เมาส์ใช้ภาพ PNG แฟนตาซี 40×40: ลูกศรปกติและมือเกราะเมื่อชี้ปุ่ม รองรับเมาส์บนหน้าเว็บและ canvas เกม ช่องข้อความคง text cursor และปุ่ม disabled คง not-allowed; ปุ่ม Google ใน iframe และหน้าต่างเลือกบัญชีใช้ cursor ของ Google
